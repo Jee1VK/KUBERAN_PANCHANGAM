@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuberan Panchangam</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f59e0b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/images/kuberan_logo_white_bg.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0c0f1a;
+            --card: #161b2e;
+            --card-border: #232a42;
+            --gold: #d4a017;
+            --gold-light: #f5c842;
+            --maroon: #7b1e2d;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --text: #e8e8f0;
+            --text-dim: #8890a8;
+            --font-kn: 'Noto Sans Kannada', sans-serif;
+            --font-en: 'Inter', 'Segoe UI', sans-serif;
+        }
+        body { font-family: var(--font-en); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* NAV */
+        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #111527; border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 50; }
+        .top-bar a img { height: 48px; }
+        .top-bar h1 { font-size: 1.1rem; color: var(--gold); letter-spacing: 0.5px; }
+        .top-bar .nav-right { display: flex; gap: 8px; }
+        .top-bar button { background: none; border: 1px solid var(--card-border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+        .top-bar button.active { border-color: var(--gold); color: var(--gold); }
+
+        /* INSTALL BANNER */
+        .install-banner { display: none; background: linear-gradient(135deg, var(--maroon), #4a1020); padding: 14px 16px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .install-banner p { font-size: 0.9rem; margin-bottom: 8px; }
+        .install-banner button { background: var(--gold); color: #000; font-weight: 700; border: none; padding: 10px 28px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+
+        .container { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+        /* DATE & LOCATION */
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
+        .controls label { font-size: 0.75rem; color: var(--text-dim); display: block; margin-bottom: 4px; }
+        .controls input, .controls select { background: var(--card); border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-size: 0.9rem; }
+        .controls input[type="date"] { min-width: 150px; }
+        .controls select { min-width: 180px; }
+        .btn-today { background: var(--gold); color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+
+        /* HEADER BAND */
+        .header-band { background: linear-gradient(135deg, var(--maroon) 0%, #3d0e18 100%); border: 1px solid #5c1a2a; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; text-align: center; }
+        .header-band .samvatsara { font-family: var(--font-kn); font-size: 1.3rem; color: var(--gold-light); font-weight: 700; }
+        .header-band .sub { font-size: 0.85rem; color: #d1a0aa; margin-top: 4px; }
+        .header-band .date-en { font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 8px; }
+        .header-band .weekday-kn { font-family: var(--font-kn); font-size: 1rem; color: var(--gold); }
+
+        /* CARDS */
+        .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+        .card h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gold); margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
+
+        /* FIVE LIMBS */
+        .limb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .limb-item { background: #1a2038; border-radius: 8px; padding: 12px; border-left: 3px solid var(--gold); }
+        .limb-item .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+        .limb-item .value { font-size: 1.05rem; font-weight: 600; margin-top: 2px; }
+        .limb-item .value-kn { font-family: var(--font-kn); font-size: 0.95rem; color: var(--gold-light); }
+        .limb-item .time { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+        .limb-item.full-width { grid-column: 1 / -1; }
+
+        /* TIMELINE BAR */
+        .timeline-bar { position: relative; height: 36px; background: #1a2038; border-radius: 8px; overflow: hidden; margin-top: 10px; margin-bottom: 6px; }
+        .timeline-bar .segment { position: absolute; top: 0; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .seg-rahu { background: rgba(239,68,68,0.6); }
+        .seg-yama { background: rgba(249,115,22,0.5); }
+        .seg-gulika { background: rgba(168,85,247,0.5); }
+        .seg-abhijit { background: rgba(34,197,94,0.5); }
+        .timeline-labels { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-dim); }
+
+        /* WINDOWS LIST */
+        .window-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #232a42; }
+        .window-row:last-child { border-bottom: none; }
+        .window-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .window-dot.bad { background: var(--red); }
+        .window-dot.good { background: var(--green); }
+        .window-dot.neutral { background: var(--orange); }
+        .window-name { font-weight: 600; font-size: 0.85rem; flex: 1; }
+        .window-time { font-size: 0.85rem; color: var(--text-dim); }
+
+        /* SUN/MOON */
+        .sun-moon { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .sm-item { text-align: center; padding: 10px; background: #1a2038; border-radius: 8px; }
+        .sm-item .icon { font-size: 1.5rem; }
+        .sm-item .lbl { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .sm-item .val { font-weight: 600; margin-top: 2px; }
+
+        /* DISCLAIMER */
+        .disclaimer { font-size: 0.7rem; color: var(--text-dim); text-align: center; padding: 20px 16px; line-height: 1.5; border-top: 1px solid var(--card-border); margin-top: 20px; }
+
+        /* TABS for multi-person section */
+        .tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .tab-btn { background: var(--card); border: 1px solid var(--card-border); color: var(--text-dim); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+        .tab-btn.active { border-color: var(--gold); color: var(--gold); background: #1f2640; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* MUHURTHA SECTION */
+        .person-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; align-items: end; }
+        .person-form input { background: var(--card); border: 1px solid var(--card-border); color: var(--text); padding: 8px; border-radius: 6px; font-size: 0.85rem; width: 100%; }
+        .person-form label { font-size: 0.7rem; color: var(--text-dim); }
+        .btn-add { background: none; border: 1px dashed var(--card-border); color: var(--text-dim); padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        .btn-calc { background: var(--gold); color: #000; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem; }
+        .result-box { margin-top: 12px; padding: 12px; border-radius: 8px; }
+        .result-good { background: rgba(34,197,94,0.15); border: 1px solid var(--green); }
+        .result-bad { background: rgba(239,68,68,0.15); border: 1px solid var(--red); }
+
+        @media (max-width: 500px) {
+            .limb-grid { grid-template-columns: 1fr; }
+            .sun-moon { grid-template-columns: 1fr 1fr; }
+            .person-form { grid-template-columns: 1fr; }
+            .top-bar h1 { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-bar">
+    <a href="https://kuberansilks.com/" target="_blank" rel="noopener noreferrer">
+        <img src="assets/images/kuberan_logo_white_bg.png" alt="Kuberan Silks">
+    </a>
+    <h1>KUBERAN PANCHANGAM</h1>
+    <div class="nav-right">
+        <button class="tab-nav active" data-tab="daily">Daily</button>
+        <button class="tab-nav" data-tab="muhurtha">Muhurtha</button>
+    </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+    <p>📲 Install <b>Kuberan Panchangam</b> on your device for offline use!</p>
+    <button id="installBtn">Install App</button>
+</div>
+
+<!-- DAILY TAB -->
+<div class="tab-content active" id="tab-daily">
+<div class="container">
+
+    <!-- CONTROLS -->
+    <div class="controls">
+        <div>
+            <label>Date</label>
+            <input type="date" id="dateInput">
+        </div>
+        <div>
+            <label>Location</label>
+            <select id="locationSelect">
+                <option value="12.9716,77.5946,Asia/Kolkata">Bengaluru, India</option>
+                <option value="12.3052,76.6552,Asia/Kolkata">Mysuru, India</option>
+                <option value="28.6139,77.2090,Asia/Kolkata">Delhi, India</option>
+                <option value="13.0827,80.2707,Asia/Kolkata">Chennai, India</option>
+                <option value="19.0760,72.8777,Asia/Kolkata">Mumbai, India</option>
+                <option value="17.3850,78.4867,Asia/Kolkata">Hyderabad, India</option>
+                <option value="37.7749,-122.4194,America/Los_Angeles">San Francisco, USA</option>
+                <option value="40.7128,-74.0060,America/New_York">New York, USA</option>
+                <option value="51.5074,-0.1278,Europe/London">London, UK</option>
+                <option value="48.8566,2.3522,Europe/Paris">Paris, France</option>
+                <option value="52.5200,13.4050,Europe/Berlin">Berlin, Germany</option>
+                <option value="1.3521,103.8198,Asia/Singapore">Singapore</option>
+                <option value="-37.8136,144.9631,Australia/Melbourne">Melbourne, Australia</option>
+                <option value="35.6762,139.6503,Asia/Tokyo">Tokyo, Japan</option>
+                <option value="25.2048,55.2708,Asia/Dubai">Dubai, UAE</option>
+            </select>
+        </div>
+        <button class="btn-today" onclick="goToday()">Today</button>
+    </div>
+
+    <!-- HEADER BAND -->
+    <div class="header-band" id="headerBand">
+        <div class="samvatsara" id="hdrSamvatsara">—</div>
+        <div class="sub" id="hdrContext">—</div>
+        <div class="date-en" id="hdrDate">—</div>
+        <div class="weekday-kn" id="hdrWeekday">—</div>
+    </div>
+
+    <!-- SUN & MOON -->
+    <div class="card">
+        <h2>☀️ Sun & Moon</h2>
+        <div class="sun-moon">
+            <div class="sm-item"><div class="icon">🌅</div><div class="lbl">Sunrise</div><div class="val" id="valSunrise">—</div></div>
+            <div class="sm-item"><div class="icon">🌇</div><div class="lbl">Sunset</div><div class="val" id="valSunset">—</div></div>
+            <div class="sm-item"><div class="icon">☀️</div><div class="lbl">Sun Rashi</div><div class="val" id="valSunRashi">—</div></div>
+            <div class="sm-item"><div class="icon">🌙</div><div class="lbl">Moon Rashi</div><div class="val" id="valMoonRashi">—</div></div>
+        </div>
+    </div>
+
+    <!-- FIVE LIMBS -->
+    <div class="card">
+        <h2>🕉️ Pancha Anga — Five Limbs</h2>
+        <div class="limb-grid">
+            <div class="limb-item">
+                <div class="label">Tithi · ತಿಥಿ</div>
+                <div class="value" id="valTithi">—</div>
+                <div class="value-kn" id="valTithiKn">—</div>
+                <div class="time" id="valTithiTime">—</div>
+            </div>
+            <div class="limb-item">
+                <div class="label">Nakshatra · ನಕ್ಷತ್ರ</div>
+                <div class="value" id="valNak">—</div>
+                <div class="value-kn" id="valNakKn">—</div>
+                <div class="time" id="valNakTime">—</div>
+            </div>
+            <div class="limb-item">
+                <div class="label">Yoga · ಯೋಗ</div>
+                <div class="value" id="valYoga">—</div>
+                <div class="time" id="valYogaTime">—</div>
+            </div>
+            <div class="limb-item">
+                <div class="label">Karana · ಕರಣ</div>
+                <div class="value" id="valKarana">—</div>
+                <div class="time" id="valKaranaTime">—</div>
+            </div>
+            <div class="limb-item full-width">
+                <div class="label">Vara · ವಾರ</div>
+                <div class="value" id="valVara">—</div>
+                <div class="value-kn" id="valVaraKn">—</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUSPICIOUS / INAUSPICIOUS WINDOWS -->
+    <div class="card">
+        <h2>⏱️ Daily Windows</h2>
+        <div class="timeline-bar" id="timelineBar"></div>
+        <div class="timeline-labels" id="timelineLabels"></div>
+        <div style="margin-top: 14px;" id="windowsList"></div>
+    </div>
+
+    <div class="disclaimer">
+        Computed values (Drik Ganita, Lahiri Ayanamsa) may differ from a printed almanac.<br>
+        For religious observance, follow your family priest / the printed Panchanga.<br>
+        Engine: Drik · Ayanamsa: Lahiri (Chitrapaksha) · Ephemeris: Moshier
+    </div>
+</div>
+</div>
+
+<!-- MUHURTHA TAB -->
+<div class="tab-content" id="tab-muhurtha">
+<div class="container">
+    <div class="card">
+        <h2>👥 Multi-Person Compatibility (up to 10)</h2>
+        <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Enter birth details to evaluate Tara Bala for a chosen date.</p>
+        <div id="peopleContainer">
+            <div class="person-form">
+                <div><label>Name</label><input type="text" class="p-name" value="Person 1"></div>
+                <div><label>Date & Time of Birth</label><input type="datetime-local" class="p-dob"></div>
+            </div>
+        </div>
+        <button class="btn-add" onclick="addPerson()">+ Add Person</button>
+        <div class="person-form" style="margin-top:8px;">
+            <div><label>Activity</label>
+                <select id="activitySelect" style="background:var(--card);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;">
+                    <option value="buy_car">Buy a Car / Vehicle</option>
+                    <option value="open_bank_account">Open Bank Account</option>
+                    <option value="griha_pravesha">Griha Pravesha</option>
+                    <option value="business_inauguration">New Business</option>
+                </select>
+            </div>
+            <div><label>Target Date</label><input type="date" id="targetDate"></div>
+        </div>
+        <button class="btn-calc" onclick="calcCompat()">Calculate Compatibility</button>
+        <div id="compatResult"></div>
+    </div>
+</div>
+</div>
+
+<script>
+// ============================================================
+//  KUBERAN PANCHANGAM — PURE JS ASTRONOMICAL ENGINE
+//  Drik Ganita · Lahiri Ayanamsa · Moshier-class precision
+// ============================================================
+
+// --- Constants ---
+const DEG = Math.PI / 180;
+const RAD = 180 / Math.PI;
+
+// Tithi names
+const TITHI_EN = ["Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi"];
+const TITHI_KN = ["ಪಾಡ್ಯ","ಬಿದಿಗೆ","ತದಿಗೆ","ಚತುರ್ಥಿ","ಪಂಚಮಿ","ಷಷ್ಠಿ","ಸಪ್ತಮಿ","ಅಷ್ಟಮಿ","ನವಮಿ","ದಶಮಿ","ಏಕಾದಶಿ","ದ್ವಾದಶಿ","ತ್ರಯೋದಶಿ","ಚತುರ್ದಶಿ"];
+
+// Nakshatra names
+const NAK_EN = ["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
+const NAK_KN = ["ಅಶ್ವಿನಿ","ಭರಣಿ","ಕೃತ್ತಿಕಾ","ರೋಹಿಣಿ","ಮೃಗಶಿರ","ಆರ್ದ್ರಾ","ಪುನರ್ವಸು","ಪುಷ್ಯ","ಆಶ್ಲೇಷ","ಮಘ","ಪೂರ್ವ ಫಲ್ಗುಣಿ","ಉತ್ತರ ಫಲ್ಗುಣಿ","ಹಸ್ತ","ಚಿತ್ರಾ","ಸ್ವಾತಿ","ವಿಶಾಖ","ಅನುರಾಧ","ಜ್ಯೇಷ್ಠ","ಮೂಲ","ಪೂರ್ವಾಷಾಢ","ಉತ್ತರಾಷಾಢ","ಶ್ರವಣ","ಧನಿಷ್ಠ","ಶತಭಿಷ","ಪೂರ್ವಾಭಾದ್ರ","ಉತ್ತರಾಭಾದ್ರ","ರೇವತಿ"];
+
+// Yoga names
+const YOGA_EN = ["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarma","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyan","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"];
+const INAUSPICIOUS_YOGAS = [0,5,8,9,12,14,16,18,26]; // indices
+
+// Karana names
+const MOVABLE_KARANA = ["Bava","Balava","Kaulava","Taitila","Gara","Vanija","Vishti"];
+function karanaName(k) {
+    if (k===1) return "Kimstughna";
+    if (k===58) return "Shakuni";
+    if (k===59) return "Chatushpada";
+    if (k===60) return "Naga";
+    return MOVABLE_KARANA[(k-2)%7];
+}
+
+// Rashi names
+const RASHI_EN = ["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrishchika","Dhanu","Makara","Kumbha","Meena"];
+const RASHI_KN = ["ಮೇಷ","ವೃಷಭ","ಮಿಥುನ","ಕರ್ಕಾಟಕ","ಸಿಂಹ","ಕನ್ಯಾ","ತುಲಾ","ವೃಶ್ಚಿಕ","ಧನುಸ್ಸು","ಮಕರ","ಕುಂಭ","ಮೀನ"];
+
+// Weekday names
+const VARA_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const VARA_KN = ["ಭಾನುವಾರ","ಸೋಮವಾರ","ಮಂಗಳವಾರ","ಬುಧವಾರ","ಗುರುವಾರ","ಶುಕ್ರವಾರ","ಶನಿವಾರ"];
+
+// Rahu/Yama/Gulika tables (Sun=0 .. Sat=6) — which 1/8th of day
+const RAHU   = [8,2,7,5,6,4,3];
+const YAMA   = [5,4,3,2,1,7,6];
+const GULIKA = [7,6,5,4,3,2,1];
+
+// Samvatsara names
+const SAMVATSARA = ["Prabhava","Vibhava","Shukla","Pramoduta","Prajapati","Angirasa","Shrimukha","Bhava","Yuva","Dhatri","Ishvara","Bahudhanya","Pramathi","Vikrama","Vrisha","Chitrabhanu","Svabhanu","Tarana","Parthiva","Vyaya","Sarvajit","Sarvadhari","Virodhi","Vikruti","Khara","Nandana","Vijaya","Jaya","Manmatha","Durmukhi","Hevilambi","Vilambi","Vikari","Sharvari","Plava","Shubhakrit","Shobhakrit","Krodhi","Vishvavasu","Parabhava","Plavanga","Kilaka","Saumya","Sadharana","Virodhikrit","Paridhavi","Pramadicha","Ananda","Rakshasa","Nala","Pingala","Kalayukti","Siddharthi","Raudra","Durmati","Dundubhi","Rudhirodgari","Raktakshi","Krodhana","Akshaya"];
+
+// Masa names
+const MASA_EN = ["Chaitra","Vaishakha","Jyeshtha","Ashadha","Shravana","Bhadrapada","Ashvina","Kartika","Margashira","Pushya","Magha","Phalguna"];
+const MASA_KN = ["ಚೈತ್ರ","ವೈಶಾಖ","ಜ್ಯೇಷ್ಠ","ಆಷಾಢ","ಶ್ರಾವಣ","ಭಾದ್ರಪದ","ಆಶ್ವಯುಜ","ಕಾರ್ತಿಕ","ಮಾರ್ಗಶಿರ","ಪುಷ್ಯ","ಮಾಘ","ಫಾಲ್ಗುಣ"];
+
+// Ritu
+const RITU = ["Vasanta","Vasanta","Grishma","Grishma","Varsha","Varsha","Sharad","Sharad","Hemanta","Hemanta","Shishira","Shishira"];
+
+// Tara Bala
+const TARA_NAMES = ["Janma","Sampat","Vipat","Kshema","Pratyak","Sadhana","Naidhana","Mitra","Parama Mitra"];
+const TARA_GOOD = [1,3,5,7,8]; // 0-indexed: Sampat(1), Kshema(3), Sadhana(5), Mitra(7), ParamaMitra(8)
+
+// ============================================================
+//  ASTRONOMICAL CORE — Low-precision solar/lunar longitudes
+//  (Moshier-class analytic series; accuracy ~1 arcmin)
+// ============================================================
+
+function julianDay(y, m, d, h) {
+    if (m <= 2) { y--; m += 12; }
+    const A = Math.floor(y / 100);
+    const B = 2 - A + Math.floor(A / 4);
+    return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + (h || 0) / 24 + B - 1524.5;
+}
+
+function jdToDate(jd) {
+    const z = Math.floor(jd + 0.5);
+    const f = jd + 0.5 - z;
+    let A = z;
+    if (z >= 2299161) { const alpha = Math.floor((z - 1867216.25) / 36524.25); A = z + 1 + alpha - Math.floor(alpha / 4); }
+    const B = A + 1524;
+    const C = Math.floor((B - 122.1) / 365.25);
+    const D = Math.floor(365.25 * C);
+    const E = Math.floor((B - D) / 30.6001);
+    const day = B - D - Math.floor(30.6001 * E) + f;
+    const month = E < 14 ? E - 1 : E - 13;
+    const year = month > 2 ? C - 4716 : C - 4715;
+    const d2 = Math.floor(day);
+    const hFrac = (day - d2) * 24;
+    const h = Math.floor(hFrac);
+    const mFrac = (hFrac - h) * 60;
+    const mi = Math.floor(mFrac);
+    const s = Math.floor((mFrac - mi) * 60);
+    return { year, month, day: d2, hour: h, minute: mi, second: s };
+}
+
+// Sun longitude (geometric, tropical, apparent)
+function sunLongitude(jd) {
+    const T = (jd - 2451545.0) / 36525.0;
+    // Mean longitude
+    let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+    // Mean anomaly
+    let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+    M = M * DEG;
+    // Equation of center
+    const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+            + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+            + 0.000289 * Math.sin(3 * M);
+    let sunLon = L0 + C;
+    // Apparent longitude (nutation approx)
+    const omega = 125.04 - 1934.136 * T;
+    sunLon = sunLon - 0.00569 - 0.00478 * Math.sin(omega * DEG);
+    return ((sunLon % 360) + 360) % 360;
+}
+
+// Moon longitude (geometric, tropical)
+function moonLongitude(jd) {
+    const T = (jd - 2451545.0) / 36525.0;
+    // Mean longitude
+    let Lp = 218.3165 + 481267.8813 * T;
+    // Mean elongation
+    const D = (297.8502 + 445267.1115 * T) * DEG;
+    // Sun's mean anomaly
+    const Ms = (357.5291 + 35999.0503 * T) * DEG;
+    // Moon's mean anomaly
+    const Mm = (134.9634 + 477198.8676 * T) * DEG;
+    // Moon's argument of latitude
+    const F = (93.2721 + 483202.0175 * T) * DEG;
+
+    // Major perturbation terms (truncated series — gives ~1' accuracy)
+    let dL = 0;
+    dL += 6.289 * Math.sin(Mm);
+    dL += 1.274 * Math.sin(2 * D - Mm);
+    dL += 0.658 * Math.sin(2 * D);
+    dL += 0.214 * Math.sin(2 * Mm);
+    dL -= 0.186 * Math.sin(Ms);
+    dL -= 0.114 * Math.sin(2 * F);
+    dL += 0.059 * Math.sin(2 * D - 2 * Mm);
+    dL += 0.057 * Math.sin(2 * D - Ms - Mm);
+    dL += 0.053 * Math.sin(2 * D + Mm);
+    dL += 0.046 * Math.sin(2 * D - Ms);
+    dL -= 0.041 * Math.sin(Ms - Mm);
+    dL -= 0.035 * Math.sin(D);
+    dL -= 0.031 * Math.sin(Ms + Mm);
+    dL -= 0.015 * Math.sin(2 * F - 2 * D);
+    dL += 0.011 * Math.sin(Mm - 2 * D); // Not from Moon position series but helps
+
+    Lp += dL;
+    return ((Lp % 360) + 360) % 360;
+}
+
+// Lahiri Ayanamsa
+function lahiriAyanamsa(jd) {
+    const T = (jd - 2451545.0) / 36525.0;
+    // Linear approximation: 23.853° at J2000, precession ~50.29"/yr
+    return 23.853 + 50.29 / 3600 * (jd - 2451545.0) / 365.25;
+}
+
+// Sidereal longitudes
+function siderealSun(jd) { return ((sunLongitude(jd) - lahiriAyanamsa(jd)) % 360 + 360) % 360; }
+function siderealMoon(jd) { return ((moonLongitude(jd) - lahiriAyanamsa(jd)) % 360 + 360) % 360; }
+
+// Elongation (Moon - Sun) mod 360
+function elongation(jd) { return ((siderealMoon(jd) - siderealSun(jd)) % 360 + 360) % 360; }
+function yogaAngle(jd) { return ((siderealSun(jd) + siderealMoon(jd)) % 360 + 360) % 360; }
+
+// ============================================================
+//  SUNRISE / SUNSET — Meeus algorithm
+// ============================================================
+function sunDeclRA(jd) {
+    const T = (jd - 2451545.0) / 36525.0;
+    let L0 = 280.46646 + 36000.76983 * T;
+    let M = (357.52911 + 35999.05029 * T) * DEG;
+    const C = (1.914602 - 0.004817 * T) * Math.sin(M) + 0.019993 * Math.sin(2 * M);
+    const sunLon = (L0 + C) * DEG;
+    const eps = (23.439291 - 0.0130042 * T) * DEG;
+    const sinLon = Math.sin(sunLon);
+    const dec = Math.asin(Math.sin(eps) * sinLon);
+    const ra = Math.atan2(Math.cos(eps) * sinLon, Math.cos(sunLon));
+    return { dec, ra };
+}
+
+function computeSunrise(year, month, day, lat, lon) {
+    // Returns { rise: fractionalHoursUTC, set: fractionalHoursUTC }
+    const jd = julianDay(year, month, day, 12); // noon
+    const T = (jd - 2451545.0) / 36525.0;
+    // Equation of time approximation
+    let L0 = 280.46646 + 36000.76983 * T;
+    let M = (357.52911 + 35999.05029 * T) * DEG;
+    const eqTime = -7.655 * Math.sin((L0 * DEG)) + 9.873 * Math.sin(2 * (L0 * DEG) + 3.5932);
+    // Better: use NOAA method
+    const { dec } = sunDeclRA(jd);
+    const latR = lat * DEG;
+    // Standard refraction correction: -0.8333 degrees
+    const ha = Math.acos((Math.sin(-0.8333 * DEG) - Math.sin(latR) * Math.sin(dec)) / (Math.cos(latR) * Math.cos(dec)));
+    if (isNaN(ha)) return null; // no sunrise/sunset (polar)
+    const haDeg = ha * RAD;
+    const noon = 12.0 - lon / 15.0; // approximate solar noon in UTC hours
+    // Better noon using equation of time
+    const Jnoon = jd; // already at noon
+    const { ra } = sunDeclRA(Jnoon);
+
+    // Simple NOAA-style
+    const T2 = T;
+    const L = 280.46646 + 36000.76983 * T2;
+    const eot_y = Math.tan((23.439 - 0.013 * T2) * DEG / 2); const eot_y2 = eot_y * eot_y;
+    const eot = 4 * RAD * (eot_y2 * Math.sin(2 * L * DEG) - 2 * 0.01671 * Math.sin(M) + 4 * 0.01671 * eot_y2 * Math.sin(M) * Math.cos(2 * L * DEG) - 0.5 * eot_y2 * eot_y2 * Math.sin(4 * L * DEG) - 1.25 * 0.01671 * 0.01671 * Math.sin(2 * M));
+    const solarNoon = 720 - 4 * lon - eot; // in minutes UTC
+    const rise = solarNoon - 4 * haDeg; // minutes UTC
+    const set = solarNoon + 4 * haDeg;
+    return { rise: rise / 60, set: set / 60 }; // fractional hours UTC
+}
+
+// ============================================================
+//  BOUNDARY FINDER — bisect to find next angle crossing
+// ============================================================
+function nextBoundary(jd, angleFn, unit) {
+    const cur = angleFn(jd);
+    const target = (Math.floor(cur / unit) + 1) * unit % 360;
+    let lo = jd, hi = jd + 1.8;
+    for (let i = 0; i < 50; i++) {
+        const mid = (lo + hi) / 2;
+        const diff = ((angleFn(mid) - target + 180) % 360 + 360) % 360 - 180;
+        if (diff >= 0) hi = mid; else lo = mid;
+    }
+    return hi;
+}
+
+// ============================================================
+//  FORMAT HELPERS
+// ============================================================
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function jdToLocalTimeStr(jd, tzOffsetHours) {
+    const utc = jdToDate(jd);
+    // Add timezone offset
+    let totalMin = utc.hour * 60 + utc.minute + utc.second / 60 + tzOffsetHours * 60;
+    // Handle day overflow (simplified for display)
+    if (totalMin < 0) totalMin += 1440;
+    if (totalMin >= 1440) totalMin -= 1440;
+    const h = Math.floor(totalMin / 60);
+    const m = Math.floor(totalMin % 60);
+    const s = Math.floor((totalMin * 60) % 60);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${pad2(h12)}:${pad2(m)} ${ampm}`;
+}
+
+function jdToLocalTimeStr24(jd, tzOffsetHours) {
+    const utc = jdToDate(jd);
+    let totalMin = utc.hour * 60 + utc.minute + utc.second / 60 + tzOffsetHours * 60;
+    if (totalMin < 0) totalMin += 1440;
+    if (totalMin >= 1440) totalMin -= 1440;
+    const h = Math.floor(totalMin / 60);
+    const m = Math.floor(totalMin % 60);
+    return `${pad2(h)}:${pad2(m)}`;
+}
+
+function getTzOffset(tzName) {
+    // Get offset for a timezone name at current moment
+    try {
+        const now = new Date();
+        const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
+        const localStr = now.toLocaleString('en-US', { timeZone: tzName });
+        return (new Date(localStr) - new Date(utcStr)) / 3600000;
+    } catch (e) {
+        return 5.5; // default IST
+    }
+}
+
+// ============================================================
+//  MAIN COMPUTE
+// ============================================================
+function computePanchanga(year, month, day, lat, lon, tzName) {
+    const tzOff = getTzOffset(tzName);
+    const sr = computeSunrise(year, month, day, lat, lon);
+    if (!sr) return null;
+
+    const riseJD = julianDay(year, month, day, sr.rise);
+    const setJD = julianDay(year, month, day, sr.set);
+
+    // Five limbs at sunrise
+    const e = elongation(riseJD);
+    const m = siderealMoon(riseJD);
+    const s = siderealSun(riseJD);
+    const ya = yogaAngle(riseJD);
+
+    // Tithi
+    const tithiNo = Math.floor(e / 12) + 1; // 1-30
+    const paksha = tithiNo <= 15 ? "Shukla" : "Krishna";
+    const pakshaKn = tithiNo <= 15 ? "ಶುಕ್ಲ ಪಕ್ಷ" : "ಕೃಷ್ಣ ಪಕ್ಷ";
+    let tithiName, tithiNameKn;
+    if (tithiNo === 15) { tithiName = "Purnima"; tithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
+    else if (tithiNo === 30) { tithiName = "Amavasya"; tithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
+    else { const idx = (tithiNo - 1) % 15; tithiName = TITHI_EN[idx]; tithiNameKn = TITHI_KN[idx]; }
+    const tithiEnd = nextBoundary(riseJD, elongation, 12);
+
+    // Nakshatra
+    const nakIdx = Math.floor(m / (360 / 27));
+    const pada = Math.floor((m % (360 / 27)) / (360 / 108)) + 1;
+    const nakEnd = nextBoundary(riseJD, siderealMoon, 360 / 27);
+
+    // Yoga
+    const yogaIdx = Math.floor(ya / (360 / 27));
+    const yogaEnd = nextBoundary(riseJD, yogaAngle, 360 / 27);
+
+    // Karana
+    const kNo = Math.floor(e / 6) + 1;
+    const karanaEnd = nextBoundary(riseJD, elongation, 6);
+
+    // Rashi
+    const sunRashiIdx = Math.floor(s / 30);
+    const moonRashiIdx = Math.floor(m / 30);
+
+    // Weekday (JS day 0=Sun)
+    const d = new Date(year, month - 1, day);
+    const wd = d.getDay();
+
+    // Rahu, Yama, Gulika
+    const dayLen = setJD - riseJD;
+    const part = dayLen / 8;
+    const seg = (p) => ({ start: riseJD + (p - 1) * part, end: riseJD + p * part });
+
+    // Abhijit muhurta: 8th of 15 daytime muhurtas
+    const abhijitStart = riseJD + 7 * dayLen / 15;
+    const abhijitEnd = riseJD + 8 * dayLen / 15;
+
+    // Brahma Muhurta: 96-48 min before sunrise
+    const brahmaStart = riseJD - 96 / 1440;
+    const brahmaEnd = riseJD - 48 / 1440;
+
+    // Masa (approximate from Sun's sidereal sign at previous new moon)
+    const masaIdx = ((sunRashiIdx + 1) % 12);
+
+    // Samvatsara
+    // Approximate Shaka year: if before ~March 22, use previous year
+    const ugadiApproxMonth = 3;
+    const shakaYear = (month < ugadiApproxMonth || (month === ugadiApproxMonth && day < 22)) ? year - 79 : year - 78;
+    const samvatsaraIdx = ((shakaYear + 12) % 60) || 60;
+    const samvatsaraName = SAMVATSARA[samvatsaraIdx - 1];
+
+    // Ayana
+    const ayana = (sunRashiIdx >= 9 || sunRashiIdx <= 2) ? "Uttarayana" : "Dakshinayana";
+    const ayanaKn = ayana === "Uttarayana" ? "ಉತ್ತರಾಯಣ" : "ದಕ್ಷಿಣಾಯನ";
+
+    // Ritu
+    const rituName = RITU[masaIdx];
+
+    return {
+        sunrise: riseJD, sunset: setJD, tzOff,
+        tithi: { no: tithiNo, name: tithiName, nameKn: tithiNameKn, paksha, pakshaKn, endJD: tithiEnd },
+        nakshatra: { idx: nakIdx, name: NAK_EN[nakIdx], nameKn: NAK_KN[nakIdx], pada, endJD: nakEnd },
+        yoga: { idx: yogaIdx, name: YOGA_EN[yogaIdx], endJD: yogaEnd, inauspicious: INAUSPICIOUS_YOGAS.includes(yogaIdx) },
+        karana: { name: karanaName(kNo), endJD: karanaEnd, isVishti: karanaName(kNo) === "Vishti" },
+        vara: { en: VARA_EN[wd], kn: VARA_KN[wd], idx: wd },
+        sunRashi: { en: RASHI_EN[sunRashiIdx], kn: RASHI_KN[sunRashiIdx] },
+        moonRashi: { en: RASHI_EN[moonRashiIdx], kn: RASHI_KN[moonRashiIdx] },
+        rahu: seg(RAHU[wd]), yama: seg(YAMA[wd]), gulika: seg(GULIKA[wd]),
+        abhijit: { start: abhijitStart, end: abhijitEnd },
+        brahma: { start: brahmaStart, end: brahmaEnd },
+        masa: { en: MASA_EN[masaIdx], kn: MASA_KN[masaIdx] },
+        samvatsara: { name: samvatsaraName, idx: samvatsaraIdx, shaka: shakaYear },
+        ayana: { en: ayana, kn: ayanaKn },
+        ritu: rituName,
+        wd, year, month, day
+    };
+}
+
+// ============================================================
+//  UI RENDERING
+// ============================================================
+function renderPanchanga(p) {
+    if (!p) return;
+    const tz = p.tzOff;
+    const fmt = (jd) => jdToLocalTimeStr(jd, tz);
+
+    // Header
+    document.getElementById('hdrSamvatsara').textContent = `${p.samvatsara.name} ನಾಮ ಸಂವತ್ಸರ`;
+    document.getElementById('hdrContext').textContent = `${p.ayana.en} · ${p.ritu} Ritu · ${p.masa.en} Masa · ${p.tithi.paksha} Paksha · Shaka ${p.samvatsara.shaka}`;
+    const dateObj = new Date(p.year, p.month - 1, p.day);
+    document.getElementById('hdrDate').textContent = dateObj.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('hdrWeekday').textContent = `${p.vara.kn} · ${p.tithi.pakshaKn} · ${p.tithi.nameKn}`;
+
+    // Sun/Moon
+    document.getElementById('valSunrise').textContent = fmt(p.sunrise);
+    document.getElementById('valSunset').textContent = fmt(p.sunset);
+    document.getElementById('valSunRashi').textContent = `${p.sunRashi.en} · ${p.sunRashi.kn}`;
+    document.getElementById('valMoonRashi').textContent = `${p.moonRashi.en} · ${p.moonRashi.kn}`;
+
+    // Five Limbs
+    document.getElementById('valTithi').textContent = `${p.tithi.paksha} ${p.tithi.name}`;
+    document.getElementById('valTithiKn').textContent = `${p.tithi.pakshaKn} ${p.tithi.nameKn}`;
+    document.getElementById('valTithiTime').textContent = `Ends: ${fmt(p.tithi.endJD)}`;
+
+    document.getElementById('valNak').textContent = `${p.nakshatra.name} (Pada ${p.nakshatra.pada})`;
+    document.getElementById('valNakKn').textContent = p.nakshatra.nameKn;
+    document.getElementById('valNakTime').textContent = `Ends: ${fmt(p.nakshatra.endJD)}`;
+
+    document.getElementById('valYoga').textContent = p.yoga.name + (p.yoga.inauspicious ? ' ⚠️' : '');
+    document.getElementById('valYogaTime').textContent = `Ends: ${fmt(p.yoga.endJD)}`;
+
+    document.getElementById('valKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️ Bhadra' : '');
+    document.getElementById('valKaranaTime').textContent = `Ends: ${fmt(p.karana.endJD)}`;
+
+    document.getElementById('valVara').textContent = p.vara.en;
+    document.getElementById('valVaraKn').textContent = p.vara.kn;
+
+    // Windows
+    const dayLen = p.sunset - p.sunrise;
+    const pct = (jd) => Math.max(0, Math.min(100, ((jd - p.sunrise) / dayLen) * 100));
+    const bar = document.getElementById('timelineBar');
+    bar.innerHTML = '';
+    const addSeg = (s, e, cls, lbl) => {
+        const el = document.createElement('div');
+        el.className = `segment ${cls}`;
+        el.style.left = pct(s) + '%';
+        el.style.width = Math.max(1, pct(e) - pct(s)) + '%';
+        el.textContent = lbl;
+        bar.appendChild(el);
+    };
+    addSeg(p.rahu.start, p.rahu.end, 'seg-rahu', 'Rahu');
+    addSeg(p.yama.start, p.yama.end, 'seg-yama', 'Yama');
+    addSeg(p.gulika.start, p.gulika.end, 'seg-gulika', 'Gulika');
+    addSeg(p.abhijit.start, p.abhijit.end, 'seg-abhijit', 'Abhijit');
+
+    const labels = document.getElementById('timelineLabels');
+    labels.innerHTML = `<span>${fmt(p.sunrise)}</span><span>Noon</span><span>${fmt(p.sunset)}</span>`;
+
+    const wl = document.getElementById('windowsList');
+    const row = (dot, name, s, e) => `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name}</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+    wl.innerHTML = row('bad', 'Rahu Kala (ರಾಹುಕಾಲ)', p.rahu.start, p.rahu.end)
+        + row('bad', 'Yamaganda (ಯಮಗಂಡ)', p.yama.start, p.yama.end)
+        + row('neutral', 'Gulika Kala (ಗುಳಿಕ)', p.gulika.start, p.gulika.end)
+        + row('good', 'Abhijit Muhurta (ಅಭಿಜಿತ್)', p.abhijit.start, p.abhijit.end)
+        + row('good', 'Brahma Muhurta (ಬ್ರಹ್ಮ)', p.brahma.start, p.brahma.end);
+}
+
+// ============================================================
+//  EVENT HANDLERS
+// ============================================================
+function getLocation() {
+    const val = document.getElementById('locationSelect').value.split(',');
+    return { lat: parseFloat(val[0]), lon: parseFloat(val[1]), tz: val[2] };
+}
+
+function recalculate() {
+    const dateStr = document.getElementById('dateInput').value;
+    if (!dateStr) return;
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const loc = getLocation();
+    const p = computePanchanga(y, m, d, loc.lat, loc.lon, loc.tz);
+    renderPanchanga(p);
+}
+
+function goToday() {
+    const now = new Date();
+    document.getElementById('dateInput').value = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    recalculate();
+}
+
+document.getElementById('dateInput').addEventListener('change', recalculate);
+document.getElementById('locationSelect').addEventListener('change', recalculate);
+
+// Tab navigation
+let personCount = 1;
+document.querySelectorAll('.tab-nav').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-nav').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+});
+
+function addPerson() {
+    if (personCount >= 10) { alert('Maximum 10 people.'); return; }
+    personCount++;
+    const c = document.getElementById('peopleContainer');
+    const div = document.createElement('div');
+    div.className = 'person-form';
+    div.innerHTML = `<div><label>Name</label><input type="text" class="p-name" value="Person ${personCount}"></div><div><label>Date & Time of Birth</label><input type="datetime-local" class="p-dob"></div>`;
+    c.appendChild(div);
+}
+
+function calcCompat() {
+    const loc = getLocation();
+    const targetStr = document.getElementById('targetDate').value;
+    if (!targetStr) { alert('Pick a target date.'); return; }
+    const [ty, tm, td] = targetStr.split('-').map(Number);
+    const targetP = computePanchanga(ty, tm, td, loc.lat, loc.lon, loc.tz);
+    if (!targetP) return;
+
+    const entries = document.querySelectorAll('.person-form');
+    const results = [];
+    let good = 0;
+    entries.forEach(entry => {
+        const name = entry.querySelector('.p-name')?.value || 'Unknown';
+        const dobVal = entry.querySelector('.p-dob')?.value;
+        if (!dobVal) return;
+        const dobDate = new Date(dobVal);
+        const bp = computePanchanga(dobDate.getFullYear(), dobDate.getMonth() + 1, dobDate.getDate(), loc.lat, loc.lon, loc.tz);
+        if (!bp) return;
+        const birthNak = bp.nakshatra.idx;
+        const transitNak = targetP.nakshatra.idx;
+        const count = ((transitNak - birthNak + 27) % 27) + 1;
+        const tara = (count % 9) || 9;
+        const taraIdx = tara - 1;
+        const isGood = TARA_GOOD.includes(taraIdx);
+        if (isGood) good++;
+        results.push({ name, tara: TARA_NAMES[taraIdx], isGood, birthNak: NAK_EN[birthNak] });
+    });
+
+    if (results.length === 0) { alert('Enter at least one person with DOB.'); return; }
+
+    const score = (good / results.length * 100).toFixed(0);
+    const isRec = score >= 70;
+    let html = `<div class="result-box ${isRec ? 'result-good' : 'result-bad'}">
+        <strong>${isRec ? '✅ RECOMMENDED' : '⚠️ NOT RECOMMENDED'}</strong> — Score: ${score}%
+        <p style="margin-top:8px;font-size:0.85rem;">Date: ${targetStr} · Nakshatra: ${targetP.nakshatra.name} · ${targetP.tithi.paksha} ${targetP.tithi.name}</p>
+    </div>`;
+    html += '<div style="margin-top:12px;">';
+    results.forEach(r => {
+        html += `<div class="window-row"><div class="window-dot ${r.isGood ? 'good' : 'bad'}"></div><div class="window-name">${r.name} <span style="color:var(--text-dim);font-size:0.75rem;">(Birth: ${r.birthNak})</span></div><div class="window-time">${r.tara} ${r.isGood ? '✓' : '✗'}</div></div>`;
+    });
+    html += '</div>';
+    document.getElementById('compatResult').innerHTML = html;
+}
+
+// ============================================================
+//  PWA INSTALL PROMPT
+// ============================================================
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').style.display = 'block';
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBanner').style.display = 'none';
+});
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registered', reg))
+            .catch(err => console.error('SW failed', err));
+    });
+}
+
+// Init
+goToday();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "Kuberan Panchangam",
+  "short_name": "Panchangam",
+  "description": "South Indian Vedic Panchangam & Muhurtha Engine by Kuberan — works offline, anywhere in the world.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0c0f1a",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/images/kuberan_logo_white_bg.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
