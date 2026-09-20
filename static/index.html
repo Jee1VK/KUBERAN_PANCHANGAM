@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuberan Panchangam & Muhurtha Engine</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #f59e0b;
+            --text-color: #f8fafc;
+            --border-color: #334155;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: var(--accent-color);
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: #0f172a;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            margin-top: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .person-entry {
+            border-left: 3px solid var(--accent-color);
+            padding-left: 10px;
+            margin-bottom: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .badge-success { background-color: #10b981; color: #000; }
+        .badge-danger { background-color: #ef4444; color: #fff; }
+        .logo-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-header">
+        <a href="https://kuberansilks.com/" target="_blank" rel="noopener noreferrer">
+            <img src="/static/assets/images/kuberan_logo_white_bg.png" alt="Kuberan Silks" style="max-height: 100px;">
+        </a>
+    </div>
+    <h1 style="text-align: center;">Kuberan Panchangam & Muhurtha Engine</h1>
+    <p style="text-align: center;">South Indian Chandramana System | Swiss Ephemeris Standard | Precision 1900–2200 CE</p>
+
+    <!-- Location & Global Config -->
+    <div class="card">
+        <h2>1. Global Location Settings</h2>
+        <div class="grid">
+            <div class="form-group">
+                <label>City Preset</label>
+                <select id="cityPreset" onchange="applyLocationPreset()">
+                    <option value="12.9716,77.5946">Bengaluru / Mysuru, India</option>
+                    <option value="28.6139,77.2090">Delhi, India</option>
+                    <option value="37.7749,-122.4194">California (SF), USA</option>
+                    <option value="48.8566,2.3522">Paris, France</option>
+                    <option value="30.5728,104.0668">Chengdu, China</option>
+                    <option value="52.5200,13.4050">Berlin, Germany</option>
+                    <option value="1.3521,103.8198">Singapore</option>
+                    <option value="-37.8136,144.9631">Melbourne, Australia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Latitude</label>
+                <input type="text" id="latitude" value="12.9716">
+            </div>
+            <div class="form-group">
+                <label>Longitude</label>
+                <input type="text" id="longitude" value="77.5946">
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-Person Nakshatra & Rashi Calculator -->
+    <div class="card">
+        <h2>2. Multi-Person Compatibility Evaluator (Up to 10 People)</h2>
+        <p>Enter details for group events (Buying a Car, Opening Accounts, Business Setup).</p>
+        <div id="peopleContainer">
+            <div class="person-entry">
+                <h4>Person 1</h4>
+                <div class="grid">
+                    <input type="text" placeholder="Name" class="p-name" value="Person 1">
+                    <input type="datetime-local" class="p-dob">
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="addPersonInput()">+ Add Another Person (Max 10)</button>
+    </div>
+
+    <!-- Action & Muhurtha Finder -->
+    <div class="card">
+        <h2>3. Activity & Date Range Search</h2>
+        <div class="grid">
+            <div class="form-group">
+                <label>Select Activity</label>
+                <select id="activityType">
+                    <option value="buy_car">Buy a Car / Vehicle</option>
+                    <option value="open_bank_account">Open Bank Account</option>
+                    <option value="griha_pravesha">Griha Pravesha (Housewarming)</option>
+                    <option value="business_inauguration">Start New Business / Shop</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Target Date</label>
+                <input type="datetime-local" id="targetDate">
+            </div>
+        </div>
+        <button onclick="calculateMuhurtha()">Calculate Compatibility</button>
+    </div>
+
+    <!-- Results Display -->
+    <div class="card" id="resultsCard" style="display:none;">
+        <h2>Evaluation Results</h2>
+        <div id="resultsContent"></div>
+    </div>
+</div>
+
+<script>
+    let personCount = 1;
+
+    function applyLocationPreset() {
+        const val = document.getElementById('cityPreset').value.split(',');
+        document.getElementById('latitude').value = val[0];
+        document.getElementById('longitude').value = val[1];
+    }
+
+    function addPersonInput() {
+        if (personCount >= 10) {
+            alert("Maximum 10 people allowed.");
+            return;
+        }
+        personCount++;
+        const container = document.getElementById('peopleContainer');
+        const div = document.createElement('div');
+        div.className = 'person-entry';
+        div.innerHTML = `
+            <h4>Person ${personCount}</h4>
+            <div class="grid">
+                <input type="text" placeholder="Name" class="p-name" value="Person ${personCount}">
+                <input type="datetime-local" class="p-dob">
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    async function calculateMuhurtha() {
+        const resultsCard = document.getElementById('resultsCard');
+        const resultsContent = document.getElementById('resultsContent');
+        
+        const peopleEntries = document.querySelectorAll('.person-entry');
+        const people = [];
+        peopleEntries.forEach(entry => {
+            const name = entry.querySelector('.p-name').value;
+            const dob = entry.querySelector('.p-dob').value;
+            if (name && dob) {
+                people.push({name, dob: dob + ":00"});
+            }
+        });
+
+        const targetDate = document.getElementById('targetDate').value;
+        if (!targetDate || people.length === 0) {
+            alert("Please provide at least one person's DOB and a target date.");
+            return;
+        }
+
+        const payload = {
+            activity: document.getElementById('activityType').value,
+            target_date: targetDate + ":00",
+            lat: parseFloat(document.getElementById('latitude').value),
+            lon: parseFloat(document.getElementById('longitude').value),
+            people: people
+        };
+
+        try {
+            const response = await fetch('/api/compatibility', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            
+            let html = `<p><strong>Overall Suitability Score:</strong> ${data.overall_suitability_score.toFixed(2)}%</p>`;
+            if (data.is_recommended) {
+                html += `<div style="border:1px solid #10b981; padding:10px; margin-bottom:10px; border-radius:5px;">
+                            <span class="badge badge-success">RECOMMENDED</span>
+                            <p>This date is generally auspicious for the group.</p>
+                         </div>`;
+            } else {
+                html += `<div style="border:1px solid #ef4444; padding:10px; border-radius:5px;">
+                            <span class="badge badge-danger">NOT RECOMMENDED (AVOID)</span>
+                            <p>This date features unfavorable Tara combinations.</p>
+                         </div>`;
+            }
+            
+            html += `<h3>Individual Breakdown</h3><ul>`;
+            data.person_breakdown.forEach(p => {
+                html += `<li><strong>${p.person_name}:</strong> ${p.tara_bala.name} - ${p.tara_bala.status}</li>`;
+            });
+            html += `</ul>`;
+            
+            resultsContent.innerHTML = html;
+            resultsCard.style.display = 'block';
+            
+        } catch (e) {
+            console.error(e);
+            alert("Error fetching data from the backend.");
+        }
+    }
+</script>
+</body>
+</html>
