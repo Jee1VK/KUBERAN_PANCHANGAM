@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
@@ -29,6 +29,14 @@ class CompatibilityRequest(BaseModel):
 async def read_index():
     with open("static/index.html", "r", encoding="utf-8") as f:
         return f.read()
+
+@app.get("/sw.js")
+async def get_sw():
+    return FileResponse("static/sw.js", media_type="application/javascript")
+
+@app.get("/manifest.json")
+async def get_manifest():
+    return FileResponse("static/manifest.json", media_type="application/json")
 
 @app.get("/api/panchanga")
 def get_panchanga(date: str, lat: float, lon: float):
