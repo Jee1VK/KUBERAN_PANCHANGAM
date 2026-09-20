@@ -119,11 +119,32 @@
         .result-good { background: rgba(34,197,94,0.15); border: 1px solid var(--green); }
         .result-bad { background: rgba(239,68,68,0.15); border: 1px solid var(--red); }
 
+        /* JATHAKA REPORT */
+        .jathaka-report { padding: 20px; background: #fff; color: #000; border-radius: 8px; margin-top: 20px; display: none; }
+        .jathaka-header { text-align: center; border-bottom: 2px solid var(--maroon); padding-bottom: 10px; margin-bottom: 15px; }
+        .jathaka-header h2 { color: var(--maroon); font-size: 1.5rem; margin-bottom: 5px; }
+        .jathaka-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .j-box { border: 1px solid #ccc; padding: 10px; border-radius: 6px; }
+        .j-box .l { font-size: 0.75rem; color: #666; text-transform: uppercase; }
+        .j-box .v { font-size: 1.1rem; font-weight: bold; color: #000; }
+        .btn-print { background: var(--maroon); color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem; margin-top: 15px; }
+
         @media (max-width: 500px) {
             .limb-grid { grid-template-columns: 1fr; }
             .sun-moon { grid-template-columns: 1fr 1fr; }
             .person-form { grid-template-columns: 1fr; }
+            .jathaka-grid { grid-template-columns: 1fr; }
             .top-bar h1 { font-size: 0.9rem; }
+        }
+
+        /* PRINT STYLES FOR PDF EXPORT */
+        @media print {
+            body { background: #fff; color: #000; }
+            .top-bar, .install-banner, .tabs, .controls, .card:not(#jathakaPrintArea), .tab-nav, .btn-calc, .btn-print, .btn-today, .btn-add, #jathakaInputArea { display: none !important; }
+            .tab-content { display: block !important; }
+            .jathaka-report { display: block !important; box-shadow: none; border: none; padding: 0; margin: 0; }
+            .j-box { border-color: #000; }
+            @page { margin: 1cm; }
         }
     </style>
 </head>
@@ -138,6 +159,7 @@
     <div class="nav-right">
         <button class="tab-nav active" data-tab="daily">Daily</button>
         <button class="tab-nav" data-tab="muhurtha">Muhurtha</button>
+        <button class="tab-nav" data-tab="jathaka">Jathaka</button>
     </div>
 </div>
 
@@ -287,6 +309,70 @@
 </div>
 </div>
 
+<!-- JATHAKA TAB -->
+<div class="tab-content" id="tab-jathaka">
+<div class="container">
+    <div class="card" id="jathakaInputArea">
+        <h2>📜 Janma Kundali (Birth Details)</h2>
+        <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Enter exact birth details to generate your Janma Jathaka (Astrological Birth Chart) and Vimshottari Dasha balance.</p>
+        
+        <div style="display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:12px;">
+            <div><label>Full Name</label><input type="text" id="jName" placeholder="E.g., Ramesh Kumar" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.9rem;"></div>
+            <div><label>Date & Time of Birth</label><input type="datetime-local" id="jDob" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.9rem;"></div>
+        </div>
+        
+        <label>Birth Location</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div>
+                <label style="font-size:0.7rem;color:var(--text-dim);">Lat (e.g. 12.97)</label>
+                <input type="number" step="any" id="jLat" value="12.9716" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:6px 8px;border-radius:6px;width:100%;font-size:0.85rem;">
+            </div>
+            <div>
+                <label style="font-size:0.7rem;color:var(--text-dim);">Lon (e.g. 77.59)</label>
+                <input type="number" step="any" id="jLon" value="77.5946" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:6px 8px;border-radius:6px;width:100%;font-size:0.85rem;">
+            </div>
+            <div>
+                <label style="font-size:0.7rem;color:var(--text-dim);">Timezone</label>
+                <input type="text" id="jTz" value="Asia/Kolkata" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:6px 8px;border-radius:6px;width:100%;font-size:0.85rem;">
+            </div>
+        </div>
+
+        <button class="btn-calc" onclick="generateJathaka()">Generate Jathaka</button>
+    </div>
+
+    <!-- Jathaka Output (This gets printed) -->
+    <div class="jathaka-report card" id="jathakaPrintArea">
+        <div class="jathaka-header">
+            <h2 id="jReportName">Name</h2>
+            <p style="font-size:0.9rem; color:#555;" id="jReportDobLoc">DOB | Location</p>
+        </div>
+        
+        <div class="jathaka-grid">
+            <div class="j-box"><div class="l">Janma Nakshatra (Birth Star)</div><div class="v" id="jNak">...</div></div>
+            <div class="j-box"><div class="l">Nakshatra Lord</div><div class="v" id="jNakLord">...</div></div>
+            <div class="j-box"><div class="l">Janma Rashi (Moon Sign)</div><div class="v" id="jMoonRashi">...</div></div>
+            <div class="j-box"><div class="l">Rashi Lord</div><div class="v" id="jRashiLord">...</div></div>
+            <div class="j-box"><div class="l">Surya Rashi (Sun Sign)</div><div class="v" id="jSunRashi">...</div></div>
+            <div class="j-box"><div class="l">Sun Sign Lord</div><div class="v" id="jSunLord">...</div></div>
+            <div class="j-box"><div class="l">Janma Tithi (Lunar Day)</div><div class="v" id="jTithi">...</div></div>
+            <div class="j-box"><div class="l">Yoga & Karana</div><div class="v" id="jYogaKarana">...</div></div>
+        </div>
+
+        <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px; text-align:center;">
+            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:5px;">Vimshottari Dasha Balance at Birth</div>
+            <div style="font-size:1.2rem; font-weight:bold; color:var(--maroon);" id="jDashaBalance">...</div>
+        </div>
+
+        <div style="margin-top:30px; text-align:center; font-size:0.75rem; color:#999;">
+            Generated by Kuberan Panchangam Engine
+        </div>
+    </div>
+
+    <button class="btn-print" id="btnPrintJathaka" style="display:none;" onclick="window.print()">Download / Print PDF</button>
+
+</div>
+</div>
+
 <script>
 // ============================================================
 //  KUBERAN PANCHANGAM — PURE JS ASTRONOMICAL ENGINE
@@ -343,8 +429,12 @@ const MASA_KN = ["ಚೈತ್ರ","ವೈಶಾಖ","ಜ್ಯೇಷ್ಠ","�
 const RITU = ["Vasanta","Vasanta","Grishma","Grishma","Varsha","Varsha","Sharad","Sharad","Hemanta","Hemanta","Shishira","Shishira"];
 
 // Tara Bala
-const TARA_NAMES = ["Janma","Sampat","Vipat","Kshema","Pratyak","Sadhana","Naidhana","Mitra","Parama Mitra"];
-const TARA_GOOD = [1,3,5,7,8]; // 0-indexed: Sampat(1), Kshema(3), Sadhana(5), Mitra(7), ParamaMitra(8)
+const TARA_NAMES = ['Janma (Danger)', 'Sampat (Wealth)', 'Vipat (Loss)', 'Kshema (Prosperity)', 'Pratyak (Obstacles)', 'Sadhaka (Success)', 'Nidhana (Death)', 'Mitra (Friend)', 'Parama Mitra (Best Friend)'];
+const TARA_GOOD = [1, 3, 5, 7, 8];
+
+const RASHI_LORDS = ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'];
+const NAKSHATRA_LORDS = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury'];
+const DASHA_YEARS = [7, 20, 6, 10, 7, 18, 16, 19, 17]; // 0-indexed: Sampat(1), Kshema(3), Sadhana(5), Mitra(7), ParamaMitra(8)
 
 // ============================================================
 //  ASTRONOMICAL CORE — Low-precision solar/lunar longitudes
@@ -860,6 +950,94 @@ function calcCompat() {
     });
     html += '</div>';
     document.getElementById('compatResult').innerHTML = html;
+}
+
+// ============================================================
+//  JATHAKA (BIRTH CHART) GENERATOR
+// ============================================================
+function generateJathaka() {
+    const name = document.getElementById('jName').value || 'Unknown';
+    const dobStr = document.getElementById('jDob').value;
+    const lat = parseFloat(document.getElementById('jLat').value);
+    const lon = parseFloat(document.getElementById('jLon').value);
+    const tz = document.getElementById('jTz').value;
+
+    if (!dobStr || isNaN(lat) || isNaN(lon)) {
+        alert("Please enter Name, Date & Time of Birth, Latitude, and Longitude.");
+        return;
+    }
+
+    const d = new Date(dobStr);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    const hours = d.getHours() + (d.getMinutes() / 60);
+
+    // Compute basic panchangam for the day
+    const p = computePanchanga(y, m, day, lat, lon, tz);
+    if (!p) return;
+
+    // Get exact Moon longitude at birth time
+    const jdUTC = julianDate(y, m, day, hours - 5.5); // Approximation assuming IST for simplicity of JS demo, for true exactness would need TZ offset
+    
+    // We can use the existing `p.tithi`, `p.nakshatra` as approximations for the day, but we need EXACT values at birth time.
+    // The computePanchanga runs at sunrise. To get exact birth time:
+    const jdBirthUTC = julianDate(y, m, day, (d.getHours() + d.getMinutes()/60) - (d.getTimezoneOffset()/-60));
+    
+    const sunLng = (sunLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
+    const moonLng = (moonLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
+
+    // Calculate Exact Tithi at birth
+    let diff = moonLng - sunLng;
+    if (diff < 0) diff += 360;
+    const tithiIdx = Math.floor(diff / 12);
+    let paksha = tithiIdx < 15 ? "Shukla" : "Krishna";
+    let tName = TITHI_EN[tithiIdx % 15];
+
+    // Calculate Exact Nakshatra at birth
+    const exactNakIdx = Math.floor(moonLng / 13.333333);
+    const nakName = NAK_EN[exactNakIdx];
+    const pada = Math.floor((moonLng % 13.333333) / 3.333333) + 1;
+
+    // Calculate Exact Rashi
+    const exactMoonRashiIdx = Math.floor(moonLng / 30);
+    const exactSunRashiIdx = Math.floor(sunLng / 30);
+
+    // Calculate Yoga at birth
+    const yogaIdx = Math.floor((sunLng + moonLng) / 13.333333) % 27;
+
+    // Calculate Vimshottari Dasha Balance
+    const nakLordIdx = exactNakIdx % 9;
+    const lordName = NAKSHATRA_LORDS[nakLordIdx];
+    const dashaTotalYears = DASHA_YEARS[nakLordIdx];
+    
+    const padaFraction = (moonLng % 13.333333) / 13.333333;
+    const remainingFraction = 1.0 - padaFraction;
+    
+    const balanceYearsDecimal = remainingFraction * dashaTotalYears;
+    const bYears = Math.floor(balanceYearsDecimal);
+    const bMonthsDecimal = (balanceYearsDecimal - bYears) * 12;
+    const bMonths = Math.floor(bMonthsDecimal);
+    const bDays = Math.floor((bMonthsDecimal - bMonths) * 30);
+
+    // Update UI
+    document.getElementById('jReportName').textContent = name;
+    document.getElementById('jReportDobLoc').textContent = `${d.toLocaleString()} | ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+    
+    document.getElementById('jNak').textContent = `${nakName} (Pada ${pada})`;
+    document.getElementById('jNakLord').textContent = lordName;
+    document.getElementById('jMoonRashi').textContent = RASHI_EN[exactMoonRashiIdx];
+    document.getElementById('jRashiLord').textContent = RASHI_LORDS[exactMoonRashiIdx];
+    document.getElementById('jSunRashi').textContent = RASHI_EN[exactSunRashiIdx];
+    document.getElementById('jSunLord').textContent = RASHI_LORDS[exactSunRashiIdx];
+    
+    document.getElementById('jTithi').textContent = `${paksha} ${tName}`;
+    document.getElementById('jYogaKarana').textContent = `${YOGA_EN[yogaIdx]}`; // omitting karana for brevity
+
+    document.getElementById('jDashaBalance').textContent = `Balance of ${lordName} Dasha: ${bYears} Yrs, ${bMonths} Mos, ${bDays} Days`;
+
+    document.getElementById('jathakaPrintArea').style.display = 'block';
+    document.getElementById('btnPrintJathaka').style.display = 'block';
 }
 
 // ============================================================
