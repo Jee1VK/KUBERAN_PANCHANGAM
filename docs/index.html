@@ -337,7 +337,10 @@
             </div>
         </div>
 
-        <button class="btn-calc" onclick="generateJathaka()">Generate Jathaka</button>
+        <button class="btn-calc" id="btnGenJathaka" onclick="generateJathaka()">Generate Jathaka</button>
+        <div id="jathakaLoading" style="display:none; text-align:center; margin-top:15px; color:var(--gold);">
+            <p>⏳ Computing planetary positions...</p>
+        </div>
     </div>
 
     <!-- Jathaka Output (This gets printed) -->
@@ -368,7 +371,19 @@
         </div>
     </div>
 
-    <button class="btn-print" id="btnPrintJathaka" style="display:none;" onclick="window.print()">Download / Print PDF</button>
+    <div style="display:flex; gap:10px; margin-top:15px;">
+        <button class="btn-print" id="btnPrintJathaka" style="display:none; flex:1;" onclick="window.print()">Download / Print PDF</button>
+        <button class="btn-print" id="btnShareJathaka" style="display:none; flex:1; background:var(--gold); color:#000;" onclick="shareJathaka()">Share</button>
+    </div>
+
+    <!-- History Section -->
+    <div class="card" id="jathakaHistoryArea" style="margin-top:20px; display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--card-border); padding-bottom:8px;">
+            <h2 style="margin:0; border:none; padding:0;">🕒 Recent Generations</h2>
+            <button onclick="clearJathakaHistory()" style="background:none; border:1px solid var(--red); color:var(--red); padding:4px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer;">Clear All</button>
+        </div>
+        <div id="jathakaHistoryList" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
 
 </div>
 </div>
@@ -953,91 +968,215 @@ function calcCompat() {
 }
 
 // ============================================================
-//  JATHAKA (BIRTH CHART) GENERATOR
+//  JATHAKA (BIRTH CHART) GENERATOR & HISTORY
 // ============================================================
+let currentJathakaData = null;
+
+function loadJathakaHistory() {
+    const list = document.getElementById('jathakaHistoryList');
+    const area = document.getElementById('jathakaHistoryArea');
+    
+    // Auto-delete records older than 48 hours
+    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    const now = Date.now();
+    const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+    history = history.filter(h => (now - h.timestamp) < FORTY_EIGHT_HOURS);
+    localStorage.setItem('kuberan_jathaka_history', JSON.stringify(history));
+
+    if (history.length === 0) {
+        area.style.display = 'none';
+        return;
+    }
+    
+    area.style.display = 'block';
+    list.innerHTML = '';
+    history.forEach((h, idx) => {
+        const div = document.createElement('div');
+        div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#1a2038; padding:10px; border-radius:6px; cursor:pointer;";
+        const d = new Date(h.timestamp);
+        div.innerHTML = `
+            <div onclick="loadJathakaFromHistory(${idx})" style="flex:1;">
+                <div style="font-weight:600; font-size:0.9rem;">${h.name}</div>
+                <div style="font-size:0.75rem; color:var(--text-dim);">${h.dobStr} | ${h.nakName} Nakshatra</div>
+            </div>
+            <button onclick="deleteJathaka(${idx})" style="background:none; border:none; color:var(--red); padding:5px; cursor:pointer;" title="Delete">🗑️</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function deleteJathaka(idx) {
+    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    history.splice(idx, 1);
+    localStorage.setItem('kuberan_jathaka_history', JSON.stringify(history));
+    loadJathakaHistory();
+}
+
+function clearJathakaHistory() {
+    if(confirm("Delete all Jathaka history?")) {
+        localStorage.removeItem('kuberan_jathaka_history');
+        loadJathakaHistory();
+    }
+}
+
+function loadJathakaFromHistory(idx) {
+    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    if(history[idx]) {
+        document.getElementById('jName').value = history[idx].name;
+        document.getElementById('jDob').value = history[idx].dobStrRaw;
+        document.getElementById('jLat').value = history[idx].lat;
+        document.getElementById('jLon').value = history[idx].lon;
+        document.getElementById('jTz').value = history[idx].tz;
+        generateJathaka();
+    }
+}
+
+function shareJathaka() {
+    if (!currentJathakaData) return;
+    const text = `*Janma Kundali for ${currentJathakaData.name}*\nDOB: ${currentJathakaData.dobStr}\n\n⭐ Janma Nakshatra: ${currentJathakaData.nakName} (Pada ${currentJathakaData.pada})\n🌙 Moon Sign: ${currentJathakaData.moonRashi}\n☀️ Sun Sign: ${currentJathakaData.sunRashi}\n📅 Tithi: ${currentJathakaData.tithi}\n\n⏳ ${currentJathakaData.dashaBalance}\n\nGenerated via Kuberan Panchangam`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: `Jathaka - ${currentJathakaData.name}`,
+            text: text,
+            url: window.location.href
+        }).catch(err => console.log('Share failed', err));
+    } else {
+        // Fallback to clipboard
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Jathaka details copied to clipboard!");
+        });
+    }
+}
+
 function generateJathaka() {
     const name = document.getElementById('jName').value || 'Unknown';
-    const dobStr = document.getElementById('jDob').value;
+    const dobStrRaw = document.getElementById('jDob').value;
     const lat = parseFloat(document.getElementById('jLat').value);
     const lon = parseFloat(document.getElementById('jLon').value);
     const tz = document.getElementById('jTz').value;
 
-    if (!dobStr || isNaN(lat) || isNaN(lon)) {
+    if (!dobStrRaw || isNaN(lat) || isNaN(lon)) {
         alert("Please enter Name, Date & Time of Birth, Latitude, and Longitude.");
         return;
     }
 
-    const d = new Date(dobStr);
-    const y = d.getFullYear();
-    const m = d.getMonth() + 1;
-    const day = d.getDate();
-    const hours = d.getHours() + (d.getMinutes() / 60);
+    // UI Loading state
+    document.getElementById('btnGenJathaka').style.display = 'none';
+    document.getElementById('jathakaLoading').style.display = 'block';
+    document.getElementById('jathakaPrintArea').style.display = 'none';
+    document.getElementById('btnPrintJathaka').style.display = 'none';
+    document.getElementById('btnShareJathaka').style.display = 'none';
 
-    // Compute basic panchangam for the day
-    const p = computePanchanga(y, m, day, lat, lon, tz);
-    if (!p) return;
+    // Use setTimeout to allow UI to render loading state before heavy computation
+    setTimeout(() => {
+        try {
+            const d = new Date(dobStrRaw);
+            const y = d.getFullYear();
+            const m = d.getMonth() + 1;
+            const day = d.getDate();
+            const hours = d.getHours() + (d.getMinutes() / 60);
 
-    // Get exact Moon longitude at birth time
-    const jdUTC = julianDate(y, m, day, hours - 5.5); // Approximation assuming IST for simplicity of JS demo, for true exactness would need TZ offset
-    
-    // We can use the existing `p.tithi`, `p.nakshatra` as approximations for the day, but we need EXACT values at birth time.
-    // The computePanchanga runs at sunrise. To get exact birth time:
-    const jdBirthUTC = julianDate(y, m, day, (d.getHours() + d.getMinutes()/60) - (d.getTimezoneOffset()/-60));
-    
-    const sunLng = (sunLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
-    const moonLng = (moonLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
+            // Compute basic panchangam for the day
+            const p = computePanchanga(y, m, day, lat, lon, tz);
+            if (!p) throw new Error("Calculation failed");
 
-    // Calculate Exact Tithi at birth
-    let diff = moonLng - sunLng;
-    if (diff < 0) diff += 360;
-    const tithiIdx = Math.floor(diff / 12);
-    let paksha = tithiIdx < 15 ? "Shukla" : "Krishna";
-    let tName = TITHI_EN[tithiIdx % 15];
+            // Get exact Moon longitude at birth time
+            const jdUTC = julianDay(y, m, day, hours - 5.5); // Fixed julianDay
+            
+            const jdBirthUTC = julianDay(y, m, day, (d.getHours() + d.getMinutes()/60) - (d.getTimezoneOffset()/-60)); // Fixed julianDay
+            
+            const sunLng = (sunLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
+            const moonLng = (moonLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
 
-    // Calculate Exact Nakshatra at birth
-    const exactNakIdx = Math.floor(moonLng / 13.333333);
-    const nakName = NAK_EN[exactNakIdx];
-    const pada = Math.floor((moonLng % 13.333333) / 3.333333) + 1;
+            // Calculate Exact Tithi at birth
+            let diff = moonLng - sunLng;
+            if (diff < 0) diff += 360;
+            const tithiIdx = Math.floor(diff / 12);
+            let paksha = tithiIdx < 15 ? "Shukla" : "Krishna";
+            let tName = TITHI_EN[tithiIdx % 15];
 
-    // Calculate Exact Rashi
-    const exactMoonRashiIdx = Math.floor(moonLng / 30);
-    const exactSunRashiIdx = Math.floor(sunLng / 30);
+            // Calculate Exact Nakshatra at birth
+            const exactNakIdx = Math.floor(moonLng / 13.333333);
+            const nakName = NAK_EN[exactNakIdx];
+            const pada = Math.floor((moonLng % 13.333333) / 3.333333) + 1;
 
-    // Calculate Yoga at birth
-    const yogaIdx = Math.floor((sunLng + moonLng) / 13.333333) % 27;
+            // Calculate Exact Rashi
+            const exactMoonRashiIdx = Math.floor(moonLng / 30);
+            const exactSunRashiIdx = Math.floor(sunLng / 30);
 
-    // Calculate Vimshottari Dasha Balance
-    const nakLordIdx = exactNakIdx % 9;
-    const lordName = NAKSHATRA_LORDS[nakLordIdx];
-    const dashaTotalYears = DASHA_YEARS[nakLordIdx];
-    
-    const padaFraction = (moonLng % 13.333333) / 13.333333;
-    const remainingFraction = 1.0 - padaFraction;
-    
-    const balanceYearsDecimal = remainingFraction * dashaTotalYears;
-    const bYears = Math.floor(balanceYearsDecimal);
-    const bMonthsDecimal = (balanceYearsDecimal - bYears) * 12;
-    const bMonths = Math.floor(bMonthsDecimal);
-    const bDays = Math.floor((bMonthsDecimal - bMonths) * 30);
+            // Calculate Yoga at birth
+            const yogaIdx = Math.floor((sunLng + moonLng) / 13.333333) % 27;
 
-    // Update UI
-    document.getElementById('jReportName').textContent = name;
-    document.getElementById('jReportDobLoc').textContent = `${d.toLocaleString()} | ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
-    
-    document.getElementById('jNak').textContent = `${nakName} (Pada ${pada})`;
-    document.getElementById('jNakLord').textContent = lordName;
-    document.getElementById('jMoonRashi').textContent = RASHI_EN[exactMoonRashiIdx];
-    document.getElementById('jRashiLord').textContent = RASHI_LORDS[exactMoonRashiIdx];
-    document.getElementById('jSunRashi').textContent = RASHI_EN[exactSunRashiIdx];
-    document.getElementById('jSunLord').textContent = RASHI_LORDS[exactSunRashiIdx];
-    
-    document.getElementById('jTithi').textContent = `${paksha} ${tName}`;
-    document.getElementById('jYogaKarana').textContent = `${YOGA_EN[yogaIdx]}`; // omitting karana for brevity
+            // Calculate Vimshottari Dasha Balance
+            const nakLordIdx = exactNakIdx % 9;
+            const lordName = NAKSHATRA_LORDS[nakLordIdx];
+            const dashaTotalYears = DASHA_YEARS[nakLordIdx];
+            
+            const padaFraction = (moonLng % 13.333333) / 13.333333;
+            const remainingFraction = 1.0 - padaFraction;
+            
+            const balanceYearsDecimal = remainingFraction * dashaTotalYears;
+            const bYears = Math.floor(balanceYearsDecimal);
+            const bMonthsDecimal = (balanceYearsDecimal - bYears) * 12;
+            const bMonths = Math.floor(bMonthsDecimal);
+            const bDays = Math.floor((bMonthsDecimal - bMonths) * 30);
 
-    document.getElementById('jDashaBalance').textContent = `Balance of ${lordName} Dasha: ${bYears} Yrs, ${bMonths} Mos, ${bDays} Days`;
+            const dashaBalanceStr = `Balance of ${lordName} Dasha: ${bYears} Yrs, ${bMonths} Mos, ${bDays} Days`;
+            const dobLocaleStr = d.toLocaleString();
 
-    document.getElementById('jathakaPrintArea').style.display = 'block';
-    document.getElementById('btnPrintJathaka').style.display = 'block';
+            // Update UI
+            document.getElementById('jReportName').textContent = name;
+            document.getElementById('jReportDobLoc').textContent = `${dobLocaleStr} | ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+            
+            document.getElementById('jNak').textContent = `${nakName} (Pada ${pada})`;
+            document.getElementById('jNakLord').textContent = lordName;
+            
+            const moonRashiStr = RASHI_EN[exactMoonRashiIdx];
+            const sunRashiStr = RASHI_EN[exactSunRashiIdx];
+            const tithiStr = `${paksha} ${tName}`;
+            
+            document.getElementById('jMoonRashi').textContent = moonRashiStr;
+            document.getElementById('jRashiLord').textContent = RASHI_LORDS[exactMoonRashiIdx];
+            document.getElementById('jSunRashi').textContent = sunRashiStr;
+            document.getElementById('jSunLord').textContent = RASHI_LORDS[exactSunRashiIdx];
+            
+            document.getElementById('jTithi').textContent = tithiStr;
+            document.getElementById('jYogaKarana').textContent = `${YOGA_EN[yogaIdx]}`;
+
+            document.getElementById('jDashaBalance').textContent = dashaBalanceStr;
+
+            // Store current for sharing
+            currentJathakaData = {
+                name, dobStr: dobLocaleStr, nakName, pada, moonRashi: moonRashiStr, sunRashi: sunRashiStr, tithi: tithiStr, dashaBalance: dashaBalanceStr
+            };
+
+            // Save to history
+            let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+            // Remove exact duplicate if re-generating
+            history = history.filter(h => !(h.name === name && h.dobStrRaw === dobStrRaw));
+            history.unshift({
+                timestamp: Date.now(),
+                name, dobStrRaw, dobStr: dobLocaleStr, lat, lon, tz, nakName, pada
+            });
+            // Keep max 20
+            if(history.length > 20) history.pop();
+            localStorage.setItem('kuberan_jathaka_history', JSON.stringify(history));
+            loadJathakaHistory();
+
+            // Show results
+            document.getElementById('jathakaPrintArea').style.display = 'block';
+            document.getElementById('btnPrintJathaka').style.display = 'block';
+            document.getElementById('btnShareJathaka').style.display = 'block';
+
+        } catch (e) {
+            alert("Error computing Jathaka. Check inputs.");
+            console.error(e);
+        } finally {
+            document.getElementById('btnGenJathaka').style.display = 'block';
+            document.getElementById('jathakaLoading').style.display = 'none';
+        }
+    }, 500); // 500ms delay to ensure loading UI renders smoothly
 }
 
 // ============================================================
@@ -1070,6 +1209,7 @@ if ('serviceWorker' in navigator) {
 //  INIT — Try GPS first, fall back to defaults
 // ============================================================
 (function init() {
+    loadJathakaHistory();
     const now = new Date();
     document.getElementById('dateInput').value = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
     // Try auto-detect silently, then recalculate
