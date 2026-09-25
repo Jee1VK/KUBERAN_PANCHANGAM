@@ -1,0 +1,23 @@
+{
+  "id": "vontikoppal",
+  "display_name": "Vontikoppal Panchanga (Karnataka)",
+  "tradition": "CHANDRAMANA_AMANTA",
+  "ayanamsa": "LAHIRI",
+  "node": "MEAN",
+  "sunrise_mode": "UPPER_LIMB_REFRACTION",
+  "ghati_minutes": 24,
+  "arunodaya_minutes": 96,
+  "pradosha_minutes": 144,
+  "nishita_half_window_minutes": 24,
+  "ekadashi_tradition": "SMARTA",
+  "sutak_hours": { "solar": 12, "lunar": 9 },
+  "gulika_treatment": "AVOID_FOR_NEW_BEGINNINGS",
+  "year_days_for_dasha": 365.25,
+  "sankranti_day_rule": "BEFORE_SUNSET_SAME_DAY",
+  "default_timezone": "Asia/Kolkata",
+  "rahu_kala_parts":   [8, 2, 7, 5, 6, 4, 3],
+  "yamagandam_parts":  [5, 4, 3, 2, 1, 7, 6],
+  "gulika_kala_parts": [7, 6, 5, 4, 3, 2, 1],
+  "source": "Vontikoppal Sri Sringeri Jagadguru Shankaracharya Mahasamsthanam Panchanga",
+  "confidence": "verify"
+}

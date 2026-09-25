@@ -1,0 +1,25 @@
+{
+  "sequence": ["Udveg", "Char", "Labh", "Amrit", "Kaal", "Shubh", "Rog"],
+  "qualities": {
+    "Amrit": "best",
+    "Shubh": "good",
+    "Labh": "good",
+    "Char": "neutral",
+    "Rog": "bad",
+    "Kaal": "bad",
+    "Udveg": "bad"
+  },
+  "day_start_index": [0, 3, 6, 2, 5, 1, 4],
+  "night_start_index": [5, 4, 2, 0, 3, 6, 1],
+  "names_kn": {
+    "Udveg": "ಉದ್ವೇಗ",
+    "Char": "ಚರ",
+    "Labh": "ಲಾಭ",
+    "Amrit": "ಅಮೃತ",
+    "Kaal": "ಕಾಲ",
+    "Shubh": "ಶುಭ",
+    "Rog": "ರೋಗ"
+  },
+  "source": "seed",
+  "confidence": "verify"
+}

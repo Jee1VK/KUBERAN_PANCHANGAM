@@ -271,6 +271,16 @@
         <div style="margin-top: 14px;" id="windowsList"></div>
     </div>
 
+    <!-- CHOGHADIYA -->
+    <div class="card">
+        <h2>🕐 Choghadiya (ಚೌಘಡಿಯಾ)</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Daytime & nighttime auspicious slots. Green = Good, Red = Avoid.</p>
+        <div id="choghadiyaList"></div>
+    </div>
+
+    <!-- SHARE DAILY -->
+    <button onclick="shareDailyPanchangam()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">📤 Share Today's Panchangam</button>
+
     <div class="disclaimer">
         Computed values (Drik Ganita, Lahiri Ayanamsa) may differ from a printed almanac.<br>
         For religious observance, follow your family priest / the printed Panchanga.<br>
@@ -823,6 +833,55 @@ function renderPanchanga(p) {
         + row('neutral', 'Gulika Kala (ಗುಳಿಕ)', p.gulika.start, p.gulika.end)
         + row('good', 'Abhijit Muhurta (ಅಭಿಜಿತ್)', p.abhijit.start, p.abhijit.end)
         + row('good', 'Brahma Muhurta (ಬ್ರಹ್ಮ)', p.brahma.start, p.brahma.end);
+
+    // --- CHOGHADIYA ---
+    const CHOG_SEQ = ['Udveg', 'Char', 'Labh', 'Amrit', 'Kaal', 'Shubh', 'Rog'];
+    const CHOG_KN = {'Udveg':'ಉದ್ವೇಗ','Char':'ಚರ','Labh':'ಲಾಭ','Amrit':'ಅಮೃತ','Kaal':'ಕಾಲ','Shubh':'ಶುಭ','Rog':'ರೋಗ'};
+    const CHOG_QUALITY = {'Amrit':'good','Shubh':'good','Labh':'good','Char':'neutral','Rog':'bad','Kaal':'bad','Udveg':'bad'};
+    const CHOG_DAY_START = [0, 3, 6, 2, 5, 1, 4]; // Sun=0..Sat=6
+    const CHOG_NIGHT_START = [5, 4, 2, 0, 3, 6, 1];
+
+    const dayLen = p.sunset - p.sunrise;
+    const nightLen = (24 * 60) - (dayLen * 24 * 60); // approximate in minutes
+    const daySlot = dayLen / 8; // in fractional hours
+    const nightSlot = nightLen / (8 * 60); // in fractional hours
+
+    const dow = new Date(p.year, p.month - 1, p.day).getDay();
+    let chogHtml = '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin-bottom:6px;">☀️ Daytime</div>';
+    let dayIdx = CHOG_DAY_START[dow];
+    for (let i = 0; i < 8; i++) {
+        const name = CHOG_SEQ[(dayIdx + i) % 7];
+        const q = CHOG_QUALITY[name];
+        const s = p.sunrise + i * daySlot;
+        const e = p.sunrise + (i + 1) * daySlot;
+        const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
+        chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+    }
+    chogHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Nighttime</div>';
+    let nightIdx = CHOG_NIGHT_START[dow];
+    for (let i = 0; i < 8; i++) {
+        const name = CHOG_SEQ[(nightIdx + i) % 7];
+        const q = CHOG_QUALITY[name];
+        const s = p.sunset + i * nightSlot;
+        const e = p.sunset + (i + 1) * nightSlot;
+        const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
+        chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+    }
+    document.getElementById('choghadiyaList').innerHTML = chogHtml;
+}
+
+let lastPanchanga = null;
+
+function shareDailyPanchangam() {
+    if (!lastPanchanga) { alert("Compute today's panchangam first."); return; }
+    const p = lastPanchanga;
+    const text = `*Kuberan Panchangam*\n📅 ${p.dateStr}\n${p.samvatsara} · ${p.masaName} ${p.paksha} · ${p.ritu}\n\n☀️ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\n🔸 Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.end)})\n⭐ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.end)})\n🔹 Yoga: ${p.yoga.name} (until ${fmt(p.yoga.end)})\n📐 Karana: ${p.karana.name}\n📆 Vara: ${p.vara.en}\n\n⚠️ Rahu Kala: ${fmt(p.rahu.start)}–${fmt(p.rahu.end)}\n⚠️ Yamaganda: ${fmt(p.yama.start)}–${fmt(p.yama.end)}\n✅ Abhijit: ${fmt(p.abhijit.start)}–${fmt(p.abhijit.end)}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
+
+    if (navigator.share) {
+        navigator.share({ title: `Panchangam ${p.dateStr}`, text }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
+    }
 }
 
 // ============================================================
@@ -891,6 +950,7 @@ function recalculate() {
     const [y, m, d] = dateStr.split('-').map(Number);
     const loc = getLocation();
     const p = computePanchanga(y, m, d, loc.lat, loc.lon, loc.tz);
+    lastPanchanga = p;
     renderPanchanga(p);
 }
 
