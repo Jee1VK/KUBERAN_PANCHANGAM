@@ -229,6 +229,12 @@
         </div>
     </div>
 
+    <!-- FESTIVAL OF THE DAY -->
+    <div class="card" id="festivalCard" style="display:none;">
+        <h2>🪔 Festival / Vrata</h2>
+        <div id="festivalList"></div>
+    </div>
+
     <!-- FIVE LIMBS -->
     <div class="card">
         <h2>🕉️ Pancha Anga — Five Limbs</h2>
@@ -868,6 +874,103 @@ function renderPanchanga(p) {
         chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
     }
     document.getElementById('choghadiyaList').innerHTML = chogHtml;
+
+    // --- FESTIVALS ---
+    const festivals = matchFestivals(p);
+    const festCard = document.getElementById('festivalCard');
+    const festList = document.getElementById('festivalList');
+    if (festivals.length > 0) {
+        festCard.style.display = 'block';
+        festList.innerHTML = festivals.map(f =>
+            `<div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--card-border);">
+                <span style="font-size:1.3rem;">${f.shopping_peak ? '🛍️' : '🪔'}</span>
+                <div style="flex:1;">
+                    <div style="font-weight:600;">${f.name.en}</div>
+                    <div style="font-family:var(--font-kn); color:var(--gold-light); font-size:0.9rem;">${f.name.kn}</div>
+                </div>
+            </div>`
+        ).join('');
+    } else {
+        festCard.style.display = 'none';
+    }
+}
+
+// ============================================================
+//  FESTIVAL MATCHING ENGINE
+// ============================================================
+const FESTIVAL_RULES = [
+    {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"rama_navami","name":{"en":"Rama Navami","kn":"ರಾಮ ನವಮಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":9,"shopping_peak":false},
+    {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"ಅಕ್ಷಯ ತೃತೀಯ"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
+    {"id":"guru_purnima","name":{"en":"Guru Purnima","kn":"ಗುರು ಪೂರ್ಣಿಮೆ"},"masa":"Ashadha","paksha":"Shukla","tithi":15,"shopping_peak":false},
+    {"id":"nagara_panchami","name":{"en":"Nagara Panchami","kn":"ನಾಗರ ಪಂಚಮಿ"},"masa":"Shravana","paksha":"Shukla","tithi":5,"shopping_peak":false},
+    {"id":"krishna_janmashtami","name":{"en":"Krishna Janmashtami","kn":"ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ"},"masa":"Shravana","paksha":"Krishna","tithi":8,"shopping_peak":false},
+    {"id":"gowri_habba","name":{"en":"Gowri Habba","kn":"ಗೌರಿ ಹಬ್ಬ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":3,"shopping_peak":true},
+    {"id":"ganesha_chaturthi","name":{"en":"Ganesha Chaturthi","kn":"ಗಣೇಶ ಚತುರ್ಥಿ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":4,"shopping_peak":true},
+    {"id":"ananta_chaturdashi","name":{"en":"Ananta Chaturdashi","kn":"ಅನಂತ ಚತುರ್ದಶಿ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":14,"shopping_peak":false},
+    {"id":"mahalaya_amavasya","name":{"en":"Mahalaya Amavasya","kn":"ಮಹಾಲಯ ಅಮಾವಾಸ್ಯೆ"},"masa":"Bhadrapada","paksha":"Krishna","tithi":30,"shopping_peak":false},
+    {"id":"navaratri","name":{"en":"Navaratri Begins","kn":"ನವರಾತ್ರಿ ಪ್ರಾರಂಭ"},"masa":"Ashvina","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"ayudha_puja","name":{"en":"Maha Navami / Ayudha Puja","kn":"ಮಹಾ ನವಮಿ / ಆಯುಧ ಪೂಜೆ"},"masa":"Ashvina","paksha":"Shukla","tithi":9,"shopping_peak":true},
+    {"id":"vijayadashami","name":{"en":"Vijayadashami","kn":"ವಿಜಯದಶಮಿ"},"masa":"Ashvina","paksha":"Shukla","tithi":10,"shopping_peak":true},
+    {"id":"dhana_trayodashi","name":{"en":"Dhana Trayodashi","kn":"ಧನ ತ್ರಯೋದಶಿ"},"masa":"Ashvina","paksha":"Krishna","tithi":13,"shopping_peak":true},
+    {"id":"naraka_chaturdashi","name":{"en":"Naraka Chaturdashi","kn":"ನರಕ ಚತುರ್ದಶಿ"},"masa":"Ashvina","paksha":"Krishna","tithi":14,"shopping_peak":true},
+    {"id":"deepavali","name":{"en":"Deepavali (Lakshmi Puja)","kn":"ದೀಪಾವಳಿ (ಲಕ್ಷ್ಮಿ ಪೂಜೆ)"},"masa":"Ashvina","paksha":"Krishna","tithi":30,"shopping_peak":true},
+    {"id":"bali_padyami","name":{"en":"Bali Padyami","kn":"ಬಲಿ ಪಾಡ್ಯಮಿ"},"masa":"Kartika","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"karthika_purnima","name":{"en":"Karthika Purnima","kn":"ಕಾರ್ತಿಕ ಪೂರ್ಣಿಮೆ"},"masa":"Kartika","paksha":"Shukla","tithi":15,"shopping_peak":false},
+    {"id":"vaikuntha_ekadashi","name":{"en":"Vaikuntha Ekadashi","kn":"ವೈಕುಂಠ ಏಕಾದಶಿ"},"masa":"Pushya","paksha":"Shukla","tithi":11,"shopping_peak":false},
+    {"id":"ratha_saptami","name":{"en":"Ratha Saptami","kn":"ರಥ ಸಪ್ತಮಿ"},"masa":"Magha","paksha":"Shukla","tithi":7,"shopping_peak":false},
+    {"id":"maha_shivaratri","name":{"en":"Maha Shivaratri","kn":"ಮಹಾ ಶಿವರಾತ್ರಿ"},"masa":"Magha","paksha":"Krishna","tithi":14,"shopping_peak":false},
+    {"id":"holi","name":{"en":"Holi (Kama Dahana)","kn":"ಹೋಳಿ"},"masa":"Phalguna","paksha":"Shukla","tithi":15,"shopping_peak":false}
+];
+
+// Recurring vratas (checked every paksha)
+const VRATA_RULES = [
+    {"id":"ekadashi","name":{"en":"Ekadashi Vrata","kn":"ಏಕಾದಶಿ ವ್ರತ"},"tithi":11,"shopping_peak":false},
+    {"id":"pradosha","name":{"en":"Pradosha Vrata","kn":"ಪ್ರದೋಷ ವ್ರತ"},"tithi":13,"shopping_peak":false},
+    {"id":"chaturthi_s","name":{"en":"Vinayaka Chaturthi","kn":"ವಿನಾಯಕ ಚತುರ್ಥಿ"},"tithi":4,"paksha":"Shukla","shopping_peak":false},
+    {"id":"sankashti","name":{"en":"Sankashti Chaturthi","kn":"ಸಂಕಷ್ಟ ಚತುರ್ಥಿ"},"tithi":4,"paksha":"Krishna","shopping_peak":false},
+    {"id":"amavasya","name":{"en":"Amavasya","kn":"ಅಮಾವಾಸ್ಯೆ"},"tithi":30,"shopping_peak":false},
+    {"id":"purnima","name":{"en":"Purnima","kn":"ಹುಣ್ಣಿಮೆ"},"tithi":15,"shopping_peak":false},
+    {"id":"shivaratri","name":{"en":"Masa Shivaratri","kn":"ಮಾಸ ಶಿವರಾತ್ರಿ"},"tithi":14,"paksha":"Krishna","shopping_peak":false}
+];
+
+function matchFestivals(p) {
+    const results = [];
+    const tithiNum = p.tithi.no; // 1-based (1-30) from computePanchanga
+    const pakshaStr = p.tithi.paksha;
+    const masaStr = p.masa.en;
+
+    // Match major festivals
+    for (const f of FESTIVAL_RULES) {
+        if (f.tithi === tithiNum && f.paksha === pakshaStr && f.masa === masaStr) {
+            results.push(f);
+        }
+    }
+
+    // Match recurring vratas
+    const tithiInPaksha = tithiNum <= 15 ? tithiNum : tithiNum - 15; // 1-15 within each paksha
+    for (const v of VRATA_RULES) {
+        if (v.tithi <= 15) {
+            // Tithi within paksha (e.g. Ekadashi = 11th of each paksha)
+            if (tithiInPaksha === v.tithi) {
+                if (!v.paksha || v.paksha === pakshaStr) {
+                    // Don't duplicate if already matched as a named festival
+                    if (!results.find(r => r.id === v.id)) {
+                        results.push(v);
+                    }
+                }
+            }
+        } else {
+            // Absolute tithi (Amavasya = 30, Purnima = 15)
+            if (tithiNum === v.tithi) {
+                if (!results.find(r => r.id === v.id)) {
+                    results.push(v);
+                }
+            }
+        }
+    }
+
+    return results;
 }
 
 let lastPanchanga = null;
@@ -875,10 +978,13 @@ let lastPanchanga = null;
 function shareDailyPanchangam() {
     if (!lastPanchanga) { alert("Compute today's panchangam first."); return; }
     const p = lastPanchanga;
-    const text = `*Kuberan Panchangam*\n📅 ${p.dateStr}\n${p.samvatsara} · ${p.masaName} ${p.paksha} · ${p.ritu}\n\n☀️ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\n🔸 Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.end)})\n⭐ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.end)})\n🔹 Yoga: ${p.yoga.name} (until ${fmt(p.yoga.end)})\n📐 Karana: ${p.karana.name}\n📆 Vara: ${p.vara.en}\n\n⚠️ Rahu Kala: ${fmt(p.rahu.start)}–${fmt(p.rahu.end)}\n⚠️ Yamaganda: ${fmt(p.yama.start)}–${fmt(p.yama.end)}\n✅ Abhijit: ${fmt(p.abhijit.start)}–${fmt(p.abhijit.end)}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
+    const tz = p.tzOff;
+    const fmt = (jd) => jdToLocalTimeStr(jd, tz);
+    const dateStr = `${p.day}/${p.month}/${p.year}`;
+    const text = `*Kuberan Panchangam*\n📅 ${dateStr}\n${p.samvatsara.name} · ${p.masa.en} ${p.tithi.paksha} · ${p.ritu}\n\n☀️ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\n🔸 Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.endJD)})\n⭐ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.endJD)})\n🔹 Yoga: ${p.yoga.name} (until ${fmt(p.yoga.endJD)})\n📐 Karana: ${p.karana.name}\n📆 Vara: ${p.vara.en}\n\n⚠️ Rahu Kala: ${fmt(p.rahu.start)}–${fmt(p.rahu.end)}\n⚠️ Yamaganda: ${fmt(p.yama.start)}–${fmt(p.yama.end)}\n✅ Abhijit: ${fmt(p.abhijit.start)}–${fmt(p.abhijit.end)}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
 
     if (navigator.share) {
-        navigator.share({ title: `Panchangam ${p.dateStr}`, text }).catch(() => {});
+        navigator.share({ title: `Panchangam ${dateStr}`, text }).catch(() => {});
     } else {
         navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
     }
