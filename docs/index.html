@@ -298,6 +298,20 @@
         <div id="gocharaList"></div>
     </div>
 
+    <!-- HORA (Planetary Hours) -->
+    <div class="card">
+        <h2>⏰ Hora (ಹೋರಾ)</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Current planetary hour ruler. Each hora is 1/12th of day or night.</p>
+        <div id="horaList"></div>
+    </div>
+
+    <!-- GOWRI PANCHANGAM -->
+    <div class="card">
+        <h2>🌺 Gowri Panchangam (ಗೌರಿ ಪಂಚಾಂಗ)</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">8 daily time slots with quality ratings. Very popular in Karnataka & South India.</p>
+        <div id="gowriList"></div>
+    </div>
+
     <!-- SHARE DAILY -->
     <button onclick="shareDailyPanchangam()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">📤 Share Today's Panchangam</button>
 
@@ -394,6 +408,18 @@
         <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px; text-align:center;">
             <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:5px;">Vimshottari Dasha Balance at Birth</div>
             <div style="font-size:1.2rem; font-weight:bold; color:var(--maroon);" id="jDashaBalance">...</div>
+        </div>
+
+        <!-- Full Dasha Timeline -->
+        <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
+            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:10px; text-align:center;">Complete Vimshottari Maha Dasha Timeline (120 Years)</div>
+            <div id="jDashaTimeline" style="display:flex; flex-direction:column; gap:4px;"></div>
+        </div>
+
+        <!-- Graha Positions at Birth -->
+        <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
+            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:10px; text-align:center;">Graha Sthiti at Birth</div>
+            <div id="jGrahaAtBirth" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;"></div>
         </div>
 
         <div style="margin-top:30px; text-align:center; font-size:0.75rem; color:#999;">
@@ -1061,6 +1087,67 @@ function renderPanchanga(p) {
     } else {
         gocharaCard.style.display = 'none';
     }
+
+    // --- HORA (Planetary Hours) ---
+    // Chaldean order: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars
+    const HORA_ORDER = ['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
+    const HORA_ICONS = {'Sun':'☀️','Venus':'⚪','Mercury':'🟢','Moon':'🌙','Saturn':'🔵','Jupiter':'🟡','Mars':'🔴'};
+    const HORA_KN = {'Sun':'ಸೂರ್ಯ','Venus':'ಶುಕ್ರ','Mercury':'ಬುಧ','Moon':'ಚಂದ್ರ','Saturn':'ಶನಿ','Jupiter':'ಗುರು','Mars':'ಮಂಗಳ'};
+    // Weekday lord index in HORA_ORDER: Sun=0,Mon=3,Tue=6,Wed=2,Thu=5,Fri=1,Sat=4
+    const HORA_DAY_START = [0, 3, 6, 2, 5, 1, 4];
+    const dayHoraDur = (p.sunset - p.sunrise) / 12; // 12 day horas
+    const nightHoraDur = ((24 - (p.sunset - p.sunrise) * 24) / 12) / 24; // approx in JD fraction
+    const startIdx = HORA_DAY_START[dow];
+
+    let horaHtml = '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin-bottom:6px;">☀️ Day Horas</div>';
+    for (let i = 0; i < 12; i++) {
+        const planet = HORA_ORDER[(startIdx + i) % 7];
+        const s = p.sunrise + i * dayHoraDur;
+        const e = p.sunrise + (i + 1) * dayHoraDur;
+        const good = ['Jupiter','Venus','Mercury'].includes(planet);
+        const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
+        horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+    }
+    horaHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Night Horas</div>';
+    for (let i = 0; i < 12; i++) {
+        const planet = HORA_ORDER[(startIdx + 12 + i) % 7];
+        const s = p.sunset + i * nightHoraDur;
+        const e = p.sunset + (i + 1) * nightHoraDur;
+        const good = ['Jupiter','Venus','Mercury'].includes(planet);
+        const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
+        horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+    }
+    document.getElementById('horaList').innerHTML = horaHtml;
+
+    // --- GOWRI PANCHANGAM ---
+    // 8 time slots during the day. The sequence rotates based on weekday.
+    // Names: Amrita, Vishakanda (Poison), Mahodaya (Great Rise), Dhanada (Wealth),
+    //        Rogana (Disease), Kaalvela (Death time), Shubha (Auspicious), Laabha (Profit)
+    const GOWRI_SEQ = [
+        {en:'Amrita',kn:'ಅಮೃತ',q:'best'},
+        {en:'Vishakanda',kn:'ವಿಷಕಂದ',q:'bad'},
+        {en:'Mahodaya',kn:'ಮಹೋದಯ',q:'good'},
+        {en:'Dhanada',kn:'ಧನದ',q:'good'},
+        {en:'Rogana',kn:'ರೋಗಣ',q:'bad'},
+        {en:'Kaalvela',kn:'ಕಾಲವೇಲ',q:'bad'},
+        {en:'Shubha',kn:'ಶುಭ',q:'good'},
+        {en:'Laabha',kn:'ಲಾಭ',q:'good'}
+    ];
+    // Starting index by weekday (Sun=0..Sat=6) — Karnataka tradition
+    const GOWRI_START = [6, 4, 3, 2, 1, 0, 5];
+    const gowriSlot = (p.sunset - p.sunrise) / 8;
+    const gowriStart = GOWRI_START[dow];
+
+    let gowriHtml = '';
+    for (let i = 0; i < 8; i++) {
+        const g = GOWRI_SEQ[(gowriStart + i) % 8];
+        const s = p.sunrise + i * gowriSlot;
+        const e = p.sunrise + (i + 1) * gowriSlot;
+        const dot = g.q === 'best' ? 'good' : (g.q === 'good' ? 'good' : 'bad');
+        const style = g.q === 'best' ? 'color:var(--green);font-weight:700;' : (g.q === 'bad' ? 'color:var(--red);' : '');
+        gowriHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${g.en} <span style="font-family:var(--font-kn);color:var(--gold-light);font-size:0.8rem;">(${g.kn})</span></div><div class="window-time" style="${style}">${fmt(s)} – ${fmt(e)}</div></div>`;
+    }
+    document.getElementById('gowriList').innerHTML = gowriHtml;
 }
 
 // ============================================================
@@ -1479,6 +1566,54 @@ function generateJathaka() {
             document.getElementById('jYogaKarana').textContent = `${YOGA_EN[yogaIdx]}`;
 
             document.getElementById('jDashaBalance').textContent = dashaBalanceStr;
+
+            // --- Full Dasha Timeline ---
+            const DASHA_PLANET_NAMES = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+            const DASHA_COLORS = ['#9333ea','#f472b6','#f59e0b','#94a3b8','#ef4444','#6366f1','#eab308','#3b82f6','#22c55e'];
+            let dashaTimelineHtml = '';
+            let curDate = new Date(d.getTime()); // birth date
+            // Add balance of first dasha
+            const balanceDays = balanceYearsDecimal * 365.25;
+            curDate = new Date(curDate.getTime() + balanceDays * 86400000);
+            
+            // The first dasha lord
+            const firstDashaIdx = nakLordIdx;
+            // Show balance dasha first
+            const balEndStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
+            const birthDateStr = d.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
+            dashaTimelineHtml += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:#f8f0e0;border-radius:4px;border-left:4px solid ${DASHA_COLORS[firstDashaIdx]};">
+                <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[firstDashaIdx]}</div>
+                <div style="flex:1;font-size:0.8rem;color:#555;">${birthDateStr} → ${balEndStr}</div>
+                <div style="font-size:0.7rem;color:#888;">${bYears}y ${bMonths}m ${bDays}d</div>
+            </div>`;
+            
+            // Now show remaining 8 dashas in sequence
+            for (let i = 1; i <= 8; i++) {
+                const idx = (firstDashaIdx + i) % 9;
+                const yrs = DASHA_YEARS[idx];
+                const startStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
+                curDate = new Date(curDate.getTime() + yrs * 365.25 * 86400000);
+                const endStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
+                const now = new Date();
+                const isCurrent = (now >= new Date(startStr) && now <= new Date(endStr));
+                dashaTimelineHtml += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;${isCurrent ? 'background:#e8f5e9;' : 'background:#fafafa;'}border-radius:4px;border-left:4px solid ${DASHA_COLORS[idx]};">
+                    <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[idx]}${isCurrent ? ' ◀' : ''}</div>
+                    <div style="flex:1;font-size:0.8rem;color:#555;">${startStr} → ${endStr}</div>
+                    <div style="font-size:0.7rem;color:#888;">${yrs} yrs</div>
+                </div>`;
+            }
+            document.getElementById('jDashaTimeline').innerHTML = dashaTimelineHtml;
+
+            // --- Graha Positions at Birth ---
+            const birthGrahas = getAllGrahaPositions(jdBirthUTC);
+            document.getElementById('jGrahaAtBirth').innerHTML = birthGrahas.map(g =>
+                `<div style="text-align:center;padding:6px;border:1px solid #ddd;border-radius:4px;">
+                    <div style="font-size:0.9rem;">${g.icon}</div>
+                    <div style="font-size:0.7rem;color:#666;">${g.name}</div>
+                    <div style="font-weight:600;font-size:0.8rem;">${g.rashi}</div>
+                    <div style="font-size:0.65rem;color:#999;">${g.deg}°</div>
+                </div>`
+            ).join('');
 
             // Store current for sharing
             currentJathakaData = {
