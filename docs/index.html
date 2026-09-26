@@ -326,6 +326,46 @@
 <!-- MUHURTHA TAB -->
 <div class="tab-content" id="tab-muhurtha">
 <div class="container">
+    <!-- AUSPICIOUS DATE SCANNER -->
+    <div class="card">
+        <h2>📅 Auspicious Date Finder</h2>
+        <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Scan a date range to find the best muhurtham dates. Scores each day on Tithi, Nakshatra, Yoga, and inauspicious period overlap.</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div><label style="font-size:0.7rem;color:var(--text-dim);">From Date</label><input type="date" id="scanFrom" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;"></div>
+            <div><label style="font-size:0.7rem;color:var(--text-dim);">To Date</label><input type="date" id="scanTo" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;"></div>
+        </div>
+        <div style="margin-bottom:12px;">
+            <label style="font-size:0.7rem;color:var(--text-dim);">Purpose</label>
+            <select id="scanPurpose" style="background:var(--card);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
+                <option value="general">General Auspicious</option>
+                <option value="marriage">Marriage / Engagement</option>
+                <option value="griha_pravesha">Griha Pravesha (Housewarming)</option>
+                <option value="business">Business / Shop Opening</option>
+                <option value="travel">Travel / Journey</option>
+                <option value="vehicle">Vehicle Purchase</option>
+                <option value="education">Education / Study Start</option>
+            </select>
+        </div>
+        <button class="btn-calc" onclick="scanDates()">🔍 Scan for Auspicious Dates</button>
+        <div id="scanLoading" style="display:none;text-align:center;margin-top:12px;color:var(--gold);">⏳ Scanning dates...</div>
+        <div id="scanResults" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- TARABALAM -->
+    <div class="card" id="tarabalamCard" style="display:none;">
+        <h2>⭐ Today's Tarabalam (ತಾರಾಬಲ)</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Personalized star compatibility for today based on your birth Nakshatra.</p>
+        <div id="tarabalamResult"></div>
+    </div>
+
+    <!-- CHANDRABALAM -->
+    <div class="card" id="chandrabalamCard" style="display:none;">
+        <h2>🌙 Today's Chandrabalam (ಚಂದ್ರಬಲ)</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Moon's transit strength from your birth Moon sign.</p>
+        <div id="chandrabalamResult"></div>
+    </div>
+
+    <!-- EXISTING MULTI-PERSON COMPAT -->
     <div class="card">
         <h2>👥 Multi-Person Compatibility (up to 10)</h2>
         <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Enter birth details to evaluate Tara Bala for a chosen date.</p>
@@ -1331,6 +1371,8 @@ document.querySelectorAll('.tab-nav').forEach(btn => {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'muhurtha') updateMuhurthaPersonalized();
+        if (btn.dataset.tab === 'jathaka') loadJathakaHistory();
     });
 });
 
@@ -1646,6 +1688,102 @@ function generateJathaka() {
             document.getElementById('jathakaLoading').style.display = 'none';
         }
     }, 500); // 500ms delay to ensure loading UI renders smoothly
+}
+
+// ============================================================
+//  AUSPICIOUS DATE SCANNER
+// ============================================================
+const GOOD_NAK = [0,2,3,5,6,7,10,11,12,14,16,19,20,21,26];
+const BAD_TITHI = [4,9,14,8,30];
+
+function scoreDayForMuhurtham(p, purpose) {
+    let score = 50;
+    const tithiNum = p.tithi.no;
+    const nakIdx = p.nakshatra.idx;
+    if (BAD_TITHI.includes(tithiNum)) score -= 20;
+    if ([2,3,5,7,10,11,13].includes(tithiNum <= 15 ? tithiNum : tithiNum - 15)) score += 10;
+    if (tithiNum === 15) score += 5;
+    if (GOOD_NAK.includes(nakIdx)) score += 15;
+    if ([8,17,18].includes(nakIdx)) score -= 15;
+    if (INAUSPICIOUS_YOGAS.includes(p.yoga.idx)) score -= 15; else score += 5;
+    if (p.karana.isVishti) score -= 15;
+    if ([2].includes(p.wd)) score -= 10;
+    if ([1,3,4,5].includes(p.wd)) score += 5;
+    if (purpose === 'marriage' && [3,6,7,11,12,21,26].includes(nakIdx)) score += 10;
+    if ((purpose === 'business' || purpose === 'vehicle') && p.wd === 4) score += 10;
+    if (purpose === 'travel' && [2,6,12,21,26].includes(nakIdx)) score += 10;
+    const fests = matchFestivals(p);
+    if (fests.some(f => f.shopping_peak)) score += 5;
+    return Math.max(0, Math.min(100, score));
+}
+
+function scanDates() {
+    const fromStr = document.getElementById('scanFrom').value;
+    const toStr = document.getElementById('scanTo').value;
+    const purpose = document.getElementById('scanPurpose').value;
+    if (!fromStr || !toStr) { alert("Please select From and To dates."); return; }
+    const from = new Date(fromStr), to = new Date(toStr);
+    if (to - from > 90 * 86400000) { alert("Max scan range is 90 days."); return; }
+    document.getElementById('scanLoading').style.display = 'block';
+    document.getElementById('scanResults').innerHTML = '';
+    setTimeout(() => {
+        const loc = getLocation();
+        const results = [];
+        let cur = new Date(from);
+        while (cur <= to) {
+            const y = cur.getFullYear(), m = cur.getMonth() + 1, d = cur.getDate();
+            const p = computePanchanga(y, m, d, loc.lat, loc.lon, loc.tz);
+            if (p) {
+                const score = scoreDayForMuhurtham(p, purpose);
+                const fests = matchFestivals(p);
+                results.push({ date: new Date(cur), score, p, fests });
+            }
+            cur.setDate(cur.getDate() + 1);
+        }
+        results.sort((a, b) => b.score - a.score);
+        let html = `<div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:8px;">Scanned ${results.length} days. Top results:</div>`;
+        results.slice(0, 15).forEach(r => {
+            const ds = r.date.toLocaleDateString('en-IN', {weekday:'short',year:'numeric',month:'short',day:'numeric'});
+            const c = r.score >= 70 ? 'var(--green)' : (r.score >= 50 ? 'var(--orange)' : 'var(--red)');
+            const lb = r.score >= 70 ? '✅ Excellent' : (r.score >= 50 ? '🟡 Moderate' : '⚠️ Avoid');
+            const fs = r.fests.length > 0 ? ` · 🪔 ${r.fests[0].name.en}` : '';
+            html += `<div class="window-row"><div style="min-width:32px;text-align:center;font-weight:700;color:${c};">${r.score}</div><div class="window-name"><div>${ds}${fs}</div><div style="font-size:0.7rem;color:var(--text-dim);">${r.p.tithi.paksha} ${r.p.tithi.name} · ${r.p.nakshatra.name} · ${r.p.yoga.name}${r.p.karana.isVishti ? ' · ⚠️Vishti' : ''}</div></div><div class="window-time" style="color:${c};font-size:0.75rem;">${lb}</div></div>`;
+        });
+        document.getElementById('scanResults').innerHTML = html;
+        document.getElementById('scanLoading').style.display = 'none';
+    }, 300);
+}
+
+// ============================================================
+//  TARABALAM & CHANDRABALAM
+// ============================================================
+function updateMuhurthaPersonalized() {
+    const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    if (history.length === 0) return;
+    const latest = history[0];
+    const loc = getLocation();
+    const now = new Date();
+    const p = computePanchanga(now.getFullYear(), now.getMonth() + 1, now.getDate(), loc.lat, loc.lon, loc.tz);
+    if (!p) return;
+    const birthDob = new Date(latest.dobStrRaw);
+    const bJd = julianDay(birthDob.getFullYear(), birthDob.getMonth() + 1, birthDob.getDate(),
+        birthDob.getHours() + birthDob.getMinutes() / 60 + (birthDob.getTimezoneOffset() / 60));
+    const birthMoonLon = siderealMoon(bJd);
+    const birthNakIdx = Math.floor(birthMoonLon / (360 / 27));
+    const birthMoonRashiIdx = Math.floor(birthMoonLon / 30);
+    // Tarabalam
+    const todayNakIdx = p.nakshatra.idx;
+    const taraCycle = ((todayNakIdx - birthNakIdx + 27) % 27) % 9;
+    const TARA_FULL = ['Janma (Birth)','Sampat (Wealth)','Vipat (Danger)','Kshema (Prosperity)','Pratyak (Obstacle)','Sadhaka (Achievement)','Nidhana (Death)','Mitra (Friend)','Parama Mitra (Best Friend)'];
+    const isGoodTara = [1,3,5,7,8].includes(taraCycle);
+    document.getElementById('tarabalamCard').style.display = 'block';
+    document.getElementById('tarabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodTara?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodTara?'✅':'⚠️'}</div><div><div style="font-weight:700;">${TARA_FULL[taraCycle]}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${NAK_EN[birthNakIdx]} → Today: ${p.nakshatra.name} (Tara ${taraCycle+1}/9)</div><div style="font-size:0.8rem;margin-top:4px;${isGoodTara?'color:var(--green);':'color:var(--red);'}">${isGoodTara?'Favourable for activities':'Avoid starting important work'}</div></div></div>`;
+    // Chandrabalam
+    const todayMoonRashiIdx = Math.floor(siderealMoon(p.sunrise) / 30);
+    const chandraHouse = ((todayMoonRashiIdx - birthMoonRashiIdx + 12) % 12) + 1;
+    const isGoodChandra = [1,3,6,7,10,11].includes(chandraHouse);
+    document.getElementById('chandrabalamCard').style.display = 'block';
+    document.getElementById('chandrabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodChandra?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodChandra?'🌙':'🌑'}</div><div><div style="font-weight:700;">Moon in House ${chandraHouse}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${RASHI_EN[birthMoonRashiIdx]} → Today: ${RASHI_EN[todayMoonRashiIdx]}</div><div style="font-size:0.8rem;margin-top:4px;${isGoodChandra?'color:var(--green);':'color:var(--red);'}">${isGoodChandra?'Chandrabalam strong — auspicious':'Chandrabalam weak — caution'}</div></div></div>`;
 }
 
 // ============================================================
