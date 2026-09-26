@@ -160,6 +160,7 @@
         <button class="tab-nav active" data-tab="daily">Daily</button>
         <button class="tab-nav" data-tab="muhurtha">Muhurtha</button>
         <button class="tab-nav" data-tab="jathaka">Jathaka</button>
+        <button id="langToggle" onclick="toggleLang()" style="background:var(--maroon);border-color:var(--gold);color:var(--gold);font-weight:600;font-size:0.75rem;">ಕನ್ನಡ</button>
     </div>
 </div>
 
@@ -216,6 +217,19 @@
         <div class="sub" id="hdrContext">—</div>
         <div class="date-en" id="hdrDate">—</div>
         <div class="weekday-kn" id="hdrWeekday">—</div>
+    </div>
+
+    <!-- TODAY AT A GLANCE -->
+    <div class="card" id="glanceCard" style="background:linear-gradient(135deg, #1a1f38, #0f1320); border:1px solid var(--gold); border-left:4px solid var(--gold);">
+        <h2 style="margin-bottom:12px;">🕉️ Today at a Glance</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" id="glanceGrid">
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">TITHI</span><div style="font-weight:600;" id="glTithi">—</div></div>
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">NAKSHATRA</span><div style="font-weight:600;" id="glNak">—</div></div>
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">YOGA</span><div style="font-weight:600;" id="glYoga">—</div></div>
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">KARANA</span><div style="font-weight:600;" id="glKarana">—</div></div>
+        </div>
+        <div id="glVerdict" style="margin-top:12px;padding:10px;border-radius:6px;text-align:center;font-weight:600;font-size:0.9rem;"></div>
+        <div id="glFestival" style="margin-top:8px;text-align:center;font-family:var(--font-kn);color:var(--gold-light);font-size:0.9rem;"></div>
     </div>
 
     <!-- SUN & MOON -->
@@ -963,6 +977,26 @@ function renderPanchanga(p) {
     document.getElementById('hdrDate').textContent = dateObj.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     document.getElementById('hdrWeekday').textContent = `${p.vara.kn} · ${p.tithi.pakshaKn} · ${p.tithi.nameKn}`;
 
+    // Glance Card
+    const isKn = document.body.dataset.lang === 'kn';
+    document.getElementById('glTithi').innerHTML = `${isKn ? p.tithi.pakshaKn+' '+p.tithi.nameKn : p.tithi.paksha+' '+p.tithi.name} <span style="font-size:0.7rem;color:var(--text-dim);">till ${fmt(p.tithi.endJD)}</span>`;
+    document.getElementById('glNak').innerHTML = `${isKn ? p.nakshatra.nameKn : p.nakshatra.name} <span style="font-size:0.7rem;color:var(--text-dim);">P${p.nakshatra.pada}</span>`;
+    document.getElementById('glYoga').textContent = (isKn ? p.yoga.name : p.yoga.name) + (p.yoga.inauspicious ? ' ⚠️' : ' ✓');
+    document.getElementById('glKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️' : ' ✓');
+    // Quick verdict
+    let vScore = 0;
+    if (!BAD_TITHI.includes(p.tithi.no)) vScore++;
+    if (GOOD_NAK.includes(p.nakshatra.idx)) vScore++;
+    if (!INAUSPICIOUS_YOGAS.includes(p.yoga.idx)) vScore++;
+    if (!p.karana.isVishti) vScore++;
+    if ([1,3,4,5].includes(p.wd)) vScore++;
+    const vEl = document.getElementById('glVerdict');
+    if (vScore >= 4) { vEl.textContent = '✅ Highly Auspicious Day'; vEl.style.background = 'rgba(34,197,94,0.15)'; vEl.style.color = 'var(--green)'; }
+    else if (vScore >= 3) { vEl.textContent = '🟡 Moderately Auspicious'; vEl.style.background = 'rgba(245,158,11,0.15)'; vEl.style.color = 'var(--orange)'; }
+    else { vEl.textContent = '⚠️ Caution Advised'; vEl.style.background = 'rgba(239,68,68,0.15)'; vEl.style.color = 'var(--red)'; }
+    const glFests = matchFestivals(p);
+    document.getElementById('glFestival').textContent = glFests.length > 0 ? `🪔 ${glFests.map(f => f.name.kn).join(' · ')}` : '';
+
     // Sun/Moon
     document.getElementById('valSunrise').textContent = fmt(p.sunrise);
     document.getElementById('valSunset').textContent = fmt(p.sunset);
@@ -1353,6 +1387,14 @@ function recalculate() {
     const p = computePanchanga(y, m, d, loc.lat, loc.lon, loc.tz);
     lastPanchanga = p;
     renderPanchanga(p);
+}
+
+function toggleLang() {
+    const isKn = document.body.dataset.lang === 'kn';
+    document.body.dataset.lang = isKn ? 'en' : 'kn';
+    document.getElementById('langToggle').textContent = isKn ? 'ಕನ್ನಡ' : 'English';
+    localStorage.setItem('kuberan_lang', document.body.dataset.lang);
+    recalculate();
 }
 
 function goToday() {
@@ -1816,6 +1858,11 @@ if ('serviceWorker' in navigator) {
 //  INIT — Try GPS first, fall back to defaults
 // ============================================================
 (function init() {
+    // Restore language preference
+    const savedLang = localStorage.getItem('kuberan_lang') || 'en';
+    document.body.dataset.lang = savedLang;
+    if (savedLang === 'kn') document.getElementById('langToggle').textContent = 'English';
+
     loadJathakaHistory();
     const now = new Date();
     document.getElementById('dateInput').value = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
