@@ -136,7 +136,26 @@
         
         .btn-print { background: var(--maroon); color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem; margin-top: 15px; }
 
-        @media (max-width: 500px) {
+        /* BOTTOM NAV */
+        .bottom-nav { display: none; }
+
+        @media (max-width: 650px) {
+            .top-bar .nav-right .desktop-tab { display: none; } /* Hide text tabs on mobile */
+            .bottom-nav {
+                display: flex; position: fixed; bottom: 0; left: 0; right: 0; 
+                background: rgba(17, 21, 39, 0.95); backdrop-filter: blur(10px);
+                border-top: 1px solid var(--card-border); 
+                z-index: 100; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom);
+            }
+            .bottom-nav button {
+                flex: 1; background: none; border: none; padding: 10px 0; color: var(--text-dim);
+                display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: color 0.2s;
+            }
+            .bottom-nav button .icon { font-size: 1.2rem; margin-bottom: 4px; }
+            .bottom-nav button span { font-size: 0.65rem; font-weight: 600; }
+            .bottom-nav button.active { color: var(--gold); }
+            body { padding-bottom: 70px; }
+            
             .limb-grid { grid-template-columns: 1fr; }
             .sun-moon { grid-template-columns: 1fr 1fr; }
             .person-form { grid-template-columns: 1fr; }
@@ -164,14 +183,23 @@
     </a>
     <h1>KUBERAN PANCHANGAM</h1>
     <div class="nav-right">
-        <button class="tab-nav active" data-tab="daily">Daily</button>
-        <button class="tab-nav" data-tab="muhurtha">Muhurtha</button>
-        <button class="tab-nav" data-tab="jathaka">Jathaka</button>
-        <button class="tab-nav" data-tab="matching">Match</button>
-        <button class="tab-nav" data-tab="calendar">📅</button>
+        <button class="tab-nav desktop-tab active" data-tab="daily">Daily</button>
+        <button class="tab-nav desktop-tab" data-tab="muhurtha">Muhurtha</button>
+        <button class="tab-nav desktop-tab" data-tab="jathaka">Jathaka</button>
+        <button class="tab-nav desktop-tab" data-tab="matching">Match</button>
+        <button class="tab-nav desktop-tab" data-tab="calendar">📅</button>
         <button id="langToggle" onclick="toggleLang()" style="background:var(--maroon);border-color:var(--gold);color:var(--gold);font-weight:600;font-size:0.75rem;">ಕನ್ನಡ</button>
     </div>
 </div>
+
+<!-- BOTTOM NAV (Mobile) -->
+<nav class="bottom-nav">
+    <button class="tab-nav active" data-tab="daily"><div class="icon">🏠</div><span>Daily</span></button>
+    <button class="tab-nav" data-tab="muhurtha"><div class="icon">⏳</div><span>Muhurtha</span></button>
+    <button class="tab-nav" data-tab="jathaka"><div class="icon">📜</div><span>Jathaka</span></button>
+    <button class="tab-nav" data-tab="matching"><div class="icon">💑</div><span>Match</span></button>
+    <button class="tab-nav" data-tab="calendar"><div class="icon">📅</div><span>Calendar</span></button>
+</nav>
 
 <!-- INSTALL BANNER -->
 <div class="install-banner" id="installBanner">
@@ -354,7 +382,8 @@
     <div class="disclaimer">
         Computed values (Drik Ganita, Lahiri Ayanamsa) may differ from a printed almanac.<br>
         For religious observance, follow your family priest / the printed Panchanga.<br>
-        Engine: Drik · Ayanamsa: Lahiri (Chitrapaksha) · Ephemeris: Moshier
+        Engine: Drik · Ayanamsa: Lahiri (Chitrapaksha) · Ephemeris: Moshier<br><br>
+        <span style="color:var(--gold);">Version 1.2.0 (Ashtakoota Update)</span>
     </div>
 </div>
 </div>
@@ -1580,7 +1609,7 @@ document.querySelectorAll('.tab-nav').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-nav').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
+        document.querySelectorAll(`.tab-nav[data-tab="${btn.dataset.tab}"]`).forEach(b => b.classList.add('active'));
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
         if (btn.dataset.tab === 'muhurtha') updateMuhurthaPersonalized();
         if (btn.dataset.tab === 'jathaka') loadJathakaHistory();
