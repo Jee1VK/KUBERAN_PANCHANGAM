@@ -11,6 +11,7 @@
     <link rel="apple-touch-icon" href="assets/images/kuberan_logo_white_bg.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/ashtakoota.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -166,6 +167,7 @@
         <button class="tab-nav active" data-tab="daily">Daily</button>
         <button class="tab-nav" data-tab="muhurtha">Muhurtha</button>
         <button class="tab-nav" data-tab="jathaka">Jathaka</button>
+        <button class="tab-nav" data-tab="matching">Match</button>
         <button class="tab-nav" data-tab="calendar">📅</button>
         <button id="langToggle" onclick="toggleLang()" style="background:var(--maroon);border-color:var(--gold);color:var(--gold);font-weight:600;font-size:0.75rem;">ಕನ್ನಡ</button>
     </div>
@@ -538,6 +540,58 @@
 
 </div>
 </div>
+
+<!-- MATCHING TAB -->
+<div class="tab-content" id="tab-matching">
+<div class="container">
+    <div class="card">
+        <h2>💑 Marriage Matching (Ashtakoota)</h2>
+        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:12px;">Enter the Nakshatra and Pada of the prospective bride and groom to calculate Ashtakoota Guna Milan (36 Points System).</p>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
+            <div style="background:rgba(255,105,180,0.1); padding:10px; border-radius:8px; border:1px solid #ff69b4;">
+                <h3 style="color:#ff69b4; margin-bottom:8px; font-size:0.95rem;">👰 Bride (Vadhū)</h3>
+                <label style="font-size:0.75rem;">Nakshatra</label>
+                <select id="matchGirlNak" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:8px; font-size:0.85rem;"></select>
+                <label style="font-size:0.75rem;">Pada (Quarter)</label>
+                <select id="matchGirlPada" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.85rem;">
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                </select>
+            </div>
+            
+            <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:8px; border:1px solid #3b82f6;">
+                <h3 style="color:#3b82f6; margin-bottom:8px; font-size:0.95rem;">🤵 Groom (Vara)</h3>
+                <label style="font-size:0.75rem;">Nakshatra</label>
+                <select id="matchBoyNak" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:8px; font-size:0.85rem;"></select>
+                <label style="font-size:0.75rem;">Pada (Quarter)</label>
+                <select id="matchBoyPada" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.85rem;">
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="doMarriageMatch()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;">Calculate Compatibility</button>
+    </div>
+    
+    <div class="card" id="matchResultArea" style="display:none;">
+        <div style="text-align:center; padding:15px 0;">
+            <div style="font-size:3rem; font-weight:800; color:var(--gold); line-height:1;" id="matchScore">--/36</div>
+            <div style="font-size:1.1rem; font-weight:600; margin-top:8px;" id="matchVerdict">--</div>
+            <div style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;" id="matchSubtext">--</div>
+        </div>
+        
+        <div style="margin-top:15px; border-top:1px solid var(--card-border); padding-top:10px;">
+            <h3 style="font-size:0.9rem; margin-bottom:10px; color:var(--gold);">Detailed Ashtakoota Breakdown</h3>
+            <div style="display:grid; grid-template-columns:2fr 3fr 1fr; gap:6px; font-size:0.8rem; border-bottom:1px solid var(--card-border); padding-bottom:6px; color:var(--text-dim);">
+                <div>Koota</div><div>Result</div><div style="text-align:right;">Score</div>
+            </div>
+            <div id="matchTable" style="display:flex; flex-direction:column; gap:8px; margin-top:8px; font-size:0.85rem;"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+
 
 <!-- CALENDAR TAB -->
 <div class="tab-content" id="tab-calendar">
@@ -2109,6 +2163,64 @@ if ('serviceWorker' in navigator) {
 }
 
 // ============================================================
+//  MARRIAGE MATCHING
+// ============================================================
+function doMarriageMatch() {
+    if (typeof calculateAshtakoota === 'undefined') {
+        alert("Ashtakoota engine is loading. Please try again in a moment.");
+        return;
+    }
+    
+    const bNak = parseInt(document.getElementById('matchBoyNak').value);
+    const bPada = parseInt(document.getElementById('matchBoyPada').value);
+    const gNak = parseInt(document.getElementById('matchGirlNak').value);
+    const gPada = parseInt(document.getElementById('matchGirlPada').value);
+    
+    const result = calculateAshtakoota(bNak, bPada, gNak, gPada);
+    
+    document.getElementById('matchResultArea').style.display = 'block';
+    
+    const scoreEl = document.getElementById('matchScore');
+    scoreEl.textContent = `${result.total} / 36`;
+    
+    const verdictEl = document.getElementById('matchVerdict');
+    if (result.total >= 25) {
+        verdictEl.textContent = "✅ Highly Compatible (Uttama)";
+        verdictEl.style.color = "var(--green)";
+    } else if (result.total >= 18) {
+        verdictEl.textContent = "🟡 Acceptable (Madhyama)";
+        verdictEl.style.color = "var(--orange)";
+    } else {
+        verdictEl.textContent = "⚠️ Not Recommended (Adhama)";
+        verdictEl.style.color = "var(--red)";
+    }
+    
+    let html = '';
+    const kootas = [
+        {name: 'Varna', key: 'varna', desc: 'Work & Ego'},
+        {name: 'Vashya', key: 'vashya', desc: 'Attraction'},
+        {name: 'Tara', key: 'tara', desc: 'Health & Wellbeing'},
+        {name: 'Yoni', key: 'yoni', desc: 'Intimacy & Nature'},
+        {name: 'Graha Maitri', key: 'maitri', desc: 'Friendship & Mind'},
+        {name: 'Gana', key: 'gana', desc: 'Temperament'},
+        {name: 'Bhakoot', key: 'bhakoot', desc: 'Family & Wealth'},
+        {name: 'Nadi', key: 'nadi', desc: 'Genetics & Progeny'}
+    ];
+    
+    kootas.forEach(k => {
+        const r = result[k.key];
+        const isGood = r.score >= (r.max / 2);
+        html += `
+        <div style="display:grid; grid-template-columns:2fr 3fr 1fr; gap:6px; align-items:center; padding:6px 0; border-bottom:1px solid var(--card-border);">
+            <div><div style="font-weight:600;">${k.name}</div><div style="font-size:0.65rem; color:var(--text-dim);">${k.desc}</div></div>
+            <div style="color:${isGood ? 'var(--green)' : 'var(--red)'}; font-size:0.8rem;">${r.desc}</div>
+            <div style="text-align:right; font-weight:700;">${r.score}/${r.max}</div>
+        </div>`;
+    });
+    document.getElementById('matchTable').innerHTML = html;
+}
+
+// ============================================================
 //  INIT — Try GPS first, fall back to defaults
 // ============================================================
 (function init() {
@@ -2116,6 +2228,12 @@ if ('serviceWorker' in navigator) {
     const savedLang = localStorage.getItem('kuberan_lang') || 'en';
     document.body.dataset.lang = savedLang;
     if (savedLang === 'kn') document.getElementById('langToggle').textContent = 'English';
+
+    // Populate Matching Dropdowns
+    let nakOpts = '';
+    NAK_EN.forEach((n, i) => { nakOpts += `<option value="${i+1}">${i+1}. ${n}</option>`; });
+    document.getElementById('matchBoyNak').innerHTML = nakOpts;
+    document.getElementById('matchGirlNak').innerHTML = nakOpts;
 
     loadJathakaHistory();
     const now = new Date();
