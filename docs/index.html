@@ -1827,8 +1827,8 @@ function generateJathaka() {
             
             const jdBirthUTC = julianDay(y, m, day, (d.getHours() + d.getMinutes()/60) - (d.getTimezoneOffset()/-60)); // Fixed julianDay
             
-            const sunLng = (sunLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
-            const moonLng = (moonLongitude(jdBirthUTC) - ayanamsa(jdBirthUTC) + 360) % 360;
+            const sunLng = (sunLongitude(jdBirthUTC) - lahiriAyanamsa(jdBirthUTC) + 360) % 360;
+            const moonLng = (moonLongitude(jdBirthUTC) - lahiriAyanamsa(jdBirthUTC) + 360) % 360;
 
             // Calculate Exact Tithi at birth
             let diff = moonLng - sunLng;
