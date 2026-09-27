@@ -250,6 +250,19 @@
         <div id="festivalList"></div>
     </div>
 
+    <!-- SANKRANTI INDICATOR -->
+    <div class="card" id="sankrantiCard" style="display:none;">
+        <h2>🌞 Sankranti</h2>
+        <div id="sankrantiInfo"></div>
+    </div>
+
+    <!-- UPCOMING FESTIVALS -->
+    <div class="card">
+        <h2>📆 Upcoming Festivals</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Next 5 festivals from today.</p>
+        <div id="upcomingFests"></div>
+    </div>
+
     <!-- FIVE LIMBS -->
     <div class="card">
         <h2>🕉️ Pancha Anga — Five Limbs</h2>
@@ -1128,6 +1141,56 @@ function renderPanchanga(p) {
     } else {
         festCard.style.display = 'none';
     }
+
+    // --- SANKRANTI (Sun changing Rashi) ---
+    const sunRashiToday = Math.floor(siderealSun(p.sunrise) / 30);
+    const sunRashiTomorrow = Math.floor(siderealSun(p.sunrise + 1) / 30);
+    const sankrantiCard = document.getElementById('sankrantiCard');
+    if (sunRashiToday !== sunRashiTomorrow) {
+        sankrantiCard.style.display = 'block';
+        document.getElementById('sankrantiInfo').innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 0;">
+                <span style="font-size:1.5rem;">🌞</span>
+                <div>
+                    <div style="font-weight:600;">Sankranti (ಸಂಕ್ರಾಂತಿ)</div>
+                    <div style="font-size:0.85rem; color:var(--text-dim);">Sun moves from <b>${RASHI_EN[sunRashiToday]}</b> to <b>${RASHI_EN[sunRashiTomorrow]}</b></div>
+                </div>
+            </div>`;
+    } else {
+        sankrantiCard.style.display = 'none';
+    }
+
+    // --- UPCOMING FESTIVALS ---
+    setTimeout(() => {
+        let upFests = [];
+        let scanJd = p.sunrise + 1; // Start from tomorrow
+        let daysScanned = 0;
+        
+        while (upFests.length < 5 && daysScanned < 90) {
+            const loc = getLocation();
+            // Need gregorian date for computePanchanga
+            const cd = new Date((scanJd - 2440587.5) * 86400000);
+            const np = computePanchanga(cd.getFullYear(), cd.getMonth() + 1, cd.getDate(), loc.lat, loc.lon, loc.tz);
+            if (np) {
+                const fs = matchFestivals(np);
+                fs.forEach(f => {
+                    if (upFests.length < 5) upFests.push({ date: cd, f });
+                });
+            }
+            scanJd += 1;
+            daysScanned++;
+        }
+        
+        document.getElementById('upcomingFests').innerHTML = upFests.map(uf => `
+            <div class="window-row" style="padding:6px 0; border-bottom:1px solid var(--card-border);">
+                <div class="window-dot ${uf.f.shopping_peak ? 'good' : 'neutral'}"></div>
+                <div class="window-name" style="flex:1;">
+                    <div style="font-weight:600;">${uf.f.name.en} <span style="font-size:0.8rem; font-family:var(--font-kn); color:var(--gold-light);">(${uf.f.name.kn})</span></div>
+                    <div style="font-size:0.75rem; color:var(--text-dim);">${uf.date.toLocaleDateString('en-IN', {weekday:'short', month:'short', day:'numeric'})}</div>
+                </div>
+            </div>
+        `).join('');
+    }, 0);
 
     // --- GRAHA STHITI (Planetary Positions) ---
     const grahas = getAllGrahaPositions(p.sunrise);

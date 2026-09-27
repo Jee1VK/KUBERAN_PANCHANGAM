@@ -1,30 +1,38 @@
-# Kuberan Panchangam
+﻿# Kuberan Panchangam
 
-A downloadable, offline-capable application for precise South Indian Chandramana Panchangam calculations, powered by Swiss Ephemeris. Built with a Python FastAPI backend and a responsive HTML/JS frontend.
+A comprehensive, offline-first Progressive Web App (PWA) for accurate Vedic astrology and Panchangam calculations. Built entirely in JavaScript with a pure astronomical engine (Meeus/VSOP87 derivatives), it requires no external API calls for calculations.
 
-## Features
-- **High Precision Astronomy:** Uses `pyswisseph` with Lahiri Ayanamsa.
-- **Dynamic Geolocation:** Supports custom Lat/Lon or preset cities.
-- **Multi-Person Compatibility:** Evaluate Tara Bala for up to 10 individuals to find the best dates for activities (Buying a car, Griha Pravesha, etc.).
-- **Offline Capable:** Can be compiled into a standalone Windows executable.
+## 🌟 Key Features
 
-## How to Run for Development
-1. Install Python 3.9+
-2. Install dependencies:
-   ```powershell
-   pip install -r requirements.txt
-   ```
-3. Run the server:
-   ```powershell
-   python app.py
-   ```
-4. Open your browser and navigate to `http://localhost:8000`
+*   **Daily Panchangam:** Tithi, Nakshatra, Yoga, Karana, Vara with exact end times.
+*   **Planetary Engine:** Real-time positions for Navagraha (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu) using Lahiri (Chitrapaksha) Ayanamsa.
+*   **Muhurtham Tools:**
+    *   **Auspicious Date Scanner:** Scan up to 90 days to find the best dates for marriage, business, travel, etc., with scoring 0-100.
+    *   **Tarabalam & Chandrabalam:** Personalized daily transit scores based on your birth chart.
+    *   **Daily Time Windows:** Rahu Kala, Yamaganda, Gulika, Abhijit, Brahma Muhurta.
+    *   **Choghadiya & Hora:** Daily/nightly planetary hours and Choghadiya slots.
+    *   **Gowri Panchangam:** 8-slot Karnataka tradition daily timing.
+*   **Jathaka (Kundli) Generator:**
+    *   Instant birth chart calculation.
+    *   Full **Vimshottari Dasha** 120-year timeline with balance at birth.
+    *   Local history storage (auto-deletes after 48h).
+*   **Festivals & Vratas:**
+    *   22 major Karnataka festivals & 7 recurring vratas (Ekadashi, Pradosha, Sankashti, etc.).
+    *   Monthly calendar view with ICS export.
+    *   Sankranti (solar ingress) detection.
+*   **Bilingual UI:** English and Kannada toggle.
+*   **Fully Offline:** PWA support, installable to home screen.
 
-## How to Build the Offline Downloadable App
-To create a standalone application that users can download from GitHub and run completely offline (without needing Python installed), run the build script:
+## 🛠️ Architecture
 
-```powershell
-.\build.ps1
-```
+*   index.html: The core application (UI + JS Astronomical Engine).
+*   sw.js: Service worker for offline caching.
+*   manifest.json: Web app manifest.
+*   **No dependencies:** Zero external JS libraries. Everything runs locally in the browser.
 
-This will use PyInstaller to compile the app into an executable located in the `dist/KuberanPanchangam/` folder. You can zip this folder and upload it to GitHub Releases. Users just extract it and double-click `KuberanPanchangam.exe`.
+## 🚀 Deployment
+
+The app is hosted on GitHub Pages:
+[https://jee1vk.github.io/KUBERAN_PANCHANGAM/](https://jee1vk.github.io/KUBERAN_PANCHANGAM/)
+
+To update, simply modify index.html, bump the version in sw.js, and push to the master branch.
