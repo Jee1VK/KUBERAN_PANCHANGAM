@@ -1,4 +1,4 @@
-﻿// KUBERAN PANCHANGAM - ASHTAKOOTA GUNA MILAN
+// KUBERAN PANCHANGAM - ASHTAKOOTA GUNA MILAN
 // 36-Point Matchmaking Algorithm
 
 // NAKSHATRA PROPERTIES
@@ -75,7 +75,7 @@ const YONI_MATRIX = [
 // 0=Sun, 1=Moon, 2=Mars, 3=Merc, 4=Jup, 5=Ven, 6=Sat
 const MAITRI_MATRIX = [
     [5,5,5,4,5,0,0], // Sun
-    [5,5,4,5,4,4,4], // Moon
+    [5,5,4,0,4,4,4], // Moon (Mercury is enemy)
     [5,5,5,0,5,4,4], // Mars
     [5,0,4,5,4,5,4], // Merc
     [5,5,5,0,5,0,4], // Jup
@@ -114,9 +114,23 @@ function calculateAshtakoota(boyNak, boyPada, girlNak, girlPada) {
     const varnaScore = (bRashi.varna <= gRashi.varna) ? 1 : 0;
     result.varna = { score: varnaScore, max: 1, desc: varnaScore === 1 ? 'Compatible' : 'Incompatible' };
 
-    // 2. VASHYA (Max 2) - Approximation: same varna gets 2, adjacent gets 1
-    const vashyaScore = (bRashi.varna === gRashi.varna) ? 2 : 1; 
-    result.vashya = { score: vashyaScore, max: 2, desc: vashyaScore === 2 ? 'Highly Compatible' : 'Average' };
+    // 2. VASHYA (Max 2) - Based on Rashi Vashya classification
+    // 0=Chatushpad(quadruped), 1=Dwipad(biped), 2=Jalchar(aquatic), 3=Vanchar(wild), 4=Keeta(insect)
+    // Aries=Chatushpad, Taurus=Chatushpad, Gemini=Dwipad, Cancer=Jalchar+Keeta,
+    // Leo=Vanchar, Virgo=Dwipad, Libra=Dwipad, Scorpio=Keeta,
+    // Sagittarius=Dwipad(latter half), Capricorn=Jalchar(latter half), Aquarius=Dwipad, Pisces=Jalchar
+    const VASHYA_TYPE = [0, 0, 1, 4, 3, 1, 1, 4, 1, 2, 1, 2]; // per rashi index
+    // Vashya compatibility: same type=2, Dwipad-controls-all=2 (if boy is Dwipad),
+    // complementary types=1, hostile=0
+    const bV = VASHYA_TYPE[bRashiIdx];
+    const gV = VASHYA_TYPE[gRashiIdx];
+    let vashyaScore = 0;
+    if (bV === gV) vashyaScore = 2;
+    else if (bV === 1 || gV === 1) vashyaScore = 1; // Dwipad has partial control over others
+    else if ((bV === 0 && gV === 3) || (bV === 3 && gV === 0)) vashyaScore = 0; // quadruped vs wild = hostile
+    else if ((bV === 2 && gV === 4) || (bV === 4 && gV === 2)) vashyaScore = 1; // aquatic-insect = partial
+    else vashyaScore = 0;
+    result.vashya = { score: vashyaScore, max: 2, desc: vashyaScore === 2 ? 'Highly Compatible' : (vashyaScore === 1 ? 'Average' : 'Incompatible') };
 
     // 3. TARA (Max 3)
     let bToG = (girlNak - boyNak) % 9; if (bToG <= 0) bToG += 9;
