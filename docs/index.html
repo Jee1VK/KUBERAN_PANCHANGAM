@@ -1205,7 +1205,7 @@ function renderPanchanga(p) {
     const CHOG_DAY_START = [0, 3, 6, 2, 5, 1, 4]; // Sun=0..Sat=6
     const CHOG_NIGHT_START = [5, 4, 2, 0, 3, 6, 1];
 
-    const dayLen = p.sunset - p.sunrise;
+    // dayLen is already declared above (p.sunset - p.sunrise)
     const nightLen = (24 * 60) - (dayLen * 24 * 60); // approximate in minutes
     const daySlot = dayLen / 8; // in fractional hours
     const nightSlot = nightLen / (8 * 60); // in fractional hours
