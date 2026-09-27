@@ -1,9 +1,10 @@
-const CACHE_NAME = 'kuberan-panchangam-v11';
+const CACHE_NAME = 'kuberan-panchangam-v12';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './assets/images/kuberan_logo_white_bg.png'
+  './assets/images/kuberan_logo_white_bg.png',
+  './js/ashtakoota.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -24,6 +25,16 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    fetch(event.request)
+      .then((response) => {
+        // If network fetch succeeds, cache the fresh response and return it
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+        return response;
+      })
+      .catch(() => {
+        // If network fails (offline), fallback to cache
+        return caches.match(event.request);
+      })
   );
 });
