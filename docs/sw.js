@@ -1,10 +1,11 @@
-const CACHE_NAME = 'kuberan-panchangam-v14';
+const CACHE_NAME = 'kuberan-panchangam-v15';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './assets/images/kuberan_logo_white_bg.png',
   './assets/images/app_icon.jpg',
+  './js/astronomy.js',
   './js/ashtakoota.js'
 ];
 

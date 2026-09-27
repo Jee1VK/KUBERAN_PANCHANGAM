@@ -11,6 +11,7 @@
     <link rel="apple-touch-icon" href="assets/images/app_icon.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/astronomy.js"></script>
     <script src="js/ashtakoota.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -770,57 +771,22 @@ function jdToDate(jd) {
 
 // Sun longitude (geometric, tropical, apparent)
 function sunLongitude(jd) {
-    const T = (jd - 2451545.0) / 36525.0;
-    // Mean longitude
-    let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
-    // Mean anomaly
-    let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
-    M = M * DEG;
-    // Equation of center
-    const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
-            + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
-            + 0.000289 * Math.sin(3 * M);
-    let sunLon = L0 + C;
-    // Apparent longitude (nutation approx)
-    const omega = 125.04 - 1934.136 * T;
-    sunLon = sunLon - 0.00569 - 0.00478 * Math.sin(omega * DEG);
-    return ((sunLon % 360) + 360) % 360;
+    const t = new Astronomy.AstroTime(jd - 2451545.0);
+    const geo = Astronomy.GeoVector(Astronomy.Body.Sun, t, true);
+    const rot = Astronomy.Rotation_EQJ_ECT(t);
+    const vec = Astronomy.RotateVector(rot, geo);
+    let elon = Math.atan2(vec.y, vec.x) * (180 / Math.PI);
+    return ((elon % 360) + 360) % 360;
 }
 
 // Moon longitude (geometric, tropical)
 function moonLongitude(jd) {
-    const T = (jd - 2451545.0) / 36525.0;
-    // Mean longitude
-    let Lp = 218.3165 + 481267.8813 * T;
-    // Mean elongation
-    const D = (297.8502 + 445267.1115 * T) * DEG;
-    // Sun's mean anomaly
-    const Ms = (357.5291 + 35999.0503 * T) * DEG;
-    // Moon's mean anomaly
-    const Mm = (134.9634 + 477198.8676 * T) * DEG;
-    // Moon's argument of latitude
-    const F = (93.2721 + 483202.0175 * T) * DEG;
-
-    // Major perturbation terms (truncated series — gives ~1' accuracy)
-    let dL = 0;
-    dL += 6.289 * Math.sin(Mm);
-    dL += 1.274 * Math.sin(2 * D - Mm);
-    dL += 0.658 * Math.sin(2 * D);
-    dL += 0.214 * Math.sin(2 * Mm);
-    dL -= 0.186 * Math.sin(Ms);
-    dL -= 0.114 * Math.sin(2 * F);
-    dL += 0.059 * Math.sin(2 * D - 2 * Mm);
-    dL += 0.057 * Math.sin(2 * D - Ms - Mm);
-    dL += 0.053 * Math.sin(2 * D + Mm);
-    dL += 0.046 * Math.sin(2 * D - Ms);
-    dL -= 0.041 * Math.sin(Ms - Mm);
-    dL -= 0.035 * Math.sin(D);
-    dL -= 0.031 * Math.sin(Ms + Mm);
-    dL -= 0.015 * Math.sin(2 * F - 2 * D);
-    dL += 0.011 * Math.sin(Mm - 2 * D); // Not from Moon position series but helps
-
-    Lp += dL;
-    return ((Lp % 360) + 360) % 360;
+    const t = new Astronomy.AstroTime(jd - 2451545.0);
+    const geo = Astronomy.GeoVector(Astronomy.Body.Moon, t, true);
+    const rot = Astronomy.Rotation_EQJ_ECT(t);
+    const vec = Astronomy.RotateVector(rot, geo);
+    let elon = Math.atan2(vec.y, vec.x) * (180 / Math.PI);
+    return ((elon % 360) + 360) % 360;
 }
 
 // Lahiri Ayanamsa
@@ -838,65 +804,6 @@ function siderealMoon(jd) { return ((moonLongitude(jd) - lahiriAyanamsa(jd)) % 3
 function elongation(jd) { return ((siderealMoon(jd) - siderealSun(jd)) % 360 + 360) % 360; }
 function yogaAngle(jd) { return ((siderealSun(jd) + siderealMoon(jd)) % 360 + 360) % 360; }
 
-// ============================================================
-//  PLANETARY LONGITUDES — Keplerian + perturbation (Meeus Ch.31)
-//  Accuracy: ~0.5° for inner, ~0.3° for outer — enough for Rashi
-// ============================================================
-function solveKepler(M, e, tol) {
-    let E = M;
-    for (let i = 0; i < 30; i++) {
-        const dE = (M - E + e * Math.sin(E)) / (1 - e * Math.cos(E));
-        E += dE;
-        if (Math.abs(dE) < (tol || 1e-8)) break;
-    }
-    return E;
-}
-
-function helioToGeo(lH, bH, rH, lS, rS) {
-    // Convert heliocentric ecliptic to geocentric ecliptic longitude
-    const x = rH * Math.cos(bH * DEG) * Math.cos(lH * DEG) - rS * Math.cos(lS * DEG);
-    const y = rH * Math.cos(bH * DEG) * Math.sin(lH * DEG) - rS * Math.sin(lS * DEG);
-    let lon = Math.atan2(y, x) * RAD;
-    return ((lon % 360) + 360) % 360;
-}
-
-function planetLongitude(jd, planet) {
-    const T = (jd - 2451545.0) / 36525.0;
-    // Orbital elements at epoch J2000 + rates per century (Meeus Table 31.A)
-    const planets = {
-        Mercury: { L: 252.2509 + 149472.6746 * T, a: 0.387098, e: 0.205635 + 0.000023 * T, i: 7.0050 + 0.0019 * T, Om: 48.3309 + 1.1862 * T, w: 77.4561 + 1.5564 * T },
-        Venus:   { L: 181.9798 + 58517.8157 * T, a: 0.723330, e: 0.006773 - 0.000048 * T, i: 3.3947 + 0.0010 * T, Om: 76.6799 + 0.9011 * T, w: 131.5637 + 1.4024 * T },
-        Mars:    { L: 355.4330 + 19140.2993 * T, a: 1.523679, e: 0.093405 + 0.000091 * T, i: 1.8497 - 0.0007 * T, Om: 49.5574 + 0.7721 * T, w: 336.0602 + 1.8410 * T },
-        Jupiter: { L: 34.3515 + 3034.9057 * T, a: 5.202561, e: 0.048498 + 0.000163 * T, i: 1.3033 - 0.0020 * T, Om: 100.4644 + 1.0210 * T, w: 14.3312 + 1.6127 * T },
-        Saturn:  { L: 50.0774 + 1222.1138 * T, a: 9.554747, e: 0.055509 - 0.000346 * T, i: 2.4889 + 0.0025 * T, Om: 113.6634 + 0.8770 * T, w: 93.0572 + 1.9638 * T }
-    };
-    const p = planets[planet];
-    if (!p) return 0;
-
-    // Mean anomaly
-    const M = ((p.L - p.w) % 360 + 360) % 360 * DEG;
-    const E = solveKepler(M, p.e);
-    const v = 2 * Math.atan2(Math.sqrt(1 + p.e) * Math.sin(E / 2), Math.sqrt(1 - p.e) * Math.cos(E / 2));
-    const r = p.a * (1 - p.e * Math.cos(E));
-
-    // Heliocentric ecliptic longitude
-    const wRad = ((p.w - p.Om) % 360 + 360) % 360 * DEG;
-    const OmRad = p.Om * DEG;
-    const iRad = p.i * DEG;
-    const u = v + wRad;
-
-    const lH = (Math.atan2(Math.sin(u) * Math.cos(iRad), Math.cos(u)) * RAD + p.Om);
-    const bH = Math.asin(Math.sin(u) * Math.sin(iRad)) * RAD;
-    const rH = r;
-
-    // Earth/Sun position for geocentric conversion
-    const sunTrop = sunLongitude(jd);
-    const rSun = 1.00014 - 0.01671 * Math.cos((357.5291 + 35999.0503 * T) * DEG);
-    const lSun = (sunTrop + 180) % 360; // heliocentric Earth = Sun + 180
-
-    return helioToGeo(lH, bH, rH, lSun, rSun);
-}
-
 // Mean Rahu (ascending node of Moon) — always retrograde
 function rahuLongitude(jd) {
     const T = (jd - 2451545.0) / 36525.0;
@@ -905,9 +812,15 @@ function rahuLongitude(jd) {
 }
 
 // Sidereal planet longitudes
-function siderealPlanet(jd, planet) {
-    const trop = planetLongitude(jd, planet);
-    return ((trop - lahiriAyanamsa(jd)) % 360 + 360) % 360;
+function siderealPlanet(jd, planetName) {
+    const t = new Astronomy.AstroTime(jd - 2451545.0);
+    const body = Astronomy.Body[planetName];
+    const geo = Astronomy.GeoVector(body, t, true);
+    const rot = Astronomy.Rotation_EQJ_ECT(t);
+    const vec = Astronomy.RotateVector(rot, geo);
+    let elon = Math.atan2(vec.y, vec.x) * (180 / Math.PI);
+    if (elon < 0) elon += 360;
+    return ((elon - lahiriAyanamsa(jd)) % 360 + 360) % 360;
 }
 function siderealRahu(jd) { return ((rahuLongitude(jd) - lahiriAyanamsa(jd)) % 360 + 360) % 360; }
 function siderealKetu(jd) { return (siderealRahu(jd) + 180) % 360; }
@@ -937,48 +850,23 @@ function getAllGrahaPositions(jd) {
 // ============================================================
 //  SUNRISE / SUNSET — Meeus algorithm
 // ============================================================
-function sunDeclRA(jd) {
-    const T = (jd - 2451545.0) / 36525.0;
-    let L0 = 280.46646 + 36000.76983 * T;
-    let M = (357.52911 + 35999.05029 * T) * DEG;
-    const C = (1.914602 - 0.004817 * T) * Math.sin(M) + 0.019993 * Math.sin(2 * M);
-    const sunLon = (L0 + C) * DEG;
-    const eps = (23.439291 - 0.0130042 * T) * DEG;
-    const sinLon = Math.sin(sunLon);
-    const dec = Math.asin(Math.sin(eps) * sinLon);
-    const ra = Math.atan2(Math.cos(eps) * sinLon, Math.cos(sunLon));
-    return { dec, ra };
-}
-
 function computeSunrise(year, month, day, lat, lon) {
-    // Returns { rise: fractionalHoursUTC, set: fractionalHoursUTC }
-    const jd = julianDay(year, month, day, 12); // noon
-    const T = (jd - 2451545.0) / 36525.0;
-    // Equation of time approximation
-    let L0 = 280.46646 + 36000.76983 * T;
-    let M = (357.52911 + 35999.05029 * T) * DEG;
-    const eqTime = -7.655 * Math.sin((L0 * DEG)) + 9.873 * Math.sin(2 * (L0 * DEG) + 3.5932);
-    // Better: use NOAA method
-    const { dec } = sunDeclRA(jd);
-    const latR = lat * DEG;
-    // Standard refraction correction: -0.8333 degrees
-    const ha = Math.acos((Math.sin(-0.8333 * DEG) - Math.sin(latR) * Math.sin(dec)) / (Math.cos(latR) * Math.cos(dec)));
-    if (isNaN(ha)) return null; // no sunrise/sunset (polar)
-    const haDeg = ha * RAD;
-    const noon = 12.0 - lon / 15.0; // approximate solar noon in UTC hours
-    // Better noon using equation of time
-    const Jnoon = jd; // already at noon
-    const { ra } = sunDeclRA(Jnoon);
-
-    // Simple NOAA-style
-    const T2 = T;
-    const L = 280.46646 + 36000.76983 * T2;
-    const eot_y = Math.tan((23.439 - 0.013 * T2) * DEG / 2); const eot_y2 = eot_y * eot_y;
-    const eot = 4 * RAD * (eot_y2 * Math.sin(2 * L * DEG) - 2 * 0.01671 * Math.sin(M) + 4 * 0.01671 * eot_y2 * Math.sin(M) * Math.cos(2 * L * DEG) - 0.5 * eot_y2 * eot_y2 * Math.sin(4 * L * DEG) - 1.25 * 0.01671 * 0.01671 * Math.sin(2 * M));
-    const solarNoon = 720 - 4 * lon - eot; // in minutes UTC
-    const rise = solarNoon - 4 * haDeg; // minutes UTC
-    const set = solarNoon + 4 * haDeg;
-    return { rise: rise / 60, set: set / 60 }; // fractional hours UTC
+    const dLocal = new Date(year, month - 1, day, 0, 0, 0);
+    const startTime = new Astronomy.AstroTime(dLocal);
+    const obs = new Astronomy.Observer(lat, lon, 0);
+    const rise = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, 1, startTime, 1);
+    const set = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, -1, startTime, 1);
+    
+    // Convert back to fractional UTC hours relative to the same day noon to match old API if needed,
+    // OR we can just return exact UTC fractional hours for that Gregorian day.
+    // Actually, earlier code did: `julianDay(y,m,d, riseTime)`.
+    // Let's just return the exact Julian Day from Astronomy Engine!
+    // But computeSunrise was returning fractional hours UTC.
+    // Let's return the fractional hours UTC on the given day.
+    const baseJD = julianDay(year, month, day, 0); 
+    const riseJD = rise ? (rise.ut + 2451545.0) : (baseJD + 6/24);
+    const setJD = set ? (set.ut + 2451545.0) : (baseJD + 18/24);
+    return { rise: (riseJD - baseJD) * 24, set: (setJD - baseJD) * 24 };
 }
 
 // ============================================================
