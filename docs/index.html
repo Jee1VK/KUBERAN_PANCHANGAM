@@ -383,6 +383,13 @@
         <div id="moudhyaWarning" style="margin-top:10px; font-size:0.8rem; color:var(--red); font-weight:600; text-align:center;"></div>
     </div>
 
+    <!-- LAGNA TABLE (Daily Ascendants) -->
+    <div class="card">
+        <h2>⏱️ Daily Lagna (ಲಗ್ನ ಪಟ್ಟಿ)</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Exact entry and exit times of all 12 ascendants calculated for your location from sunrise to next sunrise.</p>
+        <div id="lagnaList" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
+    </div>
+
     <!-- GOCHARA (Transit Analysis) -->
     <div class="card" id="gocharaCard" style="display:none;">
         <h2>🔮 Gochara (ಗೋಚಾರ)</h2>
@@ -832,6 +839,45 @@ function siderealPlanet(jd, planetName) {
 function siderealRahu(jd) { return ((rahuLongitude(jd) - lahiriAyanamsa(jd)) % 360 + 360) % 360; }
 function siderealKetu(jd) { return (siderealRahu(jd) + 180) % 360; }
 
+// ============================================================
+//  LAGNA (ASCENDANT) CALCULATIONS
+// ============================================================
+function getSiderealAscendant(jd, lat, lon) {
+    const t = new Astronomy.AstroTime(jd - 2451545.0);
+    let last = Astronomy.SiderealTime(t) + (lon / 15.0);
+    last = ((last % 24) + 24) % 24;
+    const obq = Astronomy.e_tilt(t).tobl * (Math.PI / 180);
+    const lastRad = last * 15 * (Math.PI / 180);
+    const latRad = lat * (Math.PI / 180);
+    
+    const y = Math.cos(lastRad);
+    const x = -(Math.sin(lastRad) * Math.cos(obq)) - (Math.tan(latRad) * Math.sin(obq));
+    let ascDeg = Math.atan2(y, x) * (180 / Math.PI);
+    if (ascDeg < 0) ascDeg += 360;
+    
+    return (ascDeg - lahiriAyanamsa(jd) + 360) % 360;
+}
+
+function computeDailyLagnas(jdStart, lat, lon) {
+    const lagnas = [];
+    const step = 2 / 1440; // 2 minute resolution
+    let currentJD = jdStart;
+    let prevLagnaIdx = Math.floor(getSiderealAscendant(currentJD, lat, lon) / 30);
+    let blockStart = currentJD;
+    
+    while (currentJD < jdStart + 1.0) {
+        currentJD += step;
+        let lagnaIdx = Math.floor(getSiderealAscendant(currentJD, lat, lon) / 30);
+        if (lagnaIdx !== prevLagnaIdx) {
+            lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: currentJD });
+            blockStart = currentJD;
+            prevLagnaIdx = lagnaIdx;
+        }
+    }
+    lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: currentJD });
+    return lagnas;
+}
+
 const NAK_SYLLABLES = [
     ["Chu","Che","Cho","La"],["Li","Lu","Le","Lo"],["A","I","U","E"],["O","Va","Vi","Vu"],
     ["Ve","Vo","Ka","Ki"],["Ku","Gha","Ng","Chha"],["Ke","Ko","Ha","Hi"],["Hu","He","Ho","Da"],
@@ -1040,6 +1086,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
         samvatsara: { name: samvatsaraName, idx: samvatsaraIdx, shaka: shakaYear },
         ayana: { en: ayana, kn: ayanaKn },
         ritu: rituName,
+        lagnas: computeDailyLagnas(riseJD, lat, lon),
         wd, year, month, day
     };
 }
@@ -1257,6 +1304,15 @@ function renderPanchanga(p) {
     } else {
         mWarning.textContent = '';
     }
+
+    // --- LAGNA TABLE (Daily Ascendants) ---
+    const lagnaGrid = document.getElementById('lagnaList');
+    lagnaGrid.innerHTML = p.lagnas.map(l => 
+        `<div style="background:#1a2038; padding:8px; border-radius:6px; border-left:3px solid var(--gold);">
+            <div style="font-weight:600; font-size:0.9rem;">${RASHI_EN[l.idx]} <span style="font-size:0.75rem; color:var(--text-dim); font-weight:normal;">${RASHI_KN[l.idx]}</span></div>
+            <div style="font-size:0.8rem; margin-top:4px;">${fmt(l.start)} – ${fmt(l.end)}</div>
+        </div>`
+    ).join('');
 
     // --- GOCHARA (Transit Analysis) ---
     // Check if user has generated a Jathaka to get their birth Moon Rashi
