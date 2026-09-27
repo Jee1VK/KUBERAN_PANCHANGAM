@@ -380,6 +380,7 @@
         <h2>🪐 Graha Sthiti (ಗ್ರಹ ಸ್ಥಿತಿ)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Sidereal (Lahiri) positions of the Navagraha at sunrise.</p>
         <div id="grahaGrid" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;"></div>
+        <div id="moudhyaWarning" style="margin-top:10px; font-size:0.8rem; color:var(--red); font-weight:600; text-align:center;"></div>
     </div>
 
     <!-- GOCHARA (Transit Analysis) -->
@@ -528,6 +529,7 @@
         
         <div class="jathaka-grid">
             <div class="j-box"><div class="l">Janma Nakshatra (Birth Star)</div><div class="v" id="jNak">...</div></div>
+            <div class="j-box"><div class="l">Namakarana Akshara (Name Letter)</div><div class="v" id="jNamaLetter">...</div></div>
             <div class="j-box"><div class="l">Nakshatra Lord</div><div class="v" id="jNakLord">...</div></div>
             <div class="j-box"><div class="l">Janma Rashi (Moon Sign)</div><div class="v" id="jMoonRashi">...</div></div>
             <div class="j-box"><div class="l">Rashi Lord</div><div class="v" id="jRashiLord">...</div></div>
@@ -830,6 +832,16 @@ function siderealPlanet(jd, planetName) {
 function siderealRahu(jd) { return ((rahuLongitude(jd) - lahiriAyanamsa(jd)) % 360 + 360) % 360; }
 function siderealKetu(jd) { return (siderealRahu(jd) + 180) % 360; }
 
+const NAK_SYLLABLES = [
+    ["Chu","Che","Cho","La"],["Li","Lu","Le","Lo"],["A","I","U","E"],["O","Va","Vi","Vu"],
+    ["Ve","Vo","Ka","Ki"],["Ku","Gha","Ng","Chha"],["Ke","Ko","Ha","Hi"],["Hu","He","Ho","Da"],
+    ["Di","Du","De","Do"],["Ma","Mi","Mu","Me"],["Mo","Ta","Ti","Tu"],["Te","To","Pa","Pi"],
+    ["Pu","Sha","Na","Tha"],["Pe","Po","Ra","Ri"],["Ru","Re","Ro","Ta"],["Ti","Tu","Te","To"],
+    ["Na","Ni","Nu","Ne"],["No","Ya","Yi","Yu"],["Ye","Yo","Ba","Bi"],["Bu","Dha","Bha","Dha"],
+    ["Be","Bo","Ja","Ji"],["Ju","Je","Jo","Gha"],["Ga","Gi","Gu","Ge"],["Go","Sa","Si","Su"],
+    ["Se","So","Da","Di"],["Du","Tha","Jha","Na"],["De","Do","Cha","Chi"]
+];
+
 // Get all 9 graha positions
 function getAllGrahaPositions(jd) {
     const grahas = [
@@ -843,11 +855,18 @@ function getAllGrahaPositions(jd) {
         { name: 'Rahu', nameKn: 'ರಾಹು', icon: '🐍', lon: siderealRahu(jd) },
         { name: 'Ketu', nameKn: 'ಕೇತು', icon: '🔥', lon: siderealKetu(jd) }
     ];
+    const sunLon = grahas[0].lon;
     grahas.forEach(g => {
         g.rashiIdx = Math.floor(g.lon / 30);
         g.rashi = RASHI_EN[g.rashiIdx];
         g.rashiKn = RASHI_KN[g.rashiIdx];
         g.deg = (g.lon % 30).toFixed(1);
+        
+        if (g.name === 'Jupiter' || g.name === 'Venus') {
+            let dist = Math.abs(g.lon - sunLon);
+            if (dist > 180) dist = 360 - dist;
+            g.combust = (g.name === 'Jupiter' && dist <= 11) || (g.name === 'Venus' && dist <= 10);
+        }
     });
     return grahas;
 }
@@ -1043,7 +1062,9 @@ function renderPanchanga(p) {
     // Glance Card
     const isKn = document.body.dataset.lang === 'kn';
     document.getElementById('glTithi').innerHTML = `${isKn ? p.tithi.pakshaKn+' '+p.tithi.nameKn : p.tithi.paksha+' '+p.tithi.name} <span style="font-size:0.7rem;color:var(--text-dim);">till ${fmt(p.tithi.endJD)}</span>`;
-    document.getElementById('glNak').innerHTML = `${isKn ? p.nakshatra.nameKn : p.nakshatra.name} <span style="font-size:0.7rem;color:var(--text-dim);">P${p.nakshatra.pada}</span>`;
+    
+    const syllable = NAK_SYLLABLES[p.nakshatra.idx - 1][p.nakshatra.pada - 1];
+    document.getElementById('glNak').innerHTML = `${isKn ? p.nakshatra.nameKn : p.nakshatra.name} <span style="font-size:0.75rem;color:var(--gold);">P${p.nakshatra.pada} (${syllable})</span>`;
     document.getElementById('glYoga').textContent = (isKn ? p.yoga.name : p.yoga.name) + (p.yoga.inauspicious ? ' ⚠️' : ' ✓');
     document.getElementById('glKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️' : ' ✓');
     // Quick verdict
@@ -1222,12 +1243,20 @@ function renderPanchanga(p) {
     grahaGrid.innerHTML = grahas.map(g =>
         `<div style="background:#1a2038;padding:8px;border-radius:6px;text-align:center;">
             <div style="font-size:1.1rem;">${g.icon}</div>
-            <div style="font-size:0.75rem;color:var(--text-dim);">${g.name}</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);">${g.name}${g.combust ? ' <span style="color:var(--red);" title="Combust (Moudhya)">⚠️</span>' : ''}</div>
             <div style="font-weight:600;font-size:0.85rem;">${g.rashi}</div>
             <div style="font-family:var(--font-kn);font-size:0.75rem;color:var(--gold-light);">${g.rashiKn}</div>
             <div style="font-size:0.65rem;color:var(--text-dim);">${g.deg}°</div>
         </div>`
     ).join('');
+    
+    const moudhya = grahas.filter(g => g.combust).map(g => g.nameKn + ' (' + g.name + ')');
+    const mWarning = document.getElementById('moudhyaWarning');
+    if (moudhya.length > 0) {
+        mWarning.textContent = '⚠️ Moudhya (Combust): ' + moudhya.join(', ') + ' — Marriages/Auspicious events prohibited.';
+    } else {
+        mWarning.textContent = '';
+    }
 
     // --- GOCHARA (Transit Analysis) ---
     // Check if user has generated a Jathaka to get their birth Moon Rashi
@@ -1759,7 +1788,9 @@ function generateJathaka() {
             document.getElementById('jReportName').textContent = name;
             document.getElementById('jReportDobLoc').textContent = `${dobLocaleStr} | ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
             
+            const nakSyllable = NAK_SYLLABLES[exactNakIdx][pada - 1];
             document.getElementById('jNak').textContent = `${nakName} (Pada ${pada})`;
+            document.getElementById('jNamaLetter').textContent = `${nakSyllable} / ${nakSyllable.toUpperCase()}`;
             document.getElementById('jNakLord').textContent = lordName;
             
             const moonRashiStr = RASHI_EN[exactMoonRashiIdx];
