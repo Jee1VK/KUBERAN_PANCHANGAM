@@ -15,15 +15,15 @@ const NAK_PROPS = [
     {nadi:0, gana:0, yoni:5},  // 7. Punarvasu
     {nadi:1, gana:0, yoni:2},  // 8. Pushya
     {nadi:2, gana:2, yoni:5},  // 9. Ashlesha
-    {nadi:2, gana:2, yoni:6},  // 10. Magha
+    {nadi:0, gana:2, yoni:6},  // 10. Magha
     {nadi:1, gana:1, yoni:6},  // 11. Purva Phalguni
-    {nadi:0, gana:1, yoni:7},  // 12. Uttara Phalguni
-    {nadi:0, gana:0, yoni:8},  // 13. Hasta
+    {nadi:2, gana:1, yoni:7},  // 12. Uttara Phalguni
+    {nadi:2, gana:0, yoni:8},  // 13. Hasta
     {nadi:1, gana:2, yoni:9},  // 14. Chitra
-    {nadi:2, gana:0, yoni:8},  // 15. Swati
-    {nadi:2, gana:2, yoni:9},  // 16. Vishakha
+    {nadi:0, gana:0, yoni:8},  // 15. Swati
+    {nadi:0, gana:2, yoni:9},  // 16. Vishakha
     {nadi:1, gana:0, yoni:10}, // 17. Anuradha
-    {nadi:0, gana:2, yoni:10}, // 18. Jyeshtha
+    {nadi:2, gana:2, yoni:10}, // 18. Jyeshtha
     {nadi:0, gana:2, yoni:4},  // 19. Mula
     {nadi:1, gana:1, yoni:11}, // 20. Purvashadha
     {nadi:2, gana:1, yoni:12}, // 21. Uttarashadha
@@ -75,7 +75,7 @@ const YONI_MATRIX = [
 // 0=Sun, 1=Moon, 2=Mars, 3=Merc, 4=Jup, 5=Ven, 6=Sat
 const MAITRI_MATRIX = [
     [5,5,5,4,5,0,0], // Sun
-    [5,5,4,0,4,4,4], // Moon (Mercury is enemy)
+    [5,5,4,5,4,4,4], // Moon (Sun and Mercury are friends)
     [5,5,5,0,5,4,4], // Mars
     [5,0,4,5,4,5,4], // Merc
     [5,5,5,0,5,0,4], // Jup
@@ -119,7 +119,7 @@ function calculateAshtakoota(boyNak, boyPada, girlNak, girlPada) {
     // Aries=Chatushpad, Taurus=Chatushpad, Gemini=Dwipad, Cancer=Jalchar+Keeta,
     // Leo=Vanchar, Virgo=Dwipad, Libra=Dwipad, Scorpio=Keeta,
     // Sagittarius=Dwipad(latter half), Capricorn=Jalchar(latter half), Aquarius=Dwipad, Pisces=Jalchar
-    const VASHYA_TYPE = [0, 0, 1, 4, 3, 1, 1, 4, 1, 2, 1, 2]; // per rashi index
+    const VASHYA_TYPE = [0, 0, 1, 2, 3, 1, 1, 4, 1, 2, 1, 2]; // per rashi index
     // Vashya compatibility: same type=2, Dwipad-controls-all=2 (if boy is Dwipad),
     // complementary types=1, hostile=0
     const bV = VASHYA_TYPE[bRashiIdx];
@@ -151,6 +151,7 @@ function calculateAshtakoota(boyNak, boyPada, girlNak, girlPada) {
     else if ((maitri1 === 5 && maitri2 === 4) || (maitri1 === 4 && maitri2 === 5)) maitriScore = 4;
     else if (maitri1 === 4 && maitri2 === 4) maitriScore = 3;
     else if ((maitri1 === 5 && maitri2 === 0) || (maitri1 === 0 && maitri2 === 5)) maitriScore = 1;
+    else if ((maitri1 === 4 && maitri2 === 0) || (maitri1 === 0 && maitri2 === 4)) maitriScore = 0.5;
     else maitriScore = 0;
     result.maitri = { score: maitriScore, max: 5, desc: maitriScore >= 4 ? 'Friendly' : (maitriScore > 1 ? 'Neutral' : 'Inimical') };
 

@@ -704,16 +704,18 @@ const DEG = Math.PI / 180;
 const RAD = 180 / Math.PI;
 
 // Tithi names
-const TITHI_EN = ["Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi"];
-const TITHI_KN = ["ಪಾಡ್ಯ","ಬಿದಿಗೆ","ತದಿಗೆ","ಚತುರ್ಥಿ","ಪಂಚಮಿ","ಷಷ್ಠಿ","ಸಪ್ತಮಿ","ಅಷ್ಟಮಿ","ನವಮಿ","ದಶಮಿ","ಏಕಾದಶಿ","ದ್ವಾದಶಿ","ತ್ರಯೋದಶಿ","ಚತುರ್ದಶಿ"];
+const TITHI_EN = ["Prathama","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi"];
+const TITHI_KN = ["ಪ್ರಥಮ", "ದ್ವಿತೀಯ", "ತೃತೀಯ", "ಚತುರ್ಥಿ", "ಪಂಚಮಿ", "ಷಷ್ಠಿ", "ಸಪ್ತಮಿ", "ಅಷ್ಟಮಿ", "ನವಮಿ", "ದಶಮಿ", "ಏಕಾದಶಿ", "ದ್ವಾದಶಿ", "ತ್ರಯೋದಶಿ", "ಚತುರ್ದಶಿ"];
 
 // Nakshatra names
 const NAK_EN = ["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
 const NAK_KN = ["ಅಶ್ವಿನಿ","ಭರಣಿ","ಕೃತ್ತಿಕಾ","ರೋಹಿಣಿ","ಮೃಗಶಿರ","ಆರ್ದ್ರಾ","ಪುನರ್ವಸು","ಪುಷ್ಯ","ಆಶ್ಲೇಷ","ಮಘ","ಪೂರ್ವ ಫಲ್ಗುಣಿ","ಉತ್ತರ ಫಲ್ಗುಣಿ","ಹಸ್ತ","ಚಿತ್ರಾ","ಸ್ವಾತಿ","ವಿಶಾಖ","ಅನುರಾಧ","ಜ್ಯೇಷ್ಠ","ಮೂಲ","ಪೂರ್ವಾಷಾಢ","ಉತ್ತರಾಷಾಢ","ಶ್ರವಣ","ಧನಿಷ್ಠ","ಶತಭಿಷ","ಪೂರ್ವಾಭಾದ್ರ","ಉತ್ತರಾಭಾದ್ರ","ರೇವತಿ"];
 
 // Yoga names
-const YOGA_EN = ["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarma","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyan","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"];
+const YOGA_EN = ["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarma","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyana","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"];
 const INAUSPICIOUS_YOGAS = [0,5,8,9,12,14,16,18,26]; // indices
+const GOOD_NAK = [0,2,3,5,6,7,10,11,12,14,16,19,20,21,26];
+const BAD_TITHI = [4,9,14,8,30];
 
 // Karana names
 const MOVABLE_KARANA = ["Bava","Balava","Kaulava","Taitila","Gara","Vanija","Vishti"];
@@ -735,11 +737,11 @@ const VARA_KN = ["ಭಾನುವಾರ","ಸೋಮವಾರ","ಮಂಗಳವ�
 
 // Rahu/Yama/Gulika tables (Sun=0 .. Sat=6) — which 1/8th of day
 const RAHU   = [8,2,7,5,6,4,3];
-const YAMA   = [5,4,3,2,1,7,6];
+const YAMA   = [5,4,3,7,2,1,6];
 const GULIKA = [7,6,5,4,3,2,1];
 
 // Samvatsara names
-const SAMVATSARA = ["Prabhava","Vibhava","Shukla","Pramoduta","Prajapati","Angirasa","Shrimukha","Bhava","Yuva","Dhatri","Ishvara","Bahudhanya","Pramathi","Vikrama","Vrisha","Chitrabhanu","Svabhanu","Tarana","Parthiva","Vyaya","Sarvajit","Sarvadhari","Virodhi","Vikruti","Khara","Nandana","Vijaya","Jaya","Manmatha","Durmukhi","Hevilambi","Vilambi","Vikari","Sharvari","Plava","Shubhakrit","Shobhakrit","Krodhi","Vishvavasu","Parabhava","Plavanga","Kilaka","Saumya","Sadharana","Virodhikrit","Paridhavi","Pramadicha","Ananda","Rakshasa","Nala","Pingala","Kalayukti","Siddharthi","Raudra","Durmati","Dundubhi","Rudhirodgari","Raktakshi","Krodhana","Akshaya"];
+const SAMVATSARA = ["Prabhava","Vibhava","Shukla","Pramoduta","Prajotpatti","Angirasa","Shrimukha","Bhava","Yuva","Dhatu","Ishvara","Bahudhanya","Pramathi","Vikrama","Vrisha","Chitrabhanu","Svabhanu","Tarana","Parthiva","Vyaya","Sarvajit","Sarvadhari","Virodhi","Vikruti","Khara","Nandana","Vijaya","Jaya","Manmatha","Durmukhi","Hevilambi","Vilambi","Vikari","Sharvari","Plava","Shubhakrit","Shobhakrit","Krodhi","Vishvavasu","Parabhava","Plavanga","Kilaka","Saumya","Sadharana","Virodhikrit","Paridhavi","Pramadicha","Ananda","Rakshasa","Nala","Pingala","Kalayukti","Siddharthi","Raudra","Durmati","Dundubhi","Rudhirodgari","Raktakshi","Krodhana","Akshaya"];
 
 // Masa names
 const MASA_EN = ["Chaitra","Vaishakha","Jyeshtha","Ashadha","Shravana","Bhadrapada","Ashvina","Kartika","Margashira","Pushya","Magha","Phalguna"];
@@ -889,7 +891,7 @@ const NAK_SYLLABLES = [
     ["Ve","Vo","Ka","Ki"],["Ku","Gha","Ng","Chha"],["Ke","Ko","Ha","Hi"],["Hu","He","Ho","Da"],
     ["Di","Du","De","Do"],["Ma","Mi","Mu","Me"],["Mo","Ta","Ti","Tu"],["Te","To","Pa","Pi"],
     ["Pu","Sha","Na","Tha"],["Pe","Po","Ra","Ri"],["Ru","Re","Ro","Ta"],["Ti","Tu","Te","To"],
-    ["Na","Ni","Nu","Ne"],["No","Ya","Yi","Yu"],["Ye","Yo","Ba","Bi"],["Bu","Dha","Bha","Dha"],
+    ["Na","Ni","Nu","Ne"],["No","Ya","Yi","Yu"],["Ye","Yo","Ba","Bi"],["Bhu","Dha","Pha","Dha"],
     ["Be","Bo","Ja","Ji"],["Ju","Je","Jo","Gha"],["Ga","Gi","Gu","Ge"],["Go","Sa","Si","Su"],
     ["Se","So","Da","Di"],["Du","Tha","Jha","Na"],["De","Do","Cha","Chi"]
 ];
@@ -1128,7 +1130,7 @@ function renderPanchanga(p) {
     const isKn = document.body.dataset.lang === 'kn';
     document.getElementById('glTithi').innerHTML = `${isKn ? p.tithi.pakshaKn+' '+p.tithi.nameKn : p.tithi.paksha+' '+p.tithi.name} <span style="font-size:0.7rem;color:var(--text-dim);">till ${fmt(p.tithi.endJD)}</span>`;
     
-    const syllable = NAK_SYLLABLES[p.nakshatra.idx - 1][p.nakshatra.pada - 1];
+    const syllable = NAK_SYLLABLES[p.nakshatra.idx][p.nakshatra.pada - 1];
     document.getElementById('glNak').innerHTML = `${isKn ? p.nakshatra.nameKn : p.nakshatra.name} <span style="font-size:0.75rem;color:var(--gold);">P${p.nakshatra.pada} (${syllable})</span>`;
     document.getElementById('glYoga').textContent = (isKn ? p.yoga.name : p.yoga.name) + (p.yoga.inauspicious ? ' ⚠️' : ' ✓');
     document.getElementById('glKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️' : ' ✓');
@@ -1987,8 +1989,7 @@ function generateJathaka() {
 // ============================================================
 //  AUSPICIOUS DATE SCANNER
 // ============================================================
-const GOOD_NAK = [0,2,3,5,6,7,10,11,12,14,16,19,20,21,26];
-const BAD_TITHI = [4,9,14,8,30];
+
 
 function scoreDayForMuhurtham(p, purpose) {
     let score = 50;
