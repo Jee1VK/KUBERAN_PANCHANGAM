@@ -357,6 +357,12 @@
                 <div class="value" id="valVara">—</div>
                 <div class="value-kn" id="valVaraKn">—</div>
             </div>
+            <div class="limb-item full-width" style="border-left-color:var(--orange);">
+                <div class="label">Shraddha Tithi (For Ancestral Rites) · ಶ್ರಾದ್ಧ ತಿಥಿ</div>
+                <div class="value" id="valShraddhaTithi">—</div>
+                <div class="value-kn" id="valShraddhaTithiKn">—</div>
+                <div class="time" id="valShraddhaTimeInfo">Determined by Aparahna Kala (Afternoon)</div>
+            </div>
         </div>
     </div>
 
@@ -1070,6 +1076,17 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     // Ritu
     const rituName = RITU[masaIdx];
 
+    // Shraddha Tithi (Aparahna Kala)
+    const dayLen = setJD - riseJD;
+    const aparahnaMidJD = riseJD + (dayLen * 0.7); // Midpoint of Aparahna (3/5 to 4/5 of day)
+    const sElong = elongation(aparahnaMidJD);
+    const sTithiNo = Math.floor(sElong / 12) + 1;
+    let sTithiName, sTithiNameKn;
+    if (sTithiNo === 15) { sTithiName = "Purnima"; sTithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
+    else if (sTithiNo === 30) { sTithiName = "Amavasya"; sTithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
+    else { const idx = (sTithiNo - 1) % 15; sTithiName = TITHI_EN[idx]; sTithiNameKn = TITHI_KN[idx]; }
+    const shraddha = { no: sTithiNo, name: sTithiName, nameKn: sTithiNameKn, paksha: sTithiNo <= 15 ? 'Shukla' : 'Krishna', pakshaKn: sTithiNo <= 15 ? 'ಶುಕ್ಲ' : 'ಕೃಷ್ಣ' };
+
     return {
         sunrise: riseJD, sunset: setJD, tzOff,
         tithi: { no: tithiNo, name: tithiName, nameKn: tithiNameKn, paksha, pakshaKn, endJD: tithiEnd },
@@ -1087,6 +1104,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
         ayana: { en: ayana, kn: ayanaKn },
         ritu: rituName,
         lagnas: computeDailyLagnas(riseJD, lat, lon),
+        shraddhaTithi: shraddha,
         wd, year, month, day
     };
 }
@@ -1151,6 +1169,10 @@ function renderPanchanga(p) {
 
     document.getElementById('valVara').textContent = p.vara.en;
     document.getElementById('valVaraKn').textContent = p.vara.kn;
+
+    // Shraddha Tithi
+    document.getElementById('valShraddhaTithi').textContent = `${p.shraddhaTithi.paksha} ${p.shraddhaTithi.name}`;
+    document.getElementById('valShraddhaTithiKn').textContent = `${p.shraddhaTithi.pakshaKn} ${p.shraddhaTithi.nameKn}`;
 
     // Windows
     const dayLen = p.sunset - p.sunrise;
