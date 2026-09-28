@@ -1081,7 +1081,6 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     const rituName = RITU[masaIdx];
 
     // Shraddha Tithi (Aparahna Kala)
-    const dayLen = setJD - riseJD;
     const aparahnaMidJD = riseJD + (dayLen * 0.7); // Midpoint of Aparahna (3/5 to 4/5 of day)
     const sElong = elongation(aparahnaMidJD);
     const sTithiNo = Math.floor(sElong / 12) + 1;
