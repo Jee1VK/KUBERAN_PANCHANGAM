@@ -192,7 +192,7 @@
 <!-- DISCLAIMER MODAL -->
 <div id="disclaimerModal">
     <div class="modal-content">
-        <h2 style="color:var(--gold); margin-bottom:15px; font-size:1.4rem;">⚠️ Important Notice</h2>
+        <h2 style="color:var(--gold); margin-bottom:15px; font-size:1.4rem;">âš ï¸ Important Notice</h2>
         <p style="font-size:0.95rem; line-height:1.6; margin-bottom:20px; color:var(--text);">
             The <b>KUBERAN PANCHANGAM</b> app creates astrological estimations and suggestions. It is highly suggested to contact your Purohit (family priest) before making any final decisions based on this data.
         </p>
@@ -214,23 +214,23 @@
         <button class="tab-nav desktop-tab" data-tab="muhurtha">Muhurtha</button>
         <button class="tab-nav desktop-tab" data-tab="jathaka">Jathaka</button>
         <button class="tab-nav desktop-tab" data-tab="matching">Match</button>
-        <button class="tab-nav desktop-tab" data-tab="calendar">📅</button>
-        <button id="langToggle" onclick="toggleLang()" style="background:var(--maroon);border-color:var(--gold);color:var(--gold);font-weight:600;font-size:0.75rem;">ಕನ್ನಡ</button>
+        <button class="tab-nav desktop-tab" data-tab="calendar">ðŸ“…</button>
+        <button id="langToggle" onclick="toggleLang()" style="background:var(--maroon);border-color:var(--gold);color:var(--gold);font-weight:600;font-size:0.75rem;">à²•à²¨à³à²¨à²¡</button>
     </div>
 </div>
 
 <!-- BOTTOM NAV (Mobile) -->
 <nav class="bottom-nav">
-    <button class="tab-nav active" data-tab="daily"><div class="icon">🏠</div><span>Daily</span></button>
-    <button class="tab-nav" data-tab="muhurtha"><div class="icon">⏳</div><span>Muhurtha</span></button>
-    <button class="tab-nav" data-tab="jathaka"><div class="icon">📜</div><span>Jathaka</span></button>
-    <button class="tab-nav" data-tab="matching"><div class="icon">💑</div><span>Match</span></button>
-    <button class="tab-nav" data-tab="calendar"><div class="icon">📅</div><span>Calendar</span></button>
+    <button class="tab-nav active" data-tab="daily"><div class="icon">ðŸ </div><span>Daily</span></button>
+    <button class="tab-nav" data-tab="muhurtha"><div class="icon">â³</div><span>Muhurtha</span></button>
+    <button class="tab-nav" data-tab="jathaka"><div class="icon">ðŸ“œ</div><span>Jathaka</span></button>
+    <button class="tab-nav" data-tab="matching"><div class="icon">ðŸ’‘</div><span>Match</span></button>
+    <button class="tab-nav" data-tab="calendar"><div class="icon">ðŸ“…</div><span>Calendar</span></button>
 </nav>
 
 <!-- INSTALL BANNER -->
 <div class="install-banner" id="installBanner">
-    <p>📲 Install <b>Kuberan Panchangam</b> on your device for offline use!</p>
+    <p>ðŸ“² Install <b>Kuberan Panchangam</b> on your device for offline use!</p>
     <button id="installBtn">Install App</button>
 </div>
 
@@ -250,13 +250,13 @@
     <!-- LOCATION CONTROLS -->
     <div class="card" style="padding:12px 16px; margin-bottom:14px;">
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <button onclick="detectLocation()" style="background:var(--gold);color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;white-space:nowrap;">📍 Use My Location</button>
+            <button onclick="detectLocation()" style="background:var(--gold);color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;white-space:nowrap;">ðŸ“ Use My Location</button>
             <div id="locationLabel" style="font-size:0.9rem; flex:1; min-width:120px;">
                 <span style="color:var(--text-dim);">Location:</span> <strong id="locationName">Bengaluru, India</strong>
             </div>
         </div>
         <details style="margin-top:10px;">
-            <summary style="cursor:pointer; font-size:0.8rem; color:var(--gold);">Or enter location manually ▾</summary>
+            <summary style="cursor:pointer; font-size:0.8rem; color:var(--gold);">Or enter location manually â–¾</summary>
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:8px;">
                 <div>
                     <label style="font-size:0.7rem;color:var(--text-dim);">Latitude</label>
@@ -277,20 +277,20 @@
 
     <!-- HEADER BAND -->
     <div class="header-band" id="headerBand">
-        <div class="samvatsara" id="hdrSamvatsara">—</div>
-        <div class="sub" id="hdrContext">—</div>
-        <div class="date-en" id="hdrDate">—</div>
-        <div class="weekday-kn" id="hdrWeekday">—</div>
+        <div class="samvatsara" id="hdrSamvatsara">â€”</div>
+        <div class="sub" id="hdrContext">â€”</div>
+        <div class="date-en" id="hdrDate">â€”</div>
+        <div class="weekday-kn" id="hdrWeekday">â€”</div>
     </div>
 
     <!-- TODAY AT A GLANCE -->
     <div class="card" id="glanceCard" style="background:linear-gradient(135deg, #1a1f38, #0f1320); border:1px solid var(--gold); border-left:4px solid var(--gold);">
-        <h2 style="margin-bottom:12px;">🕉️ Today at a Glance</h2>
+        <h2 style="margin-bottom:12px;">ðŸ•‰ï¸ Today at a Glance</h2>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" id="glanceGrid">
-            <div><span style="color:var(--text-dim);font-size:0.7rem;">TITHI</span><div style="font-weight:600;" id="glTithi">—</div></div>
-            <div><span style="color:var(--text-dim);font-size:0.7rem;">NAKSHATRA</span><div style="font-weight:600;" id="glNak">—</div></div>
-            <div><span style="color:var(--text-dim);font-size:0.7rem;">YOGA</span><div style="font-weight:600;" id="glYoga">—</div></div>
-            <div><span style="color:var(--text-dim);font-size:0.7rem;">KARANA</span><div style="font-weight:600;" id="glKarana">—</div></div>
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">TITHI</span><div style="font-weight:600;" id="glTithi">â€”</div></div>
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">NAKSHATRA</span><div style="font-weight:600;" id="glNak">â€”</div></div>
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">YOGA</span><div style="font-weight:600;" id="glYoga">â€”</div></div>
+            <div><span style="color:var(--text-dim);font-size:0.7rem;">KARANA</span><div style="font-weight:600;" id="glKarana">â€”</div></div>
         </div>
         <div id="glVerdict" style="margin-top:12px;padding:10px;border-radius:6px;text-align:center;font-weight:600;font-size:0.9rem;"></div>
         <div id="glFestival" style="margin-top:8px;text-align:center;font-family:var(--font-kn);color:var(--gold-light);font-size:0.9rem;"></div>
@@ -298,69 +298,69 @@
 
     <!-- SUN & MOON -->
     <div class="card">
-        <h2>☀️ Sun & Moon</h2>
+        <h2>â˜€ï¸ Sun & Moon</h2>
         <div class="sun-moon">
-            <div class="sm-item"><div class="icon">🌅</div><div class="lbl">Sunrise</div><div class="val" id="valSunrise">—</div></div>
-            <div class="sm-item"><div class="icon">🌇</div><div class="lbl">Sunset</div><div class="val" id="valSunset">—</div></div>
-            <div class="sm-item"><div class="icon">☀️</div><div class="lbl">Sun Rashi</div><div class="val" id="valSunRashi">—</div></div>
-            <div class="sm-item"><div class="icon">🌙</div><div class="lbl">Moon Rashi</div><div class="val" id="valMoonRashi">—</div></div>
+            <div class="sm-item"><div class="icon">ðŸŒ…</div><div class="lbl">Sunrise</div><div class="val" id="valSunrise">â€”</div></div>
+            <div class="sm-item"><div class="icon">ðŸŒ‡</div><div class="lbl">Sunset</div><div class="val" id="valSunset">â€”</div></div>
+            <div class="sm-item"><div class="icon">â˜€ï¸</div><div class="lbl">Sun Rashi</div><div class="val" id="valSunRashi">â€”</div></div>
+            <div class="sm-item"><div class="icon">ðŸŒ™</div><div class="lbl">Moon Rashi</div><div class="val" id="valMoonRashi">â€”</div></div>
         </div>
     </div>
 
     <!-- FESTIVAL OF THE DAY -->
     <div class="card" id="festivalCard" style="display:none;">
-        <h2>🪔 Festival / Vrata</h2>
+        <h2>ðŸª” Festival / Vrata</h2>
         <div id="festivalList"></div>
     </div>
 
     <!-- SANKRANTI INDICATOR -->
     <div class="card" id="sankrantiCard" style="display:none;">
-        <h2>🌞 Sankranti</h2>
+        <h2>ðŸŒž Sankranti</h2>
         <div id="sankrantiInfo"></div>
     </div>
 
     <!-- UPCOMING FESTIVALS -->
     <div class="card">
-        <h2>📆 Upcoming Festivals</h2>
+        <h2>ðŸ“† Upcoming Festivals</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Next 5 festivals from today.</p>
         <div id="upcomingFests"></div>
     </div>
 
     <!-- FIVE LIMBS -->
     <div class="card">
-        <h2>🕉️ Pancha Anga — Five Limbs</h2>
+        <h2>ðŸ•‰ï¸ Pancha Anga â€” Five Limbs</h2>
         <div class="limb-grid">
             <div class="limb-item">
-                <div class="label">Tithi · ತಿಥಿ</div>
-                <div class="value" id="valTithi">—</div>
-                <div class="value-kn" id="valTithiKn">—</div>
-                <div class="time" id="valTithiTime">—</div>
+                <div class="label">Tithi Â· à²¤à²¿à²¥à²¿</div>
+                <div class="value" id="valTithi">â€”</div>
+                <div class="value-kn" id="valTithiKn">â€”</div>
+                <div class="time" id="valTithiTime">â€”</div>
             </div>
             <div class="limb-item">
-                <div class="label">Nakshatra · ನಕ್ಷತ್ರ</div>
-                <div class="value" id="valNak">—</div>
-                <div class="value-kn" id="valNakKn">—</div>
-                <div class="time" id="valNakTime">—</div>
+                <div class="label">Nakshatra Â· à²¨à²•à³à²·à²¤à³à²°</div>
+                <div class="value" id="valNak">â€”</div>
+                <div class="value-kn" id="valNakKn">â€”</div>
+                <div class="time" id="valNakTime">â€”</div>
             </div>
             <div class="limb-item">
-                <div class="label">Yoga · ಯೋಗ</div>
-                <div class="value" id="valYoga">—</div>
-                <div class="time" id="valYogaTime">—</div>
+                <div class="label">Yoga Â· à²¯à³‹à²—</div>
+                <div class="value" id="valYoga">â€”</div>
+                <div class="time" id="valYogaTime">â€”</div>
             </div>
             <div class="limb-item">
-                <div class="label">Karana · ಕರಣ</div>
-                <div class="value" id="valKarana">—</div>
-                <div class="time" id="valKaranaTime">—</div>
+                <div class="label">Karana Â· à²•à²°à²£</div>
+                <div class="value" id="valKarana">â€”</div>
+                <div class="time" id="valKaranaTime">â€”</div>
             </div>
             <div class="limb-item full-width">
-                <div class="label">Vara · ವಾರ</div>
-                <div class="value" id="valVara">—</div>
-                <div class="value-kn" id="valVaraKn">—</div>
+                <div class="label">Vara Â· à²µà²¾à²°</div>
+                <div class="value" id="valVara">â€”</div>
+                <div class="value-kn" id="valVaraKn">â€”</div>
             </div>
             <div class="limb-item full-width" style="border-left-color:var(--orange);">
-                <div class="label">Shraddha Tithi (For Ancestral Rites) · ಶ್ರಾದ್ಧ ತಿಥಿ</div>
-                <div class="value" id="valShraddhaTithi">—</div>
-                <div class="value-kn" id="valShraddhaTithiKn">—</div>
+                <div class="label">Shraddha Tithi (For Ancestral Rites) Â· à²¶à³à²°à²¾à²¦à³à²§ à²¤à²¿à²¥à²¿</div>
+                <div class="value" id="valShraddhaTithi">â€”</div>
+                <div class="value-kn" id="valShraddhaTithiKn">â€”</div>
                 <div class="time" id="valShraddhaTimeInfo">Determined by Aparahna Kala (Afternoon)</div>
             </div>
         </div>
@@ -368,7 +368,7 @@
 
     <!-- AUSPICIOUS / INAUSPICIOUS WINDOWS -->
     <div class="card">
-        <h2>⏱️ Daily Windows</h2>
+        <h2>â±ï¸ Daily Windows</h2>
         <div class="timeline-bar" id="timelineBar"></div>
         <div class="timeline-labels" id="timelineLabels"></div>
         <div style="margin-top: 14px;" id="windowsList"></div>
@@ -376,14 +376,14 @@
 
     <!-- CHOGHADIYA -->
     <div class="card">
-        <h2>🕐 Choghadiya (ಚೌಘಡಿಯಾ)</h2>
+        <h2>ðŸ• Choghadiya (à²šà³Œà²˜à²¡à²¿à²¯à²¾)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Daytime & nighttime auspicious slots. Green = Good, Red = Avoid.</p>
         <div id="choghadiyaList"></div>
     </div>
 
     <!-- GRAHA STHITI (Planetary Positions) -->
     <div class="card">
-        <h2>🪐 Graha Sthiti (ಗ್ರಹ ಸ್ಥಿತಿ)</h2>
+        <h2>ðŸª Graha Sthiti (à²—à³à²°à²¹ à²¸à³à²¥à²¿à²¤à²¿)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Sidereal (Lahiri) positions of the Navagraha at sunrise.</p>
         <div id="grahaGrid" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;"></div>
         <div id="moudhyaWarning" style="margin-top:10px; font-size:0.8rem; color:var(--red); font-weight:600; text-align:center;"></div>
@@ -391,39 +391,39 @@
 
     <!-- LAGNA TABLE (Daily Ascendants) -->
     <div class="card">
-        <h2>⏱️ Daily Lagna (ಲಗ್ನ ಪಟ್ಟಿ)</h2>
+        <h2>â±ï¸ Daily Lagna (à²²à²—à³à²¨ à²ªà²Ÿà³à²Ÿà²¿)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Exact entry and exit times of all 12 ascendants calculated for your location from sunrise to next sunrise.</p>
         <div id="lagnaList" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
     </div>
 
     <!-- GOCHARA (Transit Analysis) -->
     <div class="card" id="gocharaCard" style="display:none;">
-        <h2>🔮 Gochara (ಗೋಚಾರ)</h2>
+        <h2>ðŸ”® Gochara (à²—à³‹à²šà²¾à²°)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Transit results based on your birth Moon sign. <span id="gocharaBirthInfo" style="color:var(--gold);"></span></p>
         <div id="gocharaList"></div>
     </div>
 
     <!-- HORA (Planetary Hours) -->
     <div class="card">
-        <h2>⏰ Hora (ಹೋರಾ)</h2>
+        <h2>â° Hora (à²¹à³‹à²°à²¾)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Current planetary hour ruler. Each hora is 1/12th of day or night.</p>
         <div id="horaList"></div>
     </div>
 
     <!-- GOWRI PANCHANGAM -->
     <div class="card">
-        <h2>🌺 Gowri Panchangam (ಗೌರಿ ಪಂಚಾಂಗ)</h2>
+        <h2>ðŸŒº Gowri Panchangam (à²—à³Œà²°à²¿ à²ªà²‚à²šà²¾à²‚à²—)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">8 daily time slots with quality ratings. Very popular in Karnataka & South India.</p>
         <div id="gowriList"></div>
     </div>
 
     <!-- SHARE DAILY -->
-    <button onclick="shareDailyPanchangam()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">📤 Share Today's Panchangam</button>
+    <button onclick="shareDailyPanchangam()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">ðŸ“¤ Share Today's Panchangam</button>
 
     <div class="disclaimer">
         Computed values (Drik Ganita, Lahiri Ayanamsa) may differ from a printed almanac.<br>
         For religious observance, follow your family priest / the printed Panchanga.<br>
-        Engine: Drik · Ayanamsa: Lahiri (Chitrapaksha) · Ephemeris: Moshier<br><br>
+        Engine: Drik Â· Ayanamsa: Lahiri (Chitrapaksha) Â· Ephemeris: Moshier<br><br>
         <span style="color:var(--gold);">Version 1.2.0 (Ashtakoota Update)</span>
     </div>
 </div>
@@ -434,7 +434,7 @@
 <div class="container">
     <!-- AUSPICIOUS DATE SCANNER -->
     <div class="card">
-        <h2>📅 Auspicious Date Finder</h2>
+        <h2>ðŸ“… Auspicious Date Finder</h2>
         <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Scan a date range to find the best muhurtham dates. Scores each day on Tithi, Nakshatra, Yoga, and inauspicious period overlap.</p>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
             <div><label style="font-size:0.7rem;color:var(--text-dim);">From Date</label><input type="date" id="scanFrom" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;"></div>
@@ -452,28 +452,28 @@
                 <option value="education">Education / Study Start</option>
             </select>
         </div>
-        <button class="btn-calc" onclick="scanDates()">🔍 Scan for Auspicious Dates</button>
-        <div id="scanLoading" style="display:none;text-align:center;margin-top:12px;color:var(--gold);">⏳ Scanning dates...</div>
+        <button class="btn-calc" onclick="scanDates()">ðŸ” Scan for Auspicious Dates</button>
+        <div id="scanLoading" style="display:none;text-align:center;margin-top:12px;color:var(--gold);">â³ Scanning dates...</div>
         <div id="scanResults" style="margin-top:12px;"></div>
     </div>
 
     <!-- TARABALAM -->
     <div class="card" id="tarabalamCard" style="display:none;">
-        <h2>⭐ Today's Tarabalam (ತಾರಾಬಲ)</h2>
+        <h2>â­ Today's Tarabalam (à²¤à²¾à²°à²¾à²¬à²²)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Personalized star compatibility for today based on your birth Nakshatra.</p>
         <div id="tarabalamResult"></div>
     </div>
 
     <!-- CHANDRABALAM -->
     <div class="card" id="chandrabalamCard" style="display:none;">
-        <h2>🌙 Today's Chandrabalam (ಚಂದ್ರಬಲ)</h2>
+        <h2>ðŸŒ™ Today's Chandrabalam (à²šà²‚à²¦à³à²°à²¬à²²)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Moon's transit strength from your birth Moon sign.</p>
         <div id="chandrabalamResult"></div>
     </div>
 
     <!-- EXISTING MULTI-PERSON COMPAT -->
     <div class="card">
-        <h2>👥 Multi-Person Compatibility (up to 10)</h2>
+        <h2>ðŸ‘¥ Multi-Person Compatibility (up to 10)</h2>
         <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Enter birth details to evaluate Tara Bala for a chosen date.</p>
         <div id="peopleContainer">
             <div class="person-form">
@@ -503,7 +503,7 @@
 <div class="tab-content" id="tab-jathaka">
 <div class="container">
     <div class="card" id="jathakaInputArea">
-        <h2>📜 Janma Kundali (Birth Details)</h2>
+        <h2>ðŸ“œ Janma Kundali (Birth Details)</h2>
         <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Enter exact birth details to generate your Janma Jathaka (Astrological Birth Chart) and Vimshottari Dasha balance.</p>
         
         <div style="display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:12px;">
@@ -529,7 +529,7 @@
 
         <button class="btn-calc" id="btnGenJathaka" onclick="generateJathaka()">Generate Jathaka</button>
         <div id="jathakaLoading" style="display:none; text-align:center; margin-top:15px; color:var(--gold);">
-            <p>⏳ Computing planetary positions...</p>
+            <p>â³ Computing planetary positions...</p>
         </div>
     </div>
 
@@ -603,7 +603,7 @@
     <!-- History Section -->
     <div class="card" id="jathakaHistoryArea" style="margin-top:20px; display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--card-border); padding-bottom:8px;">
-            <h2 style="margin:0; border:none; padding:0;">🕒 Recent Generations</h2>
+            <h2 style="margin:0; border:none; padding:0;">ðŸ•’ Recent Generations</h2>
             <button onclick="clearJathakaHistory()" style="background:none; border:1px solid var(--red); color:var(--red); padding:4px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer;">Clear All</button>
         </div>
         <div id="jathakaHistoryList" style="display:flex; flex-direction:column; gap:8px;"></div>
@@ -616,12 +616,12 @@
 <div class="tab-content" id="tab-matching">
 <div class="container">
     <div class="card">
-        <h2>💑 Marriage Matching (Ashtakoota)</h2>
+        <h2>ðŸ’‘ Marriage Matching (Ashtakoota)</h2>
         <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:12px;">Enter the Nakshatra and Pada of the prospective bride and groom to calculate Ashtakoota Guna Milan (36 Points System).</p>
         
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
             <div style="background:rgba(255,105,180,0.1); padding:10px; border-radius:8px; border:1px solid #ff69b4;">
-                <h3 style="color:#ff69b4; margin-bottom:8px; font-size:0.95rem;">👰 Bride (Vadhū)</h3>
+                <h3 style="color:#ff69b4; margin-bottom:8px; font-size:0.95rem;">ðŸ‘° Bride (VadhÅ«)</h3>
                 <label style="font-size:0.75rem;">Nakshatra</label>
                 <select id="matchGirlNak" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:8px; font-size:0.85rem;"></select>
                 <label style="font-size:0.75rem;">Pada (Quarter)</label>
@@ -631,7 +631,7 @@
             </div>
             
             <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:8px; border:1px solid #3b82f6;">
-                <h3 style="color:#3b82f6; margin-bottom:8px; font-size:0.95rem;">🤵 Groom (Vara)</h3>
+                <h3 style="color:#3b82f6; margin-bottom:8px; font-size:0.95rem;">ðŸ¤µ Groom (Vara)</h3>
                 <label style="font-size:0.75rem;">Nakshatra</label>
                 <select id="matchBoyNak" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:8px; font-size:0.85rem;"></select>
                 <label style="font-size:0.75rem;">Pada (Quarter)</label>
@@ -669,9 +669,9 @@
 <div class="container">
     <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <button onclick="calNavMonth(-1)" style="background:none;border:1px solid var(--card-border);color:var(--gold);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:1rem;">◀</button>
-            <h2 id="calMonthTitle" style="margin:0;font-size:1rem;">—</h2>
-            <button onclick="calNavMonth(1)" style="background:none;border:1px solid var(--card-border);color:var(--gold);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:1rem;">▶</button>
+            <button onclick="calNavMonth(-1)" style="background:none;border:1px solid var(--card-border);color:var(--gold);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:1rem;">â—€</button>
+            <h2 id="calMonthTitle" style="margin:0;font-size:1rem;">â€”</h2>
+            <button onclick="calNavMonth(1)" style="background:none;border:1px solid var(--card-border);color:var(--gold);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:1rem;">â–¶</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:0.7rem;margin-bottom:6px;">
             <div style="color:var(--red);font-weight:700;">Sun</div><div style="font-weight:700;">Mon</div><div style="font-weight:700;">Tue</div><div style="font-weight:700;">Wed</div><div style="font-weight:700;">Thu</div><div style="font-weight:700;">Fri</div><div style="color:var(--gold);font-weight:700;">Sat</div>
@@ -680,11 +680,11 @@
     </div>
 
     <div class="card">
-        <h2>🪔 Festivals This Month</h2>
+        <h2>ðŸª” Festivals This Month</h2>
         <div id="calFestList" style="font-size:0.85rem;"></div>
     </div>
 
-    <button onclick="exportMonthICS()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">📥 Export Festivals to Calendar (.ics)</button>
+    <button onclick="exportMonthICS()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">ðŸ“¥ Export Festivals to Calendar (.ics)</button>
 
 </div>
 </div>
@@ -692,13 +692,13 @@
 <!-- GLOBAL VERSION FOOTER (always visible) -->
 <div style="text-align: center; color: var(--text-dim); font-size: 0.75rem; padding: 20px 16px; margin-bottom: 60px;">
     Kuberan Panchangam v1.0.17 (Astronomy Engine)<br>
-    © 2026 Kuberan Silks
+    Â© 2026 Kuberan Silks
 </div>
 
 <script>
 // ============================================================
-//  KUBERAN PANCHANGAM — PURE JS ASTRONOMICAL ENGINE
-//  Drik Ganita · Lahiri Ayanamsa · Moshier-class precision
+//  KUBERAN PANCHANGAM â€” PURE JS ASTRONOMICAL ENGINE
+//  Drik Ganita Â· Lahiri Ayanamsa Â· Moshier-class precision
 // ============================================================
 
 // --- Constants ---
@@ -707,11 +707,11 @@ const RAD = 180 / Math.PI;
 
 // Tithi names
 const TITHI_EN = ["Prathama","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi"];
-const TITHI_KN = ["ಪ್ರಥಮ", "ದ್ವಿತೀಯ", "ತೃತೀಯ", "ಚತುರ್ಥಿ", "ಪಂಚಮಿ", "ಷಷ್ಠಿ", "ಸಪ್ತಮಿ", "ಅಷ್ಟಮಿ", "ನವಮಿ", "ದಶಮಿ", "ಏಕಾದಶಿ", "ದ್ವಾದಶಿ", "ತ್ರಯೋದಶಿ", "ಚತುರ್ದಶಿ"];
+const TITHI_KN = ["à²ªà³à²°à²¥à²®", "à²¦à³à²µà²¿à²¤à³€à²¯", "à²¤à³ƒà²¤à³€à²¯", "à²šà²¤à³à²°à³à²¥à²¿", "à²ªà²‚à²šà²®à²¿", "à²·à²·à³à² à²¿", "à²¸à²ªà³à²¤à²®à²¿", "à²…à²·à³à²Ÿà²®à²¿", "à²¨à²µà²®à²¿", "à²¦à²¶à²®à²¿", "à²à²•à²¾à²¦à²¶à²¿", "à²¦à³à²µà²¾à²¦à²¶à²¿", "à²¤à³à²°à²¯à³‹à²¦à²¶à²¿", "à²šà²¤à³à²°à³à²¦à²¶à²¿"];
 
 // Nakshatra names
 const NAK_EN = ["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
-const NAK_KN = ["ಅಶ್ವಿನಿ","ಭರಣಿ","ಕೃತ್ತಿಕಾ","ರೋಹಿಣಿ","ಮೃಗಶಿರ","ಆರ್ದ್ರಾ","ಪುನರ್ವಸು","ಪುಷ್ಯ","ಆಶ್ಲೇಷ","ಮಘ","ಪೂರ್ವ ಫಲ್ಗುಣಿ","ಉತ್ತರ ಫಲ್ಗುಣಿ","ಹಸ್ತ","ಚಿತ್ರಾ","ಸ್ವಾತಿ","ವಿಶಾಖ","ಅನುರಾಧ","ಜ್ಯೇಷ್ಠ","ಮೂಲ","ಪೂರ್ವಾಷಾಢ","ಉತ್ತರಾಷಾಢ","ಶ್ರವಣ","ಧನಿಷ್ಠ","ಶತಭಿಷ","ಪೂರ್ವಾಭಾದ್ರ","ಉತ್ತರಾಭಾದ್ರ","ರೇವತಿ"];
+const NAK_KN = ["à²…à²¶à³à²µà²¿à²¨à²¿","à²­à²°à²£à²¿","à²•à³ƒà²¤à³à²¤à²¿à²•à²¾","à²°à³‹à²¹à²¿à²£à²¿","à²®à³ƒà²—à²¶à²¿à²°","à²†à²°à³à²¦à³à²°à²¾","à²ªà³à²¨à²°à³à²µà²¸à³","à²ªà³à²·à³à²¯","à²†à²¶à³à²²à³‡à²·","à²®à²˜","à²ªà³‚à²°à³à²µ à²«à²²à³à²—à³à²£à²¿","à²‰à²¤à³à²¤à²° à²«à²²à³à²—à³à²£à²¿","à²¹à²¸à³à²¤","à²šà²¿à²¤à³à²°à²¾","à²¸à³à²µà²¾à²¤à²¿","à²µà²¿à²¶à²¾à²–","à²…à²¨à³à²°à²¾à²§","à²œà³à²¯à³‡à²·à³à² ","à²®à³‚à²²","à²ªà³‚à²°à³à²µà²¾à²·à²¾à²¢","à²‰à²¤à³à²¤à²°à²¾à²·à²¾à²¢","à²¶à³à²°à²µà²£","à²§à²¨à²¿à²·à³à² ","à²¶à²¤à²­à²¿à²·","à²ªà³‚à²°à³à²µà²¾à²­à²¾à²¦à³à²°","à²‰à²¤à³à²¤à²°à²¾à²­à²¾à²¦à³à²°","à²°à³‡à²µà²¤à²¿"];
 
 // Yoga names
 const YOGA_EN = ["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarma","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyana","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"];
@@ -731,13 +731,13 @@ function karanaName(k) {
 
 // Rashi names
 const RASHI_EN = ["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrishchika","Dhanu","Makara","Kumbha","Meena"];
-const RASHI_KN = ["ಮೇಷ","ವೃಷಭ","ಮಿಥುನ","ಕರ್ಕಾಟಕ","ಸಿಂಹ","ಕನ್ಯಾ","ತುಲಾ","ವೃಶ್ಚಿಕ","ಧನುಸ್ಸು","ಮಕರ","ಕುಂಭ","ಮೀನ"];
+const RASHI_KN = ["à²®à³‡à²·","à²µà³ƒà²·à²­","à²®à²¿à²¥à³à²¨","à²•à²°à³à²•à²¾à²Ÿà²•","à²¸à²¿à²‚à²¹","à²•à²¨à³à²¯à²¾","à²¤à³à²²à²¾","à²µà³ƒà²¶à³à²šà²¿à²•","à²§à²¨à³à²¸à³à²¸à³","à²®à²•à²°","à²•à³à²‚à²­","à²®à³€à²¨"];
 
 // Weekday names
 const VARA_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-const VARA_KN = ["ಭಾನುವಾರ","ಸೋಮವಾರ","ಮಂಗಳವಾರ","ಬುಧವಾರ","ಗುರುವಾರ","ಶುಕ್ರವಾರ","ಶನಿವಾರ"];
+const VARA_KN = ["à²­à²¾à²¨à³à²µà²¾à²°","à²¸à³‹à²®à²µà²¾à²°","à²®à²‚à²—à²³à²µà²¾à²°","à²¬à³à²§à²µà²¾à²°","à²—à³à²°à³à²µà²¾à²°","à²¶à³à²•à³à²°à²µà²¾à²°","à²¶à²¨à²¿à²µà²¾à²°"];
 
-// Rahu/Yama/Gulika tables (Sun=0 .. Sat=6) — which 1/8th of day
+// Rahu/Yama/Gulika tables (Sun=0 .. Sat=6) â€” which 1/8th of day
 const RAHU   = [8,2,7,5,6,4,3];
 const YAMA   = [5,4,3,7,2,1,6];
 const GULIKA = [7,6,5,4,3,2,1];
@@ -747,7 +747,7 @@ const SAMVATSARA = ["Prabhava","Vibhava","Shukla","Pramoduta","Prajotpatti","Ang
 
 // Masa names
 const MASA_EN = ["Chaitra","Vaishakha","Jyeshtha","Ashadha","Shravana","Bhadrapada","Ashvina","Kartika","Margashira","Pushya","Magha","Phalguna"];
-const MASA_KN = ["ಚೈತ್ರ","ವೈಶಾಖ","ಜ್ಯೇಷ್ಠ","ಆಷಾಢ","ಶ್ರಾವಣ","ಭಾದ್ರಪದ","ಆಶ್ವಯುಜ","ಕಾರ್ತಿಕ","ಮಾರ್ಗಶಿರ","ಪುಷ್ಯ","ಮಾಘ","ಫಾಲ್ಗುಣ"];
+const MASA_KN = ["à²šà³ˆà²¤à³à²°","à²µà³ˆà²¶à²¾à²–","à²œà³à²¯à³‡à²·à³à² ","à²†à²·à²¾à²¢","à²¶à³à²°à²¾à²µà²£","à²­à²¾à²¦à³à²°à²ªà²¦","à²†à²¶à³à²µà²¯à³à²œ","à²•à²¾à²°à³à²¤à²¿à²•","à²®à²¾à²°à³à²—à²¶à²¿à²°","à²ªà³à²·à³à²¯","à²®à²¾à²˜","à²«à²¾à²²à³à²—à³à²£"];
 
 // Ritu
 const RITU = ["Vasanta","Vasanta","Grishma","Grishma","Varsha","Varsha","Sharad","Sharad","Hemanta","Hemanta","Shishira","Shishira"];
@@ -761,7 +761,7 @@ const NAKSHATRA_LORDS = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupite
 const DASHA_YEARS = [7, 20, 6, 10, 7, 18, 16, 19, 17]; // 0-indexed: Sampat(1), Kshema(3), Sadhana(5), Mitra(7), ParamaMitra(8)
 
 // ============================================================
-//  ASTRONOMICAL CORE — High-precision via Astronomy Engine
+//  ASTRONOMICAL CORE â€” High-precision via Astronomy Engine
 //  (VSOP87 / JPL-grade; accuracy ~0.001 arcsec, valid 200+ years)
 // ============================================================
 
@@ -816,7 +816,7 @@ function moonLongitude(jd) {
 // Lahiri Ayanamsa
 function lahiriAyanamsa(jd) {
     const T = (jd - 2451545.0) / 36525.0;
-    // Linear approximation: 23.853° at J2000, precession ~50.29"/yr
+    // Linear approximation: 23.853Â° at J2000, precession ~50.29"/yr
     return 23.853 + 50.29 / 3600 * (jd - 2451545.0) / 365.25;
 }
 
@@ -828,7 +828,7 @@ function siderealMoon(jd) { return ((moonLongitude(jd) - lahiriAyanamsa(jd)) % 3
 function elongation(jd) { return ((siderealMoon(jd) - siderealSun(jd)) % 360 + 360) % 360; }
 function yogaAngle(jd) { return ((siderealSun(jd) + siderealMoon(jd)) % 360 + 360) % 360; }
 
-// Mean Rahu (ascending node of Moon) — always retrograde
+// Mean Rahu (ascending node of Moon) â€” always retrograde
 function rahuLongitude(jd) {
     const T = (jd - 2451545.0) / 36525.0;
     let rahu = 125.0445 - 1934.1363 * T + 0.0021 * T * T;
@@ -848,6 +848,31 @@ function siderealPlanet(jd, planetName) {
 }
 function siderealRahu(jd) { return ((rahuLongitude(jd) - lahiriAyanamsa(jd)) % 360 + 360) % 360; }
 function siderealKetu(jd) { return (siderealRahu(jd) + 180) % 360; }
+
+// ============================================================
+//  LUNAR MASA (AMANTA SYSTEM)
+// ============================================================
+function getAmantaMasaIdx(baseJD) {
+    let sl = (sunLongitude(baseJD) - lahiriAyanamsa(baseJD) + 360) % 360;
+    let ml = (moonLongitude(baseJD) - lahiriAyanamsa(baseJD) + 360) % 360;
+    let el = (ml - sl + 360) % 360;
+    
+    // Days to next New Moon (or current if exact)
+    let elToNext = (360 - el) % 360;
+    let nmJD = baseJD + (elToNext / 12.1907);
+    
+    // Refine with 3 iterations for exact New Moon conjunction
+    for (let i = 0; i < 3; i++) {
+        let tsl = (sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360;
+        let tml = (moonLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360;
+        let tel = (tml - tsl + 360) % 360;
+        if (tel > 180) tel -= 360;
+        nmJD -= tel / 12.1907;
+    }
+    
+    let finalSun = (sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360;
+    return Math.floor(finalSun / 30);
+}
 
 // ============================================================
 //  LAGNA (ASCENDANT) CALCULATIONS
@@ -901,15 +926,15 @@ const NAK_SYLLABLES = [
 // Get all 9 graha positions
 function getAllGrahaPositions(jd) {
     const grahas = [
-        { name: 'Sun', nameKn: 'ಸೂರ್ಯ', icon: '☀️', lon: siderealSun(jd) },
-        { name: 'Moon', nameKn: 'ಚಂದ್ರ', icon: '🌙', lon: siderealMoon(jd) },
-        { name: 'Mars', nameKn: 'ಮಂಗಳ', icon: '🔴', lon: siderealPlanet(jd, 'Mars') },
-        { name: 'Mercury', nameKn: 'ಬುಧ', icon: '🟢', lon: siderealPlanet(jd, 'Mercury') },
-        { name: 'Jupiter', nameKn: 'ಗುರು', icon: '🟡', lon: siderealPlanet(jd, 'Jupiter') },
-        { name: 'Venus', nameKn: 'ಶುಕ್ರ', icon: '⚪', lon: siderealPlanet(jd, 'Venus') },
-        { name: 'Saturn', nameKn: 'ಶನಿ', icon: '🔵', lon: siderealPlanet(jd, 'Saturn') },
-        { name: 'Rahu', nameKn: 'ರಾಹು', icon: '🐍', lon: siderealRahu(jd) },
-        { name: 'Ketu', nameKn: 'ಕೇತು', icon: '🔥', lon: siderealKetu(jd) }
+        { name: 'Sun', nameKn: 'à²¸à³‚à²°à³à²¯', icon: 'â˜€ï¸', lon: siderealSun(jd) },
+        { name: 'Moon', nameKn: 'à²šà²‚à²¦à³à²°', icon: 'ðŸŒ™', lon: siderealMoon(jd) },
+        { name: 'Mars', nameKn: 'à²®à²‚à²—à²³', icon: 'ðŸ”´', lon: siderealPlanet(jd, 'Mars') },
+        { name: 'Mercury', nameKn: 'à²¬à³à²§', icon: 'ðŸŸ¢', lon: siderealPlanet(jd, 'Mercury') },
+        { name: 'Jupiter', nameKn: 'à²—à³à²°à³', icon: 'ðŸŸ¡', lon: siderealPlanet(jd, 'Jupiter') },
+        { name: 'Venus', nameKn: 'à²¶à³à²•à³à²°', icon: 'âšª', lon: siderealPlanet(jd, 'Venus') },
+        { name: 'Saturn', nameKn: 'à²¶à²¨à²¿', icon: 'ðŸ”µ', lon: siderealPlanet(jd, 'Saturn') },
+        { name: 'Rahu', nameKn: 'à²°à²¾à²¹à³', icon: 'ðŸ', lon: siderealRahu(jd) },
+        { name: 'Ketu', nameKn: 'à²•à³‡à²¤à³', icon: 'ðŸ”¥', lon: siderealKetu(jd) }
     ];
     const sunLon = grahas[0].lon;
     grahas.forEach(g => {
@@ -928,7 +953,7 @@ function getAllGrahaPositions(jd) {
 }
 
 // ============================================================
-//  SUNRISE / SUNSET — Astronomy Engine (high-precision)
+//  SUNRISE / SUNSET â€” Astronomy Engine (high-precision)
 // ============================================================
 function computeSunrise(year, month, day, lat, lon) {
     // Use UTC midnight as the search start to avoid browser timezone issues
@@ -946,7 +971,7 @@ function computeSunrise(year, month, day, lat, lon) {
 }
 
 // ============================================================
-//  BOUNDARY FINDER — bisect to find next angle crossing
+//  BOUNDARY FINDER â€” bisect to find next angle crossing
 // ============================================================
 function nextBoundary(jd, angleFn, unit) {
     const cur = angleFn(jd);
@@ -1022,10 +1047,10 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     // Tithi
     const tithiNo = Math.floor(e / 12) + 1; // 1-30
     const paksha = tithiNo <= 15 ? "Shukla" : "Krishna";
-    const pakshaKn = tithiNo <= 15 ? "ಶುಕ್ಲ ಪಕ್ಷ" : "ಕೃಷ್ಣ ಪಕ್ಷ";
+    const pakshaKn = tithiNo <= 15 ? "à²¶à³à²•à³à²² à²ªà²•à³à²·" : "à²•à³ƒà²·à³à²£ à²ªà²•à³à²·";
     let tithiName, tithiNameKn;
-    if (tithiNo === 15) { tithiName = "Purnima"; tithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
-    else if (tithiNo === 30) { tithiName = "Amavasya"; tithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
+    if (tithiNo === 15) { tithiName = "Purnima"; tithiNameKn = "à²¹à³à²£à³à²£à²¿à²®à³†"; }
+    else if (tithiNo === 30) { tithiName = "Amavasya"; tithiNameKn = "à²…à²®à²¾à²µà²¾à²¸à³à²¯à³†"; }
     else { const idx = (tithiNo - 1) % 15; tithiName = TITHI_EN[idx]; tithiNameKn = TITHI_KN[idx]; }
     const tithiEnd = nextBoundary(riseJD, elongation, 12);
 
@@ -1063,8 +1088,8 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     const brahmaStart = riseJD - 96 / 1440;
     const brahmaEnd = riseJD - 48 / 1440;
 
-    // Masa (approximate from Sun's sidereal sign at previous new moon)
-    const masaIdx = ((sunRashiIdx + 1) % 12);
+    // Masa (Amanta System: based on Sun Rashi at ending New Moon)
+    const masaIdx = getAmantaMasaIdx(riseJD);
 
     // Samvatsara
     // Approximate Shaka year: if before ~March 22, use previous year
@@ -1075,7 +1100,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
 
     // Ayana
     const ayana = (sunRashiIdx >= 9 || sunRashiIdx <= 2) ? "Uttarayana" : "Dakshinayana";
-    const ayanaKn = ayana === "Uttarayana" ? "ಉತ್ತರಾಯಣ" : "ದಕ್ಷಿಣಾಯನ";
+    const ayanaKn = ayana === "Uttarayana" ? "à²‰à²¤à³à²¤à²°à²¾à²¯à²£" : "à²¦à²•à³à²·à²¿à²£à²¾à²¯à²¨";
 
     // Ritu
     const rituName = RITU[masaIdx];
@@ -1085,10 +1110,10 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     const sElong = elongation(aparahnaMidJD);
     const sTithiNo = Math.floor(sElong / 12) + 1;
     let sTithiName, sTithiNameKn;
-    if (sTithiNo === 15) { sTithiName = "Purnima"; sTithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
-    else if (sTithiNo === 30) { sTithiName = "Amavasya"; sTithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
+    if (sTithiNo === 15) { sTithiName = "Purnima"; sTithiNameKn = "à²¹à³à²£à³à²£à²¿à²®à³†"; }
+    else if (sTithiNo === 30) { sTithiName = "Amavasya"; sTithiNameKn = "à²…à²®à²¾à²µà²¾à²¸à³à²¯à³†"; }
     else { const idx = (sTithiNo - 1) % 15; sTithiName = TITHI_EN[idx]; sTithiNameKn = TITHI_KN[idx]; }
-    const shraddha = { no: sTithiNo, name: sTithiName, nameKn: sTithiNameKn, paksha: sTithiNo <= 15 ? 'Shukla' : 'Krishna', pakshaKn: sTithiNo <= 15 ? 'ಶುಕ್ಲ' : 'ಕೃಷ್ಣ' };
+    const shraddha = { no: sTithiNo, name: sTithiName, nameKn: sTithiNameKn, paksha: sTithiNo <= 15 ? 'Shukla' : 'Krishna', pakshaKn: sTithiNo <= 15 ? 'à²¶à³à²•à³à²²' : 'à²•à³ƒà²·à³à²£' };
 
     return {
         sunrise: riseJD, sunset: setJD, tzOff,
@@ -1121,11 +1146,11 @@ function renderPanchanga(p) {
     const fmt = (jd) => jdToLocalTimeStr(jd, tz);
 
     // Header
-    document.getElementById('hdrSamvatsara').textContent = `${p.samvatsara.name} ನಾಮ ಸಂವತ್ಸರ`;
-    document.getElementById('hdrContext').textContent = `${p.ayana.en} · ${p.ritu} Ritu · ${p.masa.en} Masa · ${p.tithi.paksha} Paksha · Shaka ${p.samvatsara.shaka}`;
+    document.getElementById('hdrSamvatsara').textContent = `${p.samvatsara.name} à²¨à²¾à²® à²¸à²‚à²µà²¤à³à²¸à²°`;
+    document.getElementById('hdrContext').textContent = `${p.ayana.en} Â· ${p.ritu} Ritu Â· ${p.masa.en} Masa Â· ${p.tithi.paksha} Paksha Â· Shaka ${p.samvatsara.shaka}`;
     const dateObj = new Date(p.year, p.month - 1, p.day);
     document.getElementById('hdrDate').textContent = dateObj.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('hdrWeekday').textContent = `${p.vara.kn} · ${p.tithi.pakshaKn} · ${p.tithi.nameKn}`;
+    document.getElementById('hdrWeekday').textContent = `${p.vara.kn} Â· ${p.tithi.pakshaKn} Â· ${p.tithi.nameKn}`;
 
     // Glance Card
     const isKn = document.body.dataset.lang === 'kn';
@@ -1133,8 +1158,8 @@ function renderPanchanga(p) {
     
     const syllable = NAK_SYLLABLES[p.nakshatra.idx][p.nakshatra.pada - 1];
     document.getElementById('glNak').innerHTML = `${isKn ? p.nakshatra.nameKn : p.nakshatra.name} <span style="font-size:0.75rem;color:var(--gold);">P${p.nakshatra.pada} (${syllable})</span>`;
-    document.getElementById('glYoga').textContent = (isKn ? p.yoga.name : p.yoga.name) + (p.yoga.inauspicious ? ' ⚠️' : ' ✓');
-    document.getElementById('glKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️' : ' ✓');
+    document.getElementById('glYoga').textContent = (isKn ? p.yoga.name : p.yoga.name) + (p.yoga.inauspicious ? ' âš ï¸' : ' âœ“');
+    document.getElementById('glKarana').textContent = p.karana.name + (p.karana.isVishti ? ' âš ï¸' : ' âœ“');
     // Quick verdict
     let vScore = 0;
     if (!BAD_TITHI.includes(p.tithi.no)) vScore++;
@@ -1143,17 +1168,17 @@ function renderPanchanga(p) {
     if (!p.karana.isVishti) vScore++;
     if ([1,3,4,5].includes(p.wd)) vScore++;
     const vEl = document.getElementById('glVerdict');
-    if (vScore >= 4) { vEl.textContent = '✅ Highly Auspicious Day'; vEl.style.background = 'rgba(34,197,94,0.15)'; vEl.style.color = 'var(--green)'; }
-    else if (vScore >= 3) { vEl.textContent = '🟡 Moderately Auspicious'; vEl.style.background = 'rgba(245,158,11,0.15)'; vEl.style.color = 'var(--orange)'; }
-    else { vEl.textContent = '⚠️ Caution Advised'; vEl.style.background = 'rgba(239,68,68,0.15)'; vEl.style.color = 'var(--red)'; }
+    if (vScore >= 4) { vEl.textContent = 'âœ… Highly Auspicious Day'; vEl.style.background = 'rgba(34,197,94,0.15)'; vEl.style.color = 'var(--green)'; }
+    else if (vScore >= 3) { vEl.textContent = 'ðŸŸ¡ Moderately Auspicious'; vEl.style.background = 'rgba(245,158,11,0.15)'; vEl.style.color = 'var(--orange)'; }
+    else { vEl.textContent = 'âš ï¸ Caution Advised'; vEl.style.background = 'rgba(239,68,68,0.15)'; vEl.style.color = 'var(--red)'; }
     const glFests = matchFestivals(p);
-    document.getElementById('glFestival').textContent = glFests.length > 0 ? `🪔 ${glFests.map(f => f.name.kn).join(' · ')}` : '';
+    document.getElementById('glFestival').textContent = glFests.length > 0 ? `ðŸª” ${glFests.map(f => f.name.kn).join(' Â· ')}` : '';
 
     // Sun/Moon
     document.getElementById('valSunrise').textContent = fmt(p.sunrise);
     document.getElementById('valSunset').textContent = fmt(p.sunset);
-    document.getElementById('valSunRashi').textContent = `${p.sunRashi.en} · ${p.sunRashi.kn}`;
-    document.getElementById('valMoonRashi').textContent = `${p.moonRashi.en} · ${p.moonRashi.kn}`;
+    document.getElementById('valSunRashi').textContent = `${p.sunRashi.en} Â· ${p.sunRashi.kn}`;
+    document.getElementById('valMoonRashi').textContent = `${p.moonRashi.en} Â· ${p.moonRashi.kn}`;
 
     // Five Limbs
     document.getElementById('valTithi').textContent = `${p.tithi.paksha} ${p.tithi.name}`;
@@ -1164,10 +1189,10 @@ function renderPanchanga(p) {
     document.getElementById('valNakKn').textContent = p.nakshatra.nameKn;
     document.getElementById('valNakTime').textContent = `Ends: ${fmt(p.nakshatra.endJD)}`;
 
-    document.getElementById('valYoga').textContent = p.yoga.name + (p.yoga.inauspicious ? ' ⚠️' : '');
+    document.getElementById('valYoga').textContent = p.yoga.name + (p.yoga.inauspicious ? ' âš ï¸' : '');
     document.getElementById('valYogaTime').textContent = `Ends: ${fmt(p.yoga.endJD)}`;
 
-    document.getElementById('valKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️ Bhadra' : '');
+    document.getElementById('valKarana').textContent = p.karana.name + (p.karana.isVishti ? ' âš ï¸ Bhadra' : '');
     document.getElementById('valKaranaTime').textContent = `Ends: ${fmt(p.karana.endJD)}`;
 
     document.getElementById('valVara').textContent = p.vara.en;
@@ -1199,16 +1224,16 @@ function renderPanchanga(p) {
     labels.innerHTML = `<span>${fmt(p.sunrise)}</span><span>Noon</span><span>${fmt(p.sunset)}</span>`;
 
     const wl = document.getElementById('windowsList');
-    const row = (dot, name, s, e) => `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name}</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
-    wl.innerHTML = row('bad', 'Rahu Kala (ರಾಹುಕಾಲ)', p.rahu.start, p.rahu.end)
-        + row('bad', 'Yamaganda (ಯಮಗಂಡ)', p.yama.start, p.yama.end)
-        + row('neutral', 'Gulika Kala (ಗುಳಿಕ)', p.gulika.start, p.gulika.end)
-        + row('good', 'Abhijit Muhurta (ಅಭಿಜಿತ್)', p.abhijit.start, p.abhijit.end)
-        + row('good', 'Brahma Muhurta (ಬ್ರಹ್ಮ)', p.brahma.start, p.brahma.end);
+    const row = (dot, name, s, e) => `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name}</div><div class="window-time">${fmt(s)} â€“ ${fmt(e)}</div></div>`;
+    wl.innerHTML = row('bad', 'Rahu Kala (à²°à²¾à²¹à³à²•à²¾à²²)', p.rahu.start, p.rahu.end)
+        + row('bad', 'Yamaganda (à²¯à²®à²—à²‚à²¡)', p.yama.start, p.yama.end)
+        + row('neutral', 'Gulika Kala (à²—à³à²³à²¿à²•)', p.gulika.start, p.gulika.end)
+        + row('good', 'Abhijit Muhurta (à²…à²­à²¿à²œà²¿à²¤à³)', p.abhijit.start, p.abhijit.end)
+        + row('good', 'Brahma Muhurta (à²¬à³à²°à²¹à³à²®)', p.brahma.start, p.brahma.end);
 
     // --- CHOGHADIYA ---
     const CHOG_SEQ = ['Udveg', 'Char', 'Labh', 'Amrit', 'Kaal', 'Shubh', 'Rog'];
-    const CHOG_KN = {'Udveg':'ಉದ್ವೇಗ','Char':'ಚರ','Labh':'ಲಾಭ','Amrit':'ಅಮೃತ','Kaal':'ಕಾಲ','Shubh':'ಶುಭ','Rog':'ರೋಗ'};
+    const CHOG_KN = {'Udveg':'à²‰à²¦à³à²µà³‡à²—','Char':'à²šà²°','Labh':'à²²à²¾à²­','Amrit':'à²…à²®à³ƒà²¤','Kaal':'à²•à²¾à²²','Shubh':'à²¶à³à²­','Rog':'à²°à³‹à²—'};
     const CHOG_QUALITY = {'Amrit':'good','Shubh':'good','Labh':'good','Char':'neutral','Rog':'bad','Kaal':'bad','Udveg':'bad'};
     const CHOG_DAY_START = [0, 3, 6, 2, 5, 1, 4]; // Sun=0..Sat=6
     const CHOG_NIGHT_START = [5, 4, 2, 0, 3, 6, 1];
@@ -1218,7 +1243,7 @@ function renderPanchanga(p) {
     const nightSlot = nightLen / 8; // in Julian Day fraction
 
     const dow = new Date(p.year, p.month - 1, p.day).getDay();
-    let chogHtml = '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin-bottom:6px;">☀️ Daytime</div>';
+    let chogHtml = '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin-bottom:6px;">â˜€ï¸ Daytime</div>';
     let dayIdx = CHOG_DAY_START[dow];
     for (let i = 0; i < 8; i++) {
         const name = CHOG_SEQ[(dayIdx + i) % 7];
@@ -1226,9 +1251,9 @@ function renderPanchanga(p) {
         const s = p.sunrise + i * daySlot;
         const e = p.sunrise + (i + 1) * daySlot;
         const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
-        chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} â€“ ${fmt(e)}</div></div>`;
     }
-    chogHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Nighttime</div>';
+    chogHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">ðŸŒ™ Nighttime</div>';
     let nightIdx = CHOG_NIGHT_START[dow];
     for (let i = 0; i < 8; i++) {
         const name = CHOG_SEQ[(nightIdx + i) % 7];
@@ -1236,7 +1261,7 @@ function renderPanchanga(p) {
         const s = p.sunset + i * nightSlot;
         const e = p.sunset + (i + 1) * nightSlot;
         const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
-        chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} â€“ ${fmt(e)}</div></div>`;
     }
     document.getElementById('choghadiyaList').innerHTML = chogHtml;
 
@@ -1248,7 +1273,7 @@ function renderPanchanga(p) {
         festCard.style.display = 'block';
         festList.innerHTML = festivals.map(f =>
             `<div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--card-border);">
-                <span style="font-size:1.3rem;">${f.shopping_peak ? '🛍️' : '🪔'}</span>
+                <span style="font-size:1.3rem;">${f.shopping_peak ? 'ðŸ›ï¸' : 'ðŸª”'}</span>
                 <div style="flex:1;">
                     <div style="font-weight:600;">${f.name.en}</div>
                     <div style="font-family:var(--font-kn); color:var(--gold-light); font-size:0.9rem;">${f.name.kn}</div>
@@ -1267,9 +1292,9 @@ function renderPanchanga(p) {
         sankrantiCard.style.display = 'block';
         document.getElementById('sankrantiInfo').innerHTML = `
             <div style="display:flex; align-items:center; gap:10px; padding:8px 0;">
-                <span style="font-size:1.5rem;">🌞</span>
+                <span style="font-size:1.5rem;">ðŸŒž</span>
                 <div>
-                    <div style="font-weight:600;">Sankranti (ಸಂಕ್ರಾಂತಿ)</div>
+                    <div style="font-weight:600;">Sankranti (à²¸à²‚à²•à³à²°à²¾à²‚à²¤à²¿)</div>
                     <div style="font-size:0.85rem; color:var(--text-dim);">Sun moves from <b>${RASHI_EN[sunRashiToday]}</b> to <b>${RASHI_EN[sunRashiTomorrow]}</b></div>
                 </div>
             </div>`;
@@ -1315,17 +1340,17 @@ function renderPanchanga(p) {
     grahaGrid.innerHTML = grahas.map(g =>
         `<div style="background:#1a2038;padding:8px;border-radius:6px;text-align:center;">
             <div style="font-size:1.1rem;">${g.icon}</div>
-            <div style="font-size:0.75rem;color:var(--text-dim);">${g.name}${g.combust ? ' <span style="color:var(--red);" title="Combust (Moudhya)">⚠️</span>' : ''}</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);">${g.name}${g.combust ? ' <span style="color:var(--red);" title="Combust (Moudhya)">âš ï¸</span>' : ''}</div>
             <div style="font-weight:600;font-size:0.85rem;">${g.rashi}</div>
             <div style="font-family:var(--font-kn);font-size:0.75rem;color:var(--gold-light);">${g.rashiKn}</div>
-            <div style="font-size:0.65rem;color:var(--text-dim);">${g.deg}°</div>
+            <div style="font-size:0.65rem;color:var(--text-dim);">${g.deg}Â°</div>
         </div>`
     ).join('');
     
     const moudhya = grahas.filter(g => g.combust).map(g => g.nameKn + ' (' + g.name + ')');
     const mWarning = document.getElementById('moudhyaWarning');
     if (moudhya.length > 0) {
-        mWarning.textContent = '⚠️ Moudhya (Combust): ' + moudhya.join(', ') + ' — Marriages/Auspicious events prohibited.';
+        mWarning.textContent = 'âš ï¸ Moudhya (Combust): ' + moudhya.join(', ') + ' â€” Marriages/Auspicious events prohibited.';
     } else {
         mWarning.textContent = '';
     }
@@ -1335,7 +1360,7 @@ function renderPanchanga(p) {
     lagnaGrid.innerHTML = p.lagnas.map(l => 
         `<div style="background:#1a2038; padding:8px; border-radius:6px; border-left:3px solid var(--gold);">
             <div style="font-weight:600; font-size:0.9rem;">${RASHI_EN[l.idx]} <span style="font-size:0.75rem; color:var(--text-dim); font-weight:normal;">${RASHI_KN[l.idx]}</span></div>
-            <div style="font-size:0.8rem; margin-top:4px;">${fmt(l.start)} – ${fmt(l.end)}</div>
+            <div style="font-size:0.8rem; margin-top:4px;">${fmt(l.start)} â€“ ${fmt(l.end)}</div>
         </div>`
     ).join('');
 
@@ -1354,7 +1379,7 @@ function renderPanchanga(p) {
 
         gocharaCard.style.display = 'block';
         document.getElementById('gocharaBirthInfo').textContent =
-            `(${latest.name} — Janma Rashi: ${RASHI_EN[birthMoonRashiIdx]})`;
+            `(${latest.name} â€” Janma Rashi: ${RASHI_EN[birthMoonRashiIdx]})`;
 
         // Gochara favourability table
         const GOCHARA_FAV = {
@@ -1372,7 +1397,7 @@ function renderPanchanga(p) {
             const favHouses = GOCHARA_FAV[g.name] || [];
             const isFav = favHouses.includes(house);
             const dotCls = isFav ? 'good' : 'bad';
-            const label = isFav ? '✓ Favourable' : '✗ Unfavourable';
+            const label = isFav ? 'âœ“ Favourable' : 'âœ— Unfavourable';
             gocharaHtml += `<div class="window-row">
                 <div class="window-dot ${dotCls}"></div>
                 <div class="window-name">${g.icon} ${g.name} <span style="color:var(--text-dim);font-size:0.75rem;">in ${g.rashi} (House ${house})</span></div>
@@ -1387,31 +1412,31 @@ function renderPanchanga(p) {
     // --- HORA (Planetary Hours) ---
     // Chaldean order: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars
     const HORA_ORDER = ['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
-    const HORA_ICONS = {'Sun':'☀️','Venus':'⚪','Mercury':'🟢','Moon':'🌙','Saturn':'🔵','Jupiter':'🟡','Mars':'🔴'};
-    const HORA_KN = {'Sun':'ಸೂರ್ಯ','Venus':'ಶುಕ್ರ','Mercury':'ಬುಧ','Moon':'ಚಂದ್ರ','Saturn':'ಶನಿ','Jupiter':'ಗುರು','Mars':'ಮಂಗಳ'};
+    const HORA_ICONS = {'Sun':'â˜€ï¸','Venus':'âšª','Mercury':'ðŸŸ¢','Moon':'ðŸŒ™','Saturn':'ðŸ”µ','Jupiter':'ðŸŸ¡','Mars':'ðŸ”´'};
+    const HORA_KN = {'Sun':'à²¸à³‚à²°à³à²¯','Venus':'à²¶à³à²•à³à²°','Mercury':'à²¬à³à²§','Moon':'à²šà²‚à²¦à³à²°','Saturn':'à²¶à²¨à²¿','Jupiter':'à²—à³à²°à³','Mars':'à²®à²‚à²—à²³'};
     // Weekday lord index in HORA_ORDER: Sun=0,Mon=3,Tue=6,Wed=2,Thu=5,Fri=1,Sat=4
     const HORA_DAY_START = [0, 3, 6, 2, 5, 1, 4];
     const dayHoraDur = dayLen / 12; // 12 day horas
     const nightHoraDur = (1.0 - dayLen) / 12; // 12 night horas
     const startIdx = HORA_DAY_START[dow];
 
-    let horaHtml = '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin-bottom:6px;">☀️ Day Horas</div>';
+    let horaHtml = '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin-bottom:6px;">â˜€ï¸ Day Horas</div>';
     for (let i = 0; i < 12; i++) {
         const planet = HORA_ORDER[(startIdx + i) % 7];
         const s = p.sunrise + i * dayHoraDur;
         const e = p.sunrise + (i + 1) * dayHoraDur;
         const good = ['Jupiter','Venus','Mercury'].includes(planet);
         const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
-        horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} â€“ ${fmt(e)}</div></div>`;
     }
-    horaHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Night Horas</div>';
+    horaHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">ðŸŒ™ Night Horas</div>';
     for (let i = 0; i < 12; i++) {
         const planet = HORA_ORDER[(startIdx + 12 + i) % 7];
         const s = p.sunset + i * nightHoraDur;
         const e = p.sunset + (i + 1) * nightHoraDur;
         const good = ['Jupiter','Venus','Mercury'].includes(planet);
         const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
-        horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} â€“ ${fmt(e)}</div></div>`;
     }
     document.getElementById('horaList').innerHTML = horaHtml;
 
@@ -1420,16 +1445,16 @@ function renderPanchanga(p) {
     // Names: Amrita, Vishakanda (Poison), Mahodaya (Great Rise), Dhanada (Wealth),
     //        Rogana (Disease), Kaalvela (Death time), Shubha (Auspicious), Laabha (Profit)
     const GOWRI_SEQ = [
-        {en:'Amrita',kn:'ಅಮೃತ',q:'best'},
-        {en:'Vishakanda',kn:'ವಿಷಕಂದ',q:'bad'},
-        {en:'Mahodaya',kn:'ಮಹೋದಯ',q:'good'},
-        {en:'Dhanada',kn:'ಧನದ',q:'good'},
-        {en:'Rogana',kn:'ರೋಗಣ',q:'bad'},
-        {en:'Kaalvela',kn:'ಕಾಲವೇಲ',q:'bad'},
-        {en:'Shubha',kn:'ಶುಭ',q:'good'},
-        {en:'Laabha',kn:'ಲಾಭ',q:'good'}
+        {en:'Amrita',kn:'à²…à²®à³ƒà²¤',q:'best'},
+        {en:'Vishakanda',kn:'à²µà²¿à²·à²•à²‚à²¦',q:'bad'},
+        {en:'Mahodaya',kn:'à²®à²¹à³‹à²¦à²¯',q:'good'},
+        {en:'Dhanada',kn:'à²§à²¨à²¦',q:'good'},
+        {en:'Rogana',kn:'à²°à³‹à²—à²£',q:'bad'},
+        {en:'Kaalvela',kn:'à²•à²¾à²²à²µà³‡à²²',q:'bad'},
+        {en:'Shubha',kn:'à²¶à³à²­',q:'good'},
+        {en:'Laabha',kn:'à²²à²¾à²­',q:'good'}
     ];
-    // Starting index by weekday (Sun=0..Sat=6) — Karnataka tradition
+    // Starting index by weekday (Sun=0..Sat=6) â€” Karnataka tradition
     const GOWRI_START = [6, 4, 3, 2, 1, 0, 5];
     const gowriSlot = (p.sunset - p.sunrise) / 8;
     const gowriStart = GOWRI_START[dow];
@@ -1441,7 +1466,7 @@ function renderPanchanga(p) {
         const e = p.sunrise + (i + 1) * gowriSlot;
         const dot = g.q === 'best' ? 'good' : (g.q === 'good' ? 'good' : 'bad');
         const style = g.q === 'best' ? 'color:var(--green);font-weight:700;' : (g.q === 'bad' ? 'color:var(--red);' : '');
-        gowriHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${g.en} <span style="font-family:var(--font-kn);color:var(--gold-light);font-size:0.8rem;">(${g.kn})</span></div><div class="window-time" style="${style}">${fmt(s)} – ${fmt(e)}</div></div>`;
+        gowriHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${g.en} <span style="font-family:var(--font-kn);color:var(--gold-light);font-size:0.8rem;">(${g.kn})</span></div><div class="window-time" style="${style}">${fmt(s)} â€“ ${fmt(e)}</div></div>`;
     }
     document.getElementById('gowriList').innerHTML = gowriHtml;
 }
@@ -1450,39 +1475,39 @@ function renderPanchanga(p) {
 //  FESTIVAL MATCHING ENGINE
 // ============================================================
 const FESTIVAL_RULES = [
-    {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
-    {"id":"rama_navami","name":{"en":"Rama Navami","kn":"ರಾಮ ನವಮಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":9,"shopping_peak":false},
-    {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"ಅಕ್ಷಯ ತೃತೀಯ"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
-    {"id":"guru_purnima","name":{"en":"Guru Purnima","kn":"ಗುರು ಪೂರ್ಣಿಮೆ"},"masa":"Ashadha","paksha":"Shukla","tithi":15,"shopping_peak":false},
-    {"id":"nagara_panchami","name":{"en":"Nagara Panchami","kn":"ನಾಗರ ಪಂಚಮಿ"},"masa":"Shravana","paksha":"Shukla","tithi":5,"shopping_peak":false},
-    {"id":"krishna_janmashtami","name":{"en":"Krishna Janmashtami","kn":"ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ"},"masa":"Shravana","paksha":"Krishna","tithi":8,"shopping_peak":false},
-    {"id":"gowri_habba","name":{"en":"Gowri Habba","kn":"ಗೌರಿ ಹಬ್ಬ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":3,"shopping_peak":true},
-    {"id":"ganesha_chaturthi","name":{"en":"Ganesha Chaturthi","kn":"ಗಣೇಶ ಚತುರ್ಥಿ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":4,"shopping_peak":true},
-    {"id":"ananta_chaturdashi","name":{"en":"Ananta Chaturdashi","kn":"ಅನಂತ ಚತುರ್ದಶಿ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":14,"shopping_peak":false},
-    {"id":"mahalaya_amavasya","name":{"en":"Mahalaya Amavasya","kn":"ಮಹಾಲಯ ಅಮಾವಾಸ್ಯೆ"},"masa":"Bhadrapada","paksha":"Krishna","tithi":30,"shopping_peak":false},
-    {"id":"navaratri","name":{"en":"Navaratri Begins","kn":"ನವರಾತ್ರಿ ಪ್ರಾರಂಭ"},"masa":"Ashvina","paksha":"Shukla","tithi":1,"shopping_peak":true},
-    {"id":"ayudha_puja","name":{"en":"Maha Navami / Ayudha Puja","kn":"ಮಹಾ ನವಮಿ / ಆಯುಧ ಪೂಜೆ"},"masa":"Ashvina","paksha":"Shukla","tithi":9,"shopping_peak":true},
-    {"id":"vijayadashami","name":{"en":"Vijayadashami","kn":"ವಿಜಯದಶಮಿ"},"masa":"Ashvina","paksha":"Shukla","tithi":10,"shopping_peak":true},
-    {"id":"dhana_trayodashi","name":{"en":"Dhana Trayodashi","kn":"ಧನ ತ್ರಯೋದಶಿ"},"masa":"Ashvina","paksha":"Krishna","tithi":13,"shopping_peak":true},
-    {"id":"naraka_chaturdashi","name":{"en":"Naraka Chaturdashi","kn":"ನರಕ ಚತುರ್ದಶಿ"},"masa":"Ashvina","paksha":"Krishna","tithi":14,"shopping_peak":true},
-    {"id":"deepavali","name":{"en":"Deepavali (Lakshmi Puja)","kn":"ದೀಪಾವಳಿ (ಲಕ್ಷ್ಮಿ ಪೂಜೆ)"},"masa":"Ashvina","paksha":"Krishna","tithi":30,"shopping_peak":true},
-    {"id":"bali_padyami","name":{"en":"Bali Padyami","kn":"ಬಲಿ ಪಾಡ್ಯಮಿ"},"masa":"Kartika","paksha":"Shukla","tithi":1,"shopping_peak":true},
-    {"id":"karthika_purnima","name":{"en":"Karthika Purnima","kn":"ಕಾರ್ತಿಕ ಪೂರ್ಣಿಮೆ"},"masa":"Kartika","paksha":"Shukla","tithi":15,"shopping_peak":false},
-    {"id":"vaikuntha_ekadashi","name":{"en":"Vaikuntha Ekadashi","kn":"ವೈಕುಂಠ ಏಕಾದಶಿ"},"masa":"Pushya","paksha":"Shukla","tithi":11,"shopping_peak":false},
-    {"id":"ratha_saptami","name":{"en":"Ratha Saptami","kn":"ರಥ ಸಪ್ತಮಿ"},"masa":"Magha","paksha":"Shukla","tithi":7,"shopping_peak":false},
-    {"id":"maha_shivaratri","name":{"en":"Maha Shivaratri","kn":"ಮಹಾ ಶಿವರಾತ್ರಿ"},"masa":"Magha","paksha":"Krishna","tithi":14,"shopping_peak":false},
-    {"id":"holi","name":{"en":"Holi (Kama Dahana)","kn":"ಹೋಳಿ"},"masa":"Phalguna","paksha":"Shukla","tithi":15,"shopping_peak":false}
+    {"id":"ugadi","name":{"en":"Ugadi","kn":"à²¯à³à²—à²¾à²¦à²¿"},"masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"rama_navami","name":{"en":"Rama Navami","kn":"à²°à²¾à²® à²¨à²µà²®à²¿"},"masa":"Chaitra","paksha":"Shukla","tithi":9,"shopping_peak":false},
+    {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"à²…à²•à³à²·à²¯ à²¤à³ƒà²¤à³€à²¯"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
+    {"id":"guru_purnima","name":{"en":"Guru Purnima","kn":"à²—à³à²°à³ à²ªà³‚à²°à³à²£à²¿à²®à³†"},"masa":"Ashadha","paksha":"Shukla","tithi":15,"shopping_peak":false},
+    {"id":"nagara_panchami","name":{"en":"Nagara Panchami","kn":"à²¨à²¾à²—à²° à²ªà²‚à²šà²®à²¿"},"masa":"Shravana","paksha":"Shukla","tithi":5,"shopping_peak":false},
+    {"id":"krishna_janmashtami","name":{"en":"Krishna Janmashtami","kn":"à²•à³ƒà²·à³à²£ à²œà²¨à³à²®à²¾à²·à³à²Ÿà²®à²¿"},"masa":"Shravana","paksha":"Krishna","tithi":23,"shopping_peak":false},
+    {"id":"gowri_habba","name":{"en":"Gowri Habba","kn":"à²—à³Œà²°à²¿ à²¹à²¬à³à²¬"},"masa":"Bhadrapada","paksha":"Shukla","tithi":3,"shopping_peak":true},
+    {"id":"ganesha_chaturthi","name":{"en":"Ganesha Chaturthi","kn":"à²—à²£à³‡à²¶ à²šà²¤à³à²°à³à²¥à²¿"},"masa":"Bhadrapada","paksha":"Shukla","tithi":4,"shopping_peak":true},
+    {"id":"ananta_chaturdashi","name":{"en":"Ananta Chaturdashi","kn":"à²…à²¨à²‚à²¤ à²šà²¤à³à²°à³à²¦à²¶à²¿"},"masa":"Bhadrapada","paksha":"Shukla","tithi":14,"shopping_peak":false},
+    {"id":"mahalaya_amavasya","name":{"en":"Mahalaya Amavasya","kn":"à²®à²¹à²¾à²²à²¯ à²…à²®à²¾à²µà²¾à²¸à³à²¯à³†"},"masa":"Bhadrapada","paksha":"Krishna","tithi":30,"shopping_peak":false},
+    {"id":"navaratri","name":{"en":"Navaratri Begins","kn":"à²¨à²µà²°à²¾à²¤à³à²°à²¿ à²ªà³à²°à²¾à²°à²‚à²­"},"masa":"Ashvina","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"ayudha_puja","name":{"en":"Maha Navami / Ayudha Puja","kn":"à²®à²¹à²¾ à²¨à²µà²®à²¿ / à²†à²¯à³à²§ à²ªà³‚à²œà³†"},"masa":"Ashvina","paksha":"Shukla","tithi":9,"shopping_peak":true},
+    {"id":"vijayadashami","name":{"en":"Vijayadashami","kn":"à²µà²¿à²œà²¯à²¦à²¶à²®à²¿"},"masa":"Ashvina","paksha":"Shukla","tithi":10,"shopping_peak":true},
+    {"id":"dhana_trayodashi","name":{"en":"Dhana Trayodashi","kn":"à²§à²¨ à²¤à³à²°à²¯à³‹à²¦à²¶à²¿"},"masa":"Ashvina","paksha":"Krishna","tithi":28,"shopping_peak":true},
+    {"id":"naraka_chaturdashi","name":{"en":"Naraka Chaturdashi","kn":"à²¨à²°à²• à²šà²¤à³à²°à³à²¦à²¶à²¿"},"masa":"Ashvina","paksha":"Krishna","tithi":29,"shopping_peak":true},
+    {"id":"deepavali","name":{"en":"Deepavali (Lakshmi Puja)","kn":"à²¦à³€à²ªà²¾à²µà²³à²¿ (à²²à²•à³à²·à³à²®à²¿ à²ªà³‚à²œà³†)"},"masa":"Ashvina","paksha":"Krishna","tithi":30,"shopping_peak":true},
+    {"id":"bali_padyami","name":{"en":"Bali Padyami","kn":"à²¬à²²à²¿ à²ªà²¾à²¡à³à²¯à²®à²¿"},"masa":"Kartika","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"karthika_purnima","name":{"en":"Karthika Purnima","kn":"à²•à²¾à²°à³à²¤à²¿à²• à²ªà³‚à²°à³à²£à²¿à²®à³†"},"masa":"Kartika","paksha":"Shukla","tithi":15,"shopping_peak":false},
+    {"id":"vaikuntha_ekadashi","name":{"en":"Vaikuntha Ekadashi","kn":"à²µà³ˆà²•à³à²‚à²  à²à²•à²¾à²¦à²¶à²¿"},"masa":"Pushya","paksha":"Shukla","tithi":11,"shopping_peak":false},
+    {"id":"ratha_saptami","name":{"en":"Ratha Saptami","kn":"à²°à²¥ à²¸à²ªà³à²¤à²®à²¿"},"masa":"Magha","paksha":"Shukla","tithi":7,"shopping_peak":false},
+    {"id":"maha_shivaratri","name":{"en":"Maha Shivaratri","kn":"à²®à²¹à²¾ à²¶à²¿à²µà²°à²¾à²¤à³à²°à²¿"},"masa":"Magha","paksha":"Krishna","tithi":14,"shopping_peak":false},
+    {"id":"holi","name":{"en":"Holi (Kama Dahana)","kn":"à²¹à³‹à²³à²¿"},"masa":"Phalguna","paksha":"Shukla","tithi":15,"shopping_peak":false}
 ];
 
 // Recurring vratas (checked every paksha)
 const VRATA_RULES = [
-    {"id":"ekadashi","name":{"en":"Ekadashi Vrata","kn":"ಏಕಾದಶಿ ವ್ರತ"},"tithi":11,"shopping_peak":false},
-    {"id":"pradosha","name":{"en":"Pradosha Vrata","kn":"ಪ್ರದೋಷ ವ್ರತ"},"tithi":13,"shopping_peak":false},
-    {"id":"chaturthi_s","name":{"en":"Vinayaka Chaturthi","kn":"ವಿನಾಯಕ ಚತುರ್ಥಿ"},"tithi":4,"paksha":"Shukla","shopping_peak":false},
-    {"id":"sankashti","name":{"en":"Sankashti Chaturthi","kn":"ಸಂಕಷ್ಟ ಚತುರ್ಥಿ"},"tithi":4,"paksha":"Krishna","shopping_peak":false},
-    {"id":"amavasya","name":{"en":"Amavasya","kn":"ಅಮಾವಾಸ್ಯೆ"},"tithi":30,"shopping_peak":false},
-    {"id":"purnima","name":{"en":"Purnima","kn":"ಹುಣ್ಣಿಮೆ"},"tithi":15,"shopping_peak":false},
-    {"id":"shivaratri","name":{"en":"Masa Shivaratri","kn":"ಮಾಸ ಶಿವರಾತ್ರಿ"},"tithi":14,"paksha":"Krishna","shopping_peak":false}
+    {"id":"ekadashi","name":{"en":"Ekadashi Vrata","kn":"à²à²•à²¾à²¦à²¶à²¿ à²µà³à²°à²¤"},"tithi":11,"shopping_peak":false},
+    {"id":"pradosha","name":{"en":"Pradosha Vrata","kn":"à²ªà³à²°à²¦à³‹à²· à²µà³à²°à²¤"},"tithi":13,"shopping_peak":false},
+    {"id":"chaturthi_s","name":{"en":"Vinayaka Chaturthi","kn":"à²µà²¿à²¨à²¾à²¯à²• à²šà²¤à³à²°à³à²¥à²¿"},"tithi":4,"paksha":"Shukla","shopping_peak":false},
+    {"id":"sankashti","name":{"en":"Sankashti Chaturthi","kn":"à²¸à²‚à²•à²·à³à²Ÿ à²šà²¤à³à²°à³à²¥à²¿"},"tithi":4,"paksha":"Krishna","shopping_peak":false},
+    {"id":"amavasya","name":{"en":"Amavasya","kn":"à²…à²®à²¾à²µà²¾à²¸à³à²¯à³†"},"tithi":30,"shopping_peak":false},
+    {"id":"purnima","name":{"en":"Purnima","kn":"à²¹à³à²£à³à²£à²¿à²®à³†"},"tithi":15,"shopping_peak":false},
+    {"id":"shivaratri","name":{"en":"Masa Shivaratri","kn":"à²®à²¾à²¸ à²¶à²¿à²µà²°à²¾à²¤à³à²°à²¿"},"tithi":14,"paksha":"Krishna","shopping_peak":false}
 ];
 
 function matchFestivals(p) {
@@ -1532,7 +1557,7 @@ function shareDailyPanchangam() {
     const tz = p.tzOff;
     const fmt = (jd) => jdToLocalTimeStr(jd, tz);
     const dateStr = `${p.day}/${p.month}/${p.year}`;
-    const text = `*Kuberan Panchangam*\n📅 ${dateStr}\n${p.samvatsara.name} · ${p.masa.en} ${p.tithi.paksha} · ${p.ritu}\n\n☀️ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\n🔸 Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.endJD)})\n⭐ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.endJD)})\n🔹 Yoga: ${p.yoga.name} (until ${fmt(p.yoga.endJD)})\n📐 Karana: ${p.karana.name}\n📆 Vara: ${p.vara.en}\n\n⚠️ Rahu Kala: ${fmt(p.rahu.start)}–${fmt(p.rahu.end)}\n⚠️ Yamaganda: ${fmt(p.yama.start)}–${fmt(p.yama.end)}\n✅ Abhijit: ${fmt(p.abhijit.start)}–${fmt(p.abhijit.end)}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
+    const text = `*Kuberan Panchangam*\nðŸ“… ${dateStr}\n${p.samvatsara.name} Â· ${p.masa.en} ${p.tithi.paksha} Â· ${p.ritu}\n\nâ˜€ï¸ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\nðŸ”¸ Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.endJD)})\nâ­ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.endJD)})\nðŸ”¹ Yoga: ${p.yoga.name} (until ${fmt(p.yoga.endJD)})\nðŸ“ Karana: ${p.karana.name}\nðŸ“† Vara: ${p.vara.en}\n\nâš ï¸ Rahu Kala: ${fmt(p.rahu.start)}â€“${fmt(p.rahu.end)}\nâš ï¸ Yamaganda: ${fmt(p.yama.start)}â€“${fmt(p.yama.end)}\nâœ… Abhijit: ${fmt(p.abhijit.start)}â€“${fmt(p.abhijit.end)}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
 
     if (navigator.share) {
         navigator.share({ title: `Panchangam ${dateStr}`, text }).catch(() => {});
@@ -1542,7 +1567,7 @@ function shareDailyPanchangam() {
 }
 
 // ============================================================
-//  EVENT HANDLERS — GPS + Manual Location
+//  EVENT HANDLERS â€” GPS + Manual Location
 // ============================================================
 let currentLocation = { lat: 12.9716, lon: 77.5946, tz: 'Asia/Kolkata' };
 
@@ -1561,7 +1586,7 @@ function setLocation(lat, lon, tz, name) {
 
 function detectLocation() {
     const nameEl = document.getElementById('locationName');
-    nameEl.textContent = 'Detecting…';
+    nameEl.textContent = 'Detectingâ€¦';
     if (!navigator.geolocation) {
         nameEl.textContent = 'Geolocation not supported';
         return;
@@ -1578,16 +1603,16 @@ function detectLocation() {
                 .then(data => {
                     const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || '';
                     const country = data.address?.country || '';
-                    const name = city ? `${city}, ${country}` : `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
-                    setLocation(lat, lon, tz, `📍 ${name}`);
+                    const name = city ? `${city}, ${country}` : `${lat.toFixed(2)}Â°, ${lon.toFixed(2)}Â°`;
+                    setLocation(lat, lon, tz, `ðŸ“ ${name}`);
                 })
                 .catch(() => {
-                    setLocation(lat, lon, tz, `📍 ${lat.toFixed(4)}°, ${lon.toFixed(4)}°`);
+                    setLocation(lat, lon, tz, `ðŸ“ ${lat.toFixed(4)}Â°, ${lon.toFixed(4)}Â°`);
                 });
         },
         (err) => {
             console.error('Geolocation error:', err);
-            nameEl.textContent = 'Location denied — use manual entry below';
+            nameEl.textContent = 'Location denied â€” use manual entry below';
         },
         { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -1598,7 +1623,7 @@ function applyManualLocation() {
     const lon = parseFloat(document.getElementById('lonInput').value);
     const tz = document.getElementById('tzInput').value.trim() || 'Asia/Kolkata';
     if (isNaN(lat) || isNaN(lon)) { alert('Enter valid latitude and longitude.'); return; }
-    setLocation(lat, lon, tz, `${lat.toFixed(4)}°, ${lon.toFixed(4)}°`);
+    setLocation(lat, lon, tz, `${lat.toFixed(4)}Â°, ${lon.toFixed(4)}Â°`);
 }
 
 function recalculate() {
@@ -1625,7 +1650,7 @@ function declineDisclaimer() {
 function toggleLang() {
     const isKn = document.body.dataset.lang === 'kn';
     document.body.dataset.lang = isKn ? 'en' : 'kn';
-    document.getElementById('langToggle').textContent = isKn ? 'ಕನ್ನಡ' : 'English';
+    document.getElementById('langToggle').textContent = isKn ? 'à²•à²¨à³à²¨à²¡' : 'English';
     localStorage.setItem('kuberan_lang', document.body.dataset.lang);
     recalculate();
 }
@@ -1695,12 +1720,12 @@ function calcCompat() {
     const score = (good / results.length * 100).toFixed(0);
     const isRec = score >= 70;
     let html = `<div class="result-box ${isRec ? 'result-good' : 'result-bad'}">
-        <strong>${isRec ? '✅ RECOMMENDED' : '⚠️ NOT RECOMMENDED'}</strong> — Score: ${score}%
-        <p style="margin-top:8px;font-size:0.85rem;">Date: ${targetStr} · Nakshatra: ${targetP.nakshatra.name} · ${targetP.tithi.paksha} ${targetP.tithi.name}</p>
+        <strong>${isRec ? 'âœ… RECOMMENDED' : 'âš ï¸ NOT RECOMMENDED'}</strong> â€” Score: ${score}%
+        <p style="margin-top:8px;font-size:0.85rem;">Date: ${targetStr} Â· Nakshatra: ${targetP.nakshatra.name} Â· ${targetP.tithi.paksha} ${targetP.tithi.name}</p>
     </div>`;
     html += '<div style="margin-top:12px;">';
     results.forEach(r => {
-        html += `<div class="window-row"><div class="window-dot ${r.isGood ? 'good' : 'bad'}"></div><div class="window-name">${r.name} <span style="color:var(--text-dim);font-size:0.75rem;">(Birth: ${r.birthNak})</span></div><div class="window-time">${r.tara} ${r.isGood ? '✓' : '✗'}</div></div>`;
+        html += `<div class="window-row"><div class="window-dot ${r.isGood ? 'good' : 'bad'}"></div><div class="window-name">${r.name} <span style="color:var(--text-dim);font-size:0.75rem;">(Birth: ${r.birthNak})</span></div><div class="window-time">${r.tara} ${r.isGood ? 'âœ“' : 'âœ—'}</div></div>`;
     });
     html += '</div>';
     document.getElementById('compatResult').innerHTML = html;
@@ -1738,7 +1763,7 @@ function loadJathakaHistory() {
                 <div style="font-weight:600; font-size:0.9rem;">${h.name}</div>
                 <div style="font-size:0.75rem; color:var(--text-dim);">${h.dobStr} | ${h.nakName} Nakshatra</div>
             </div>
-            <button onclick="deleteJathaka(${idx})" style="background:none; border:none; color:var(--red); padding:5px; cursor:pointer;" title="Delete">🗑️</button>
+            <button onclick="deleteJathaka(${idx})" style="background:none; border:none; color:var(--red); padding:5px; cursor:pointer;" title="Delete">ðŸ—‘ï¸</button>
         `;
         list.appendChild(div);
     });
@@ -1772,7 +1797,7 @@ function loadJathakaFromHistory(idx) {
 
 function shareJathaka() {
     if (!currentJathakaData) return;
-    const text = `*Janma Kundali for ${currentJathakaData.name}*\nDOB: ${currentJathakaData.dobStr}\n\n⭐ Janma Nakshatra: ${currentJathakaData.nakName} (Pada ${currentJathakaData.pada})\n🌙 Moon Sign: ${currentJathakaData.moonRashi}\n☀️ Sun Sign: ${currentJathakaData.sunRashi}\n📅 Tithi: ${currentJathakaData.tithi}\n\n⏳ ${currentJathakaData.dashaBalance}\n\nGenerated via Kuberan Panchangam`;
+    const text = `*Janma Kundali for ${currentJathakaData.name}*\nDOB: ${currentJathakaData.dobStr}\n\nâ­ Janma Nakshatra: ${currentJathakaData.nakName} (Pada ${currentJathakaData.pada})\nðŸŒ™ Moon Sign: ${currentJathakaData.moonRashi}\nâ˜€ï¸ Sun Sign: ${currentJathakaData.sunRashi}\nðŸ“… Tithi: ${currentJathakaData.tithi}\n\nâ³ ${currentJathakaData.dashaBalance}\n\nGenerated via Kuberan Panchangam`;
     
     if (navigator.share) {
         navigator.share({
@@ -1867,7 +1892,7 @@ function generateJathaka() {
 
             // Update UI
             document.getElementById('jReportName').textContent = name;
-            document.getElementById('jReportDobLoc').textContent = `${dobLocaleStr} | ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+            document.getElementById('jReportDobLoc').textContent = `${dobLocaleStr} | ${lat.toFixed(2)}Â°, ${lon.toFixed(2)}Â°`;
             
             const nakSyllable = NAK_SYLLABLES[exactNakIdx][pada - 1];
             document.getElementById('jNak').textContent = `${nakName} (Pada ${pada})`;
@@ -1904,7 +1929,7 @@ function generateJathaka() {
             const birthDateStr = d.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
             dashaTimelineHtml += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:#f8f0e0;border-radius:4px;border-left:4px solid ${DASHA_COLORS[firstDashaIdx]};">
                 <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[firstDashaIdx]}</div>
-                <div style="flex:1;font-size:0.8rem;color:#555;">${birthDateStr} → ${balEndStr}</div>
+                <div style="flex:1;font-size:0.8rem;color:#555;">${birthDateStr} â†’ ${balEndStr}</div>
                 <div style="font-size:0.7rem;color:#888;">${bYears}y ${bMonths}m ${bDays}d</div>
             </div>`;
             
@@ -1918,8 +1943,8 @@ function generateJathaka() {
                 const now = new Date();
                 const isCurrent = (now >= new Date(startStr) && now <= new Date(endStr));
                 dashaTimelineHtml += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;${isCurrent ? 'background:#e8f5e9;' : 'background:#fafafa;'}border-radius:4px;border-left:4px solid ${DASHA_COLORS[idx]};">
-                    <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[idx]}${isCurrent ? ' ◀' : ''}</div>
-                    <div style="flex:1;font-size:0.8rem;color:#555;">${startStr} → ${endStr}</div>
+                    <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[idx]}${isCurrent ? ' â—€' : ''}</div>
+                    <div style="flex:1;font-size:0.8rem;color:#555;">${startStr} â†’ ${endStr}</div>
                     <div style="font-size:0.7rem;color:#888;">${yrs} yrs</div>
                 </div>`;
             }
@@ -1950,7 +1975,7 @@ function generateJathaka() {
                     <div style="font-size:0.9rem;">${g.icon}</div>
                     <div style="font-size:0.7rem;color:#666;">${g.name}</div>
                     <div style="font-weight:600;font-size:0.8rem;">${g.rashi}</div>
-                    <div style="font-size:0.65rem;color:#999;">${g.deg}°</div>
+                    <div style="font-size:0.65rem;color:#999;">${g.deg}Â°</div>
                 </div>`
             ).join('');
 
@@ -2041,9 +2066,9 @@ function scanDates() {
         results.slice(0, 15).forEach(r => {
             const ds = r.date.toLocaleDateString('en-IN', {weekday:'short',year:'numeric',month:'short',day:'numeric'});
             const c = r.score >= 70 ? 'var(--green)' : (r.score >= 50 ? 'var(--orange)' : 'var(--red)');
-            const lb = r.score >= 70 ? '✅ Excellent' : (r.score >= 50 ? '🟡 Moderate' : '⚠️ Avoid');
-            const fs = r.fests.length > 0 ? ` · 🪔 ${r.fests[0].name.en}` : '';
-            html += `<div class="window-row"><div style="min-width:32px;text-align:center;font-weight:700;color:${c};">${r.score}</div><div class="window-name"><div>${ds}${fs}</div><div style="font-size:0.7rem;color:var(--text-dim);">${r.p.tithi.paksha} ${r.p.tithi.name} · ${r.p.nakshatra.name} · ${r.p.yoga.name}${r.p.karana.isVishti ? ' · ⚠️Vishti' : ''}</div></div><div class="window-time" style="color:${c};font-size:0.75rem;">${lb}</div></div>`;
+            const lb = r.score >= 70 ? 'âœ… Excellent' : (r.score >= 50 ? 'ðŸŸ¡ Moderate' : 'âš ï¸ Avoid');
+            const fs = r.fests.length > 0 ? ` Â· ðŸª” ${r.fests[0].name.en}` : '';
+            html += `<div class="window-row"><div style="min-width:32px;text-align:center;font-weight:700;color:${c};">${r.score}</div><div class="window-name"><div>${ds}${fs}</div><div style="font-size:0.7rem;color:var(--text-dim);">${r.p.tithi.paksha} ${r.p.tithi.name} Â· ${r.p.nakshatra.name} Â· ${r.p.yoga.name}${r.p.karana.isVishti ? ' Â· âš ï¸Vishti' : ''}</div></div><div class="window-time" style="color:${c};font-size:0.75rem;">${lb}</div></div>`;
         });
         document.getElementById('scanResults').innerHTML = html;
         document.getElementById('scanLoading').style.display = 'none';
@@ -2073,13 +2098,13 @@ function updateMuhurthaPersonalized() {
     const TARA_FULL = ['Janma (Birth)','Sampat (Wealth)','Vipat (Danger)','Kshema (Prosperity)','Pratyak (Obstacle)','Sadhaka (Achievement)','Nidhana (Death)','Mitra (Friend)','Parama Mitra (Best Friend)'];
     const isGoodTara = [1,3,5,7,8].includes(taraCycle);
     document.getElementById('tarabalamCard').style.display = 'block';
-    document.getElementById('tarabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodTara?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodTara?'✅':'⚠️'}</div><div><div style="font-weight:700;">${TARA_FULL[taraCycle]}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${NAK_EN[birthNakIdx]} → Today: ${p.nakshatra.name} (Tara ${taraCycle+1}/9)</div><div style="font-size:0.8rem;margin-top:4px;${isGoodTara?'color:var(--green);':'color:var(--red);'}">${isGoodTara?'Favourable for activities':'Avoid starting important work'}</div></div></div>`;
+    document.getElementById('tarabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodTara?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodTara?'âœ…':'âš ï¸'}</div><div><div style="font-weight:700;">${TARA_FULL[taraCycle]}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${NAK_EN[birthNakIdx]} â†’ Today: ${p.nakshatra.name} (Tara ${taraCycle+1}/9)</div><div style="font-size:0.8rem;margin-top:4px;${isGoodTara?'color:var(--green);':'color:var(--red);'}">${isGoodTara?'Favourable for activities':'Avoid starting important work'}</div></div></div>`;
     // Chandrabalam
     const todayMoonRashiIdx = Math.floor(siderealMoon(p.sunrise) / 30);
     const chandraHouse = ((todayMoonRashiIdx - birthMoonRashiIdx + 12) % 12) + 1;
     const isGoodChandra = [1,3,6,7,10,11].includes(chandraHouse);
     document.getElementById('chandrabalamCard').style.display = 'block';
-    document.getElementById('chandrabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodChandra?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodChandra?'🌙':'🌑'}</div><div><div style="font-weight:700;">Moon in House ${chandraHouse}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${RASHI_EN[birthMoonRashiIdx]} → Today: ${RASHI_EN[todayMoonRashiIdx]}</div><div style="font-size:0.8rem;margin-top:4px;${isGoodChandra?'color:var(--green);':'color:var(--red);'}">${isGoodChandra?'Chandrabalam strong — auspicious':'Chandrabalam weak — caution'}</div></div></div>`;
+    document.getElementById('chandrabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodChandra?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodChandra?'ðŸŒ™':'ðŸŒ‘'}</div><div><div style="font-weight:700;">Moon in House ${chandraHouse}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${RASHI_EN[birthMoonRashiIdx]} â†’ Today: ${RASHI_EN[todayMoonRashiIdx]}</div><div style="font-size:0.8rem;margin-top:4px;${isGoodChandra?'color:var(--green);':'color:var(--red);'}">${isGoodChandra?'Chandrabalam strong â€” auspicious':'Chandrabalam weak â€” caution'}</div></div></div>`;
 }
 
 // ============================================================
@@ -2134,7 +2159,7 @@ function renderCalendar() {
         if (fests.length > 0) border = `border:2px solid var(--orange);`;
         if (isToday && fests.length > 0) border = 'border:2px solid var(--gold);box-shadow:0 0 6px var(--gold);';
 
-        const festDot = fests.length > 0 ? '<div style="font-size:0.5rem;line-height:1;">🪔</div>' : '';
+        const festDot = fests.length > 0 ? '<div style="font-size:0.5rem;line-height:1;">ðŸª”</div>' : '';
         const tithiShort = p ? (p.tithi.no <= 15 ? p.tithi.no : p.tithi.no - 15) : '';
         const dayColor = dow === 0 ? 'color:var(--red);' : (dow === 6 ? 'color:var(--gold);' : '');
 
@@ -2157,7 +2182,7 @@ function renderCalendar() {
         festHtml = '<div style="color:var(--text-dim);padding:8px;">No major festivals this month.</div>';
     } else {
         monthFestivals.forEach(f => {
-            festHtml += `<div class="window-row"><div class="window-dot ${f.shopping ? 'good' : 'neutral'}"></div><div class="window-name">${f.day} — ${f.name.en} <span style="font-family:var(--font-kn);color:var(--gold-light);">(${f.name.kn})</span></div></div>`;
+            festHtml += `<div class="window-row"><div class="window-dot ${f.shopping ? 'good' : 'neutral'}"></div><div class="window-name">${f.day} â€” ${f.name.en} <span style="font-family:var(--font-kn);color:var(--gold-light);">(${f.name.kn})</span></div></div>`;
         });
     }
     document.getElementById('calFestList').innerHTML = festHtml;
@@ -2260,13 +2285,13 @@ function doMarriageMatch() {
     
     const verdictEl = document.getElementById('matchVerdict');
     if (result.total >= 25) {
-        verdictEl.textContent = "✅ Highly Compatible (Uttama)";
+        verdictEl.textContent = "âœ… Highly Compatible (Uttama)";
         verdictEl.style.color = "var(--green)";
     } else if (result.total >= 18) {
-        verdictEl.textContent = "🟡 Acceptable (Madhyama)";
+        verdictEl.textContent = "ðŸŸ¡ Acceptable (Madhyama)";
         verdictEl.style.color = "var(--orange)";
     } else {
-        verdictEl.textContent = "⚠️ Not Recommended (Adhama)";
+        verdictEl.textContent = "âš ï¸ Not Recommended (Adhama)";
         verdictEl.style.color = "var(--red)";
     }
     
@@ -2296,7 +2321,7 @@ function doMarriageMatch() {
 }
 
 // ============================================================
-//  INIT — Try GPS first, fall back to defaults
+//  INIT â€” Try GPS first, fall back to defaults
 // ============================================================
 (function init() {
     // Restore language preference
@@ -2325,13 +2350,13 @@ function doMarriageMatch() {
                     .then(data => {
                         const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || '';
                         const country = data.address?.country || '';
-                        const name = city ? `${city}, ${country}` : `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
-                        setLocation(lat, lon, tz, `📍 ${name}`);
+                        const name = city ? `${city}, ${country}` : `${lat.toFixed(2)}Â°, ${lon.toFixed(2)}Â°`;
+                        setLocation(lat, lon, tz, `ðŸ“ ${name}`);
                     })
-                    .catch(() => setLocation(lat, lon, tz, `📍 ${lat.toFixed(4)}°, ${lon.toFixed(4)}°`));
+                    .catch(() => setLocation(lat, lon, tz, `ðŸ“ ${lat.toFixed(4)}Â°, ${lon.toFixed(4)}Â°`));
             },
             () => {
-                // Geolocation denied/failed — use Bengaluru defaults
+                // Geolocation denied/failed â€” use Bengaluru defaults
                 recalculate();
             },
             { enableHighAccuracy: false, timeout: 5000 }
