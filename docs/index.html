@@ -765,6 +765,14 @@ const DASHA_YEARS = [7, 20, 6, 10, 7, 18, 16, 19, 17]; // 0-indexed: Sampat(1), 
 //  (VSOP87 / JPL-grade; accuracy ~0.001 arcsec, valid 200+ years)
 // ============================================================
 
+// NOTE ON DELTA-T: The Astronomy Engine (astronomy.js) internally applies
+// Delta-T corrections using the Espenak & Meeus polynomial when computing
+// planetary positions via AstroTime. Our julianDay() function is used only
+// for time-formatting conversions and does NOT need separate Delta-T handling.
+// For dates beyond ±500 years from present, Delta-T uncertainty grows to
+// ~minutes, which affects exact sunrise/sunset times but NOT Tithi/Nakshatra
+// determination (those depend on relative angular positions, not clock time).
+
 function julianDay(y, m, d, h) {
     if (m <= 2) { y--; m += 12; }
     const A = Math.floor(y / 100);
@@ -945,7 +953,10 @@ function computeSunrise(year, month, day, lat, lon) {
     const baseJD = julianDay(year, month, day, 0); 
     const riseJD = rise ? (rise.ut + 2451545.0) : (baseJD + 6/24);
     const setJD = set ? (set.ut + 2451545.0) : (baseJD + 18/24);
-    return { rise: (riseJD - baseJD) * 24, set: (setJD - baseJD) * 24 };
+    // Upper-limb correction: subtract Sun semidiameter (~16') from rise time
+    // This gives ~1.1 minutes earlier sunrise (traditional Drik standard)
+    const upperLimbCorrDays = 16 / 60 / 360; // 16 arcmin in day fraction (approx)
+    return { rise: (riseJD - baseJD) * 24 - 1.1/60, set: (setJD - baseJD) * 24 + 1.1/60 };
 }
 
 // ============================================================
@@ -2101,7 +2112,7 @@ function scanDates() {
     const purpose = document.getElementById('scanPurpose').value;
     if (!fromStr || !toStr) { alert("Please select From and To dates."); return; }
     const from = new Date(fromStr), to = new Date(toStr);
-    if (to - from > 90 * 86400000) { alert("Max scan range is 90 days."); return; }
+    if (to - from > 365 * 86400000) { alert("Max scan range is 90 days."); return; }
     document.getElementById('scanLoading').style.display = 'block';
     document.getElementById('scanResults').innerHTML = '';
     setTimeout(() => {
