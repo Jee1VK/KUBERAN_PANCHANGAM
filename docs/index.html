@@ -1450,6 +1450,10 @@ function renderPanchanga(p) {
 //  FESTIVAL MATCHING ENGINE
 // ============================================================
 const FESTIVAL_RULES = [
+    {"id":"basava_jayanthi","name":{"en":"Basava Jayanthi","kn":"ಬಸವ ಜಯಂತಿ"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":false},
+    {"id":"kara_hunnime","name":{"en":"Kara Hunnime","kn":"ಕಾರ ಹುಣ್ಣಿಮೆ"},"masa":"Jyeshtha","paksha":"Shukla","tithi":15,"shopping_peak":false},
+    {"id":"prathama_ekadashi","name":{"en":"Prathama / Ashadhi Ekadashi","kn":"ಪ್ರಥಮ ಏಕಾದಶಿ"},"masa":"Ashadha","paksha":"Shukla","tithi":11,"shopping_peak":false},
+    {"id":"hanuman_jayanti","name":{"en":"Hanuman Jayanti","kn":"ಹನುಮಾನ್ ಜಯಂತಿ"},"masa":"Margashira","paksha":"Shukla","tithi":13,"shopping_peak":false},
     {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
     {"id":"rama_navami","name":{"en":"Rama Navami","kn":"ರಾಮ ನವಮಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":9,"shopping_peak":false},
     {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"ಅಕ್ಷಯ ತೃತೀಯ"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
@@ -1460,7 +1464,7 @@ const FESTIVAL_RULES = [
     {"id":"ganesha_chaturthi","name":{"en":"Ganesha Chaturthi","kn":"ಗಣೇಶ ಚತುರ್ಥಿ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":4,"shopping_peak":true},
     {"id":"ananta_chaturdashi","name":{"en":"Ananta Chaturdashi","kn":"ಅನಂತ ಚತುರ್ದಶಿ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":14,"shopping_peak":false},
     {"id":"mahalaya_amavasya","name":{"en":"Mahalaya Amavasya","kn":"ಮಹಾಲಯ ಅಮಾವಾಸ್ಯೆ"},"masa":"Bhadrapada","paksha":"Krishna","tithi":30,"shopping_peak":false},
-    {"id":"navaratri","name":{"en":"Navaratri Begins","kn":"ನವರಾತ್ರಿ ಪ್ರಾರಂಭ"},"masa":"Ashvina","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"navaratri","name":{"en":"Sharad Navaratri / Mysuru Dasara Begins","kn":"ಶರನ್ನವರಾತ್ರಿ / ಮೈಸೂರು ದಸರಾ ಪ್ರಾರಂಭ"},"masa":"Ashvina","paksha":"Shukla","tithi":1,"shopping_peak":true},
     {"id":"ayudha_puja","name":{"en":"Maha Navami / Ayudha Puja","kn":"ಮಹಾ ನವಮಿ / ಆಯುಧ ಪೂಜೆ"},"masa":"Ashvina","paksha":"Shukla","tithi":9,"shopping_peak":true},
     {"id":"vijayadashami","name":{"en":"Vijayadashami","kn":"ವಿಜಯದಶಮಿ"},"masa":"Ashvina","paksha":"Shukla","tithi":10,"shopping_peak":true},
     {"id":"dhana_trayodashi","name":{"en":"Dhana Trayodashi","kn":"ಧನ ತ್ರಯೋದಶಿ"},"masa":"Ashvina","paksha":"Krishna","tithi":28,"shopping_peak":true},
