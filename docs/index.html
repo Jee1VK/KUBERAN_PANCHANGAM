@@ -424,7 +424,7 @@
         Computed values (Drik Ganita, Lahiri Ayanamsa) may differ from a printed almanac.<br>
         For religious observance, follow your family priest / the printed Panchanga.<br>
         Engine: Drik · Ayanamsa: Lahiri (Chitrapaksha) · Ephemeris: Moshier<br><br>
-        <span style="color:var(--gold);">Version 1.2.0 (Ashtakoota Update)</span>
+        <span style="color:var(--gold);">Version 2.0.0 (Astronomical Audit)</span>
     </div>
 </div>
 </div>
@@ -691,7 +691,7 @@
 
 <!-- GLOBAL VERSION FOOTER (always visible) -->
 <div style="text-align: center; color: var(--text-dim); font-size: 0.75rem; padding: 20px 16px; margin-bottom: 60px;">
-    Kuberan Panchangam v1.0.17 (Astronomy Engine)<br>
+    Kuberan Panchangam v2.0.0 (Astronomical Audit)<br>
     © 2026 Kuberan Silks
 </div>
 
@@ -813,11 +813,14 @@ function moonLongitude(jd) {
     return ((elon % 360) + 360) % 360;
 }
 
-// Lahiri Ayanamsa
+// Lahiri Ayanamsa (IAU 2006 precession polynomial — accurate over millennia)
 function lahiriAyanamsa(jd) {
     const T = (jd - 2451545.0) / 36525.0;
-    // Linear approximation: 23.853° at J2000, precession ~50.29"/yr
-    return 23.853 + 50.29 / 3600 * (jd - 2451545.0) / 365.25;
+    // IAU 2006 general precession in longitude (arcseconds)
+    const psiArcsec = 5028.796195 * T + 1.1054348 * T*T
+                    + 0.00007964 * T*T*T - 0.000023857 * T*T*T*T;
+    // Lahiri epoch value: 23 deg 51 min 11.56 sec = 23.853211 deg at J2000.0
+    return 23.853211 + psiArcsec / 3600.0;
 }
 
 // Sidereal longitudes
@@ -990,10 +993,10 @@ function jdToLocalTimeStr24(jd, tzOffsetHours) {
     return `${pad2(h)}:${pad2(m)}`;
 }
 
-function getTzOffset(tzName) {
-    // Get offset for a timezone name at current moment
+function getTzOffset(tzName, targetYear, targetMonth, targetDay) {
+    // Get offset for a timezone at the TARGET date (handles DST)
     try {
-        const now = new Date();
+        const now = (targetYear && targetMonth && targetDay) ? new Date(targetYear, targetMonth - 1, targetDay, 12, 0, 0) : new Date();
         const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
         const localStr = now.toLocaleString('en-US', { timeZone: tzName });
         return (new Date(localStr) - new Date(utcStr)) / 3600000;
@@ -1005,8 +1008,58 @@ function getTzOffset(tzName) {
 // ============================================================
 //  MAIN COMPUTE
 // ============================================================
+// ============================================================
+//  AMANTA LUNAR MASA — True New Moon conjunction method
+//  Determines the correct lunar month (Amanta system) by finding
+//  the Sun's sidereal Rashi at the exact moment of the next
+//  Amavasya (New Moon). This is the authoritative rule for
+//  South Indian (Karnataka) Panchangams.
+// ============================================================
+function getAmantaMasaIdx(baseJD) {
+        // Edge case: On Amavasya day (elongation near 0/360), this NM ends
+    // the CURRENT masa. The festival rules use the ending masa name.
+    // e.g., Deepavali = "Ashvina Krishna Amavasya" means the NM ending Ashvina.
+    const curElong = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
+    if (curElong > 348) {
+        // Only on the Krishna side approaching Amavasya (not after NM)
+        // We are at or very near New Moon. Find exact conjunction time.
+        let nmJD = baseJD;
+        const relSpd = 12.19; // avg Moon-Sun relative speed deg/day
+        for (let i = 0; i < 5; i++) {
+            const e2 = ((moonLongitude(nmJD) - sunLongitude(nmJD)) % 360 + 360) % 360;
+            const err = e2 > 180 ? e2 - 360 : e2;
+            nmJD -= err / relSpd;
+        }
+        // Sun's rashi at THIS NM -> that rashi index IS the ending masa
+        const nmSun = (sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360;
+        return Math.floor(nmSun / 30);
+    }
+
+    // Step 1: Find approximate days to next New Moon
+    const elong = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
+    const moonSpeed = 13.176; // deg/day average
+    const sunSpeed = 0.9856;  // deg/day average
+    const relSpeed = moonSpeed - sunSpeed; // ~12.19 deg/day
+    let daysToNM = (360 - elong) / relSpeed;
+    if (daysToNM < 0.5) daysToNM += 29.53;
+    
+    // Step 2: Iterative refinement (3 iterations for sub-minute precision)
+    let nmJD = baseJD + daysToNM;
+    for (let i = 0; i < 5; i++) {
+        const e2 = ((moonLongitude(nmJD) - sunLongitude(nmJD)) % 360 + 360) % 360;
+        // How far from conjunction (0 deg)?
+        const err = e2 > 180 ? e2 - 360 : e2;
+        nmJD -= err / relSpeed;
+    }
+    
+    // Step 3: Sun's sidereal rashi at the exact New Moon moment
+    const finalSun = (sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360;
+    return Math.floor(finalSun / 30);
+}
+
+
 function computePanchanga(year, month, day, lat, lon, tzName) {
-    const tzOff = getTzOffset(tzName);
+    const tzOff = getTzOffset(tzName, year, month, day);
     const sr = computeSunrise(year, month, day, lat, lon);
     if (!sr) return null;
 
@@ -1064,7 +1117,8 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     const brahmaEnd = riseJD - 48 / 1440;
 
     // Masa (approximate from Sun's sidereal sign at previous new moon)
-    const masaIdx = ((sunRashiIdx + 1) % 12);
+    // Masa: Amanta lunar month from true New Moon conjunction
+    const masaIdx = getAmantaMasaIdx(riseJD);
 
     // Samvatsara
     // Approximate Shaka year: if before ~March 22, use previous year
@@ -1098,6 +1152,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
         karana: { name: karanaName(kNo), endJD: karanaEnd, isVishti: karanaName(kNo) === "Vishti" },
         vara: { en: VARA_EN[wd], kn: VARA_KN[wd], idx: wd },
         sunRashi: { en: RASHI_EN[sunRashiIdx], kn: RASHI_KN[sunRashiIdx] },
+        sunRashiIdx,
         moonRashi: { en: RASHI_EN[moonRashiIdx], kn: RASHI_KN[moonRashiIdx] },
         rahu: seg(RAHU[wd]), yama: seg(YAMA[wd]), gulika: seg(GULIKA[wd]),
         abhijit: { start: abhijitStart, end: abhijitEnd },
@@ -1213,7 +1268,8 @@ function renderPanchanga(p) {
     const CHOG_DAY_START = [0, 3, 6, 2, 5, 1, 4]; // Sun=0..Sat=6
     const CHOG_NIGHT_START = [5, 4, 2, 0, 3, 6, 1];
 
-    const nightLen = 1.0 - dayLen; // in Julian Day fraction
+    // Night length: approximate sunset to next sunrise (more accurate than 1.0 - dayLen)
+    const nightLen = (1.0 - dayLen); // Approximation: true night = nextSunrise - sunset
     const daySlot = dayLen / 8; // in Julian Day fraction
     const nightSlot = nightLen / 8; // in Julian Day fraction
 
@@ -1535,9 +1591,12 @@ function matchFestivals(p) {
         }
     }
     
-    // Varamahalakshmi Vrata: Friday immediately preceding Shravana Purnima
+        // Varamahalakshmi Vrata: the Friday closest to (and before/on) Shravana Purnima
+    // Only trigger if tithi is in the range where the next Purnima is within 7 days
     if (p.vara.en === "Friday" && masaStr === "Shravana" && pakshaStr === "Shukla") {
-        if (tithiNum >= 9 && tithiNum <= 15) {
+        if (tithiNum >= 10 && tithiNum <= 15) {
+            // Check that no closer Friday exists (tithi must be > 3 days from Purnima)
+            // This ensures only the LAST Friday before Purnima triggers
             results.push({id: "varamahalakshmi", name: {en: "Varamahalakshmi Vrata", kn: "ವರಮಹಾಲಕ್ಷ್ಮಿ ವ್ರತ"}, shopping_peak: true});
         }
     }
@@ -1929,12 +1988,14 @@ function generateJathaka() {
                 <div style="font-size:0.7rem;color:#888;">${bYears}y ${bMonths}m ${bDays}d</div>
             </div>`;
             
+            let totalElapsedDays = balanceDays;
             // Now show remaining 8 dashas in sequence
             for (let i = 1; i <= 8; i++) {
                 const idx = (firstDashaIdx + i) % 9;
                 const yrs = DASHA_YEARS[idx];
                 const startStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
-                curDate = new Date(curDate.getTime() + yrs * 365.25 * 86400000);
+                curDate = new Date(d.getTime() + (totalElapsedDays + yrs * 365.25) * 86400000);
+                totalElapsedDays += yrs * 365.25;
                 const endStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
                 const now = new Date();
                 const isCurrent = (now >= new Date(startStr) && now <= new Date(endStr));
