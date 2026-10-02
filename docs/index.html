@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -2112,14 +2112,17 @@ function scanDates() {
     const purpose = document.getElementById('scanPurpose').value;
     if (!fromStr || !toStr) { alert("Please select From and To dates."); return; }
     const from = new Date(fromStr), to = new Date(toStr);
-    if (to - from > 365 * 86400000) { alert("Max scan range is 90 days."); return; }
+    if (to - from > 365 * 86400000) { alert("Max scan range is 365 days."); return; }
     document.getElementById('scanLoading').style.display = 'block';
     document.getElementById('scanResults').innerHTML = '';
-    setTimeout(() => {
-        const loc = getLocation();
-        const results = [];
-        let cur = new Date(from);
-        while (cur <= to) {
+    // Chunked async scan: 7 days per animation frame to keep UI responsive
+    const loc = getLocation();
+    const results = [];
+    let cur = new Date(from);
+    const CHUNK = 7;
+    function scanChunk() {
+        let n = 0;
+        while (cur <= to && n < CHUNK) {
             const y = cur.getFullYear(), m = cur.getMonth() + 1, d = cur.getDate();
             const p = computePanchanga(y, m, d, loc.lat, loc.lon, loc.tz);
             if (p) {
@@ -2128,7 +2131,9 @@ function scanDates() {
                 results.push({ date: new Date(cur), score, p, fests });
             }
             cur.setDate(cur.getDate() + 1);
+            n++;
         }
+        if (cur <= to) { requestAnimationFrame(scanChunk); return; }
         results.sort((a, b) => b.score - a.score);
         let html = `<div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:8px;">Scanned ${results.length} days. Top results:</div>`;
         results.slice(0, 15).forEach(r => {
@@ -2140,7 +2145,8 @@ function scanDates() {
         });
         document.getElementById('scanResults').innerHTML = html;
         document.getElementById('scanLoading').style.display = 'none';
-    }, 300);
+    }
+    scanChunk();
 }
 
 // ============================================================
