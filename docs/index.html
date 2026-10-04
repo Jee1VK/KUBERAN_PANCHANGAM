@@ -522,7 +522,7 @@
         <label>Birth Location</label>
         <div style="position:relative; margin-bottom:12px;">
             <div style="display:flex; gap:8px;">
-                <input type="text" id="jCitySearch" placeholder="Type city or village name..." autocomplete="off"
+                <input type="text" id="jCitySearch" oninput="debounceCitySearch()" placeholder="Type city or village name..." autocomplete="off"
                     style="flex:1; background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:0.9rem;">
                 <button onclick="searchBirthCity()" id="jCitySearchBtn"
                     style="background:var(--gold);color:#000;border:none;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem;white-space:nowrap;">
@@ -1927,12 +1927,25 @@ function shareJathaka() {
 
 let jCitySearchTimer = null;
 
-function searchBirthCity() {
+
+let citySearchDebounceTimer = null;
+function debounceCitySearch() {
+    clearTimeout(citySearchDebounceTimer);
     const query = document.getElementById('jCitySearch').value.trim();
-    if (!query || query.length < 2) {
-        alert('Please type at least 2 characters of a city or village name.');
+    if (query.length < 3) {
+        document.getElementById('jCityResults').style.display = 'none';
+        document.getElementById('jCitySearchBtn').textContent = 'Search';
         return;
     }
+    document.getElementById('jCitySearchBtn').textContent = '...';
+    citySearchDebounceTimer = setTimeout(function() {
+        searchBirthCity();
+    }, 800);
+}
+
+function searchBirthCity() {
+    const query = document.getElementById('jCitySearch').value.trim();
+    if (!query || query.length < 3) { return; }
     const btn = document.getElementById('jCitySearchBtn');
     const resultsDiv = document.getElementById('jCityResults');
     btn.textContent = '...';
