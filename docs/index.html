@@ -1401,9 +1401,10 @@ function renderPanchanga(p) {
     document.getElementById('valSunset').textContent = fmt(p.sunset);
 
     // --- Moonrise / Moonset ---
-    const moonRS = computeMoonRiseSet(y, m, d, lat, lon);
-    document.getElementById('valMoonrise').textContent = moonRS.riseHrs !== null ? formatHoursToTime(moonRS.riseHrs + tzOff) : 'N/A';
-    document.getElementById('valMoonset').textContent = moonRS.setHrs !== null ? formatHoursToTime(moonRS.setHrs + tzOff) : 'N/A';
+    const loc = getLocation();
+    const moonRS = computeMoonRiseSet(p.year, p.month, p.day, loc.lat, loc.lon);
+    document.getElementById('valMoonrise').textContent = moonRS.riseJD ? fmt(moonRS.riseJD) : '—';
+    document.getElementById('valMoonset').textContent = moonRS.setJD ? fmt(moonRS.setJD) : '—';
     document.getElementById('valSunRashi').textContent = `${p.sunRashi.en} · ${p.sunRashi.kn}`;
     document.getElementById('valMoonRashi').textContent = `${p.moonRashi.en} · ${p.moonRashi.kn}`;
 
@@ -2445,12 +2446,11 @@ function computeMoonRiseSet(year, month, day, lat, lon) {
         const obs = new Astronomy.Observer(lat, lon, 0);
         const rise = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, 1, startTime, 1);
         const set = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, startTime, 1);
-        const baseJD = julianDay(year, month, day, 0);
         return {
-            riseHrs: rise ? (rise.ut + 2451545.0 - baseJD) * 24 : null,
-            setHrs: set ? (set.ut + 2451545.0 - baseJD) * 24 : null
+            riseJD: rise ? (rise.ut + 2451545.0) : null,
+            setJD: set ? (set.ut + 2451545.0) : null
         };
-    } catch(e) { return { riseHrs: null, setHrs: null }; }
+    } catch(e) { return { riseJD: null, setJD: null }; }
 }
 
 // ============================================================
