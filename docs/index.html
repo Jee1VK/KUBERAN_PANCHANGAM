@@ -1537,7 +1537,7 @@ function renderPanchanga(p) {
         const e = p.sunrise + (i + 1) * daySlot;
         const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
         chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
-        chogDataCache.push({name, quality: q, startJD: s, endJD: e});
+        chogDataCache.push({ name, nameKn: CHOG_KN[name], quality: q, startJD: s, endJD: e, timeStr: fmt(s) + ' – ' + fmt(e) });
     }
     chogHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Nighttime</div>';
     let nightIdx = CHOG_NIGHT_START[dow];
@@ -1548,7 +1548,7 @@ function renderPanchanga(p) {
         const e = p.sunset + (i + 1) * nightSlot;
         const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
         chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
-        chogDataCache.push({name, quality: q, startJD: s, endJD: e});
+        chogDataCache.push({ name, nameKn: CHOG_KN[name], quality: q, startJD: s, endJD: e, timeStr: fmt(s) + ' – ' + fmt(e) });
     }
     cachedChogData = chogDataCache; // FIXED: was never populated
     document.getElementById('choghadiyaList').innerHTML = chogHtml;
@@ -1697,6 +1697,7 @@ function renderPanchanga(p) {
         gocharaCard.style.display = 'none';
     }
 
+    let horaDataCache = [];
     // --- HORA (Planetary Hours) ---
     // Chaldean order: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars
     const HORA_ORDER = ['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'];
@@ -1716,7 +1717,7 @@ function renderPanchanga(p) {
         const good = ['Jupiter','Venus','Mercury'].includes(planet);
         const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
         horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
-        horaDataCache.push({planet, startJD: s, endJD: e, quality: dot});
+        horaDataCache.push({ planet, planetKn: HORA_KN[planet], icon: HORA_ICONS[planet], quality: dot, startJD: s, endJD: e, timeStr: fmt(s) + ' – ' + fmt(e) });
     }
     horaHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Night Horas</div>';
     for (let i = 0; i < 12; i++) {
@@ -1726,7 +1727,7 @@ function renderPanchanga(p) {
         const good = ['Jupiter','Venus','Mercury'].includes(planet);
         const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
         horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
-        horaDataCache.push({planet, startJD: s, endJD: e, quality: dot});
+        horaDataCache.push({ planet, planetKn: HORA_KN[planet], icon: HORA_ICONS[planet], quality: dot, startJD: s, endJD: e, timeStr: fmt(s) + ' – ' + fmt(e) });
     }
     cachedHoraData = horaDataCache; // FIXED: was never populated
     document.getElementById('horaList').innerHTML = horaHtml;
@@ -2516,15 +2517,19 @@ function generateJathaka() {
 //  MOONRISE / MOONSET COMPUTATION
 // ============================================================
 function computeMoonRiseSet(year, month, day, lat, lon, tzOff) {
+    try {
         // FIXED: Start from local midnight in UTC (was UTC midnight causing misses in India)
         const localMidnightJD = julianDay(year, month, day, 0) - ((tzOff || 5.5) / 24);
         const startTime = new Astronomy.AstroTime(localMidnightJD - 2451545.0);
         const obs = new Astronomy.Observer(lat, lon, 0);
         const moonRise = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, 1, startTime, 1.5);
         const moonSet = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, startTime, 1.5);
-        return { moonRise, moonSet };
-    };
-    } catch(e) { return { riseJD: null, setJD: null }; }
+        const riseJD = moonRise ? (moonRise.ut + 2451545.0) : null;
+        const setJD = moonSet ? (moonSet.ut + 2451545.0) : null;
+        return { riseJD, setJD, moonRise, moonSet };
+    } catch (e) {
+        return { riseJD: null, setJD: null, moonRise: null, moonSet: null };
+    }
 }
 
 // ============================================================
