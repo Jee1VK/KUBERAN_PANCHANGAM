@@ -379,6 +379,8 @@
             <div class="sm-item"><div class="icon">🌇</div><div class="lbl">Sunset</div><div class="val" id="valSunset">—</div></div>
             <div class="sm-item"><div class="icon">☀️</div><div class="lbl">Sun Rashi</div><div class="val" id="valSunRashi">—</div></div>
             <div class="sm-item"><div class="icon">🌙</div><div class="lbl">Moon Rashi</div><div class="val" id="valMoonRashi">—</div></div>
+            <div class="sm-item"><div class="icon">🌕</div><div class="lbl">Moonrise</div><div class="val" id="valMoonrise">—</div></div>
+            <div class="sm-item"><div class="icon">🌑</div><div class="lbl">Moonset</div><div class="val" id="valMoonset">—</div></div>
         </div>
     </div>
 
@@ -452,6 +454,11 @@
     <!-- CHOGHADIYA -->
     <div class="card">
         <h2>🕐 Choghadiya (ಚೌಘಡಿಯಾ)</h2>
+        <div id="chogLiveNow" style="display:none; padding:10px 14px; margin-bottom:12px; border-radius:8px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid var(--gold); text-align:center;">
+            <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;">🟢 Right Now</div>
+            <div id="chogLiveNowText" style="font-size:1.1rem; font-weight:700; color:var(--gold); margin:4px 0;"></div>
+            <div id="chogLiveNowCountdown" style="font-size:0.75rem; color:var(--text-dim);"></div>
+        </div>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Daytime & nighttime auspicious slots. Green = Good, Red = Avoid.</p>
         <div id="choghadiyaList"></div>
     </div>
@@ -478,9 +485,39 @@
         <div id="gocharaList"></div>
     </div>
 
+    
+    <!-- DAILY RASHIFAL (Moon Sign Horoscope) -->
+    <div class="card" id="rashifalCard">
+        <h2>🔮 Daily Rashifal (ರಾಶಿಫಲ)</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Real-time Gochara transit analysis for all 12 Rashis.</p>
+        <div style="margin-bottom:12px;">
+            <label style="font-size:0.75rem; color:var(--text-dim); font-weight:600;">Choose Your Moon Sign (ರಾಶಿ):</label>
+            <select id="rashifalSelect" onchange="onSelectRashifal(this.value)" style="width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:6px; font-size:0.85rem; margin-top:4px;">
+                <option value="0">♈ Mesha (ಮೇಷ · Aries)</option>
+                <option value="1">♉ Vrishabha (ವೃಷಭ · Taurus)</option>
+                <option value="2">♊ Mithuna (ಮಿಥುನ · Gemini)</option>
+                <option value="3">♋ Karka (ಕರ್ಕಾಟಕ · Cancer)</option>
+                <option value="4">♌ Simha (ಸಿಂಹ · Leo)</option>
+                <option value="5">♍ Kanya (ಕನ್ಯಾ · Virgo)</option>
+                <option value="6">♎ Tula (ತುಲಾ · Libra)</option>
+                <option value="7">♏ Vrishchika (ವೃಶ್ಚಿಕ · Scorpio)</option>
+                <option value="8">♐ Dhanu (ಧನುಸ್ಸು · Sagittarius)</option>
+                <option value="9">♑ Makara (ಮಕರ · Capricorn)</option>
+                <option value="10">♒ Kumbha (ಕುಂಭ · Aquarius)</option>
+                <option value="11">♓ Meena (ಮೀನ · Pisces)</option>
+            </select>
+        </div>
+        <div id="rashifalContent" style="padding:12px; border-radius:8px; background:rgba(212,175,55,0.08); border-left:3px solid var(--gold); font-size:0.85rem; line-height:1.6;"></div>
+    </div>
+
     <!-- HORA (Planetary Hours) -->
     <div class="card">
         <h2>⏰ Hora (ಹೋರಾ)</h2>
+        <div id="horaLiveNow" style="display:none; padding:10px 14px; margin-bottom:12px; border-radius:8px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid var(--gold); text-align:center;">
+            <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;">🟢 Right Now</div>
+            <div id="horaLiveNowText" style="font-size:1.1rem; font-weight:700; color:var(--gold); margin:4px 0;"></div>
+            <div id="horaLiveNowCountdown" style="font-size:0.75rem; color:var(--text-dim);"></div>
+        </div>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Current planetary hour ruler. Each hora is 1/12th of day or night.</p>
         <div id="horaList"></div>
     </div>
@@ -490,6 +527,14 @@
         <h2>🌺 Gowri Panchangam (ಗೌರಿ ಪಂಚಾಂಗ)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">8 daily time slots with quality ratings. Very popular in Karnataka & South India.</p>
         <div id="gowriList"></div>
+    </div>
+
+    
+    <!-- SUVARNA & PATTU MUHURTHA (Gold & Silk Buying) -->
+    <div class="card" id="suvarnaCard" style="display:none;">
+        <h2>🪙 Suvarna & Pattu Muhurtha</h2>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Auspicious timings for buying Gold, Jewellery & Silk today.</p>
+        <div id="suvarnaContent"></div>
     </div>
 
     <!-- SHARE DAILY -->
@@ -525,6 +570,11 @@
                 <option value="travel">Travel / Journey</option>
                 <option value="vehicle">Vehicle Purchase</option>
                 <option value="education">Education / Study Start</option>
+                <option value="property">Property Registration / Land</option>
+                <option value="upanayana">Upanayana (Thread Ceremony)</option>
+                <option value="mundan">Mundan / Chaula (First Haircut)</option>
+                <option value="namakarana">Namakarana (Naming Ceremony)</option>
+                <option value="gold_silk">Gold & Silk Buying (Suvarna Muhurtha)</option>
             </select>
         </div>
         <button class="btn-calc" onclick="scanDates()">🔍 Scan for Auspicious Dates</button>
@@ -643,7 +693,18 @@
 
         <!-- Graha Positions at Birth -->
         <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
-            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:10px; text-align:center;">Graha Sthiti at Birth (Rasi Chakra)</div>
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:center; margin-bottom:12px;">
+                <div style="display:flex; gap:8px;">
+                    <button id="btnRasiChart" onclick="setChartType('rasi')" style="padding:5px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:var(--maroon); color:#fff; border:none;">Rasi (D1)</button>
+                    <button id="btnNavamshaChart" onclick="setChartType('navamsha')" style="padding:5px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:#eee; color:#333; border:1px solid #ccc;">Navamsha (D9)</button>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button id="btnSouthChart" onclick="setChartStyle('south')" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; background:var(--gold); color:#000; border:none;">South Indian Style</button>
+                    <button id="btnNorthChart" onclick="setChartStyle('north')" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; background:#eee; color:#333; border:1px solid #ccc;">North Indian Style</button>
+                </div>
+            </div>
+            <!-- North Indian Chart Container -->
+            <div id="northIndianChartContainer" style="display:none; margin:15px auto; max-width:320px;"></div>
             
             <div class="si-chart">
                 <div class="si-cell" id="si-11"><div class="si-cell-title">Meena</div><div id="si-g-11"></div></div>
@@ -666,6 +727,26 @@
             
             <!-- Still show detailed degrees below chart -->
             <div id="jGrahaAtBirth" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;"></div>
+            
+            <!-- NAVAMSHA (D9) CHART -->
+            <div id="navamshaChartContainer" style="display:none; margin-top:15px;">
+                <div class="si-chart" id="navamshaChart">
+                    <div class="si-cell"><div class="si-cell-title">Meena</div><div id="nav-g-11"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Mesha</div><div id="nav-g-0"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Vrishabha</div><div id="nav-g-1"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Mithuna</div><div id="nav-g-2"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Kumbha</div><div id="nav-g-10"></div></div>
+                    <div class="si-center">NAVAMSHA<br>D9</div>
+                    <div class="si-cell"><div class="si-cell-title">Karka</div><div id="nav-g-3"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Makara</div><div id="nav-g-9"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Simha</div><div id="nav-g-4"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Dhanus</div><div id="nav-g-8"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Vrishchika</div><div id="nav-g-7"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Tula</div><div id="nav-g-6"></div></div>
+                    <div class="si-cell"><div class="si-cell-title">Kanya</div><div id="nav-g-5"></div></div>
+                </div>
+                <div id="jGrahaNavamsha" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px;"></div>
+            </div>
         </div>
 
         <div style="margin-top:30px; text-align:center; font-size:0.75rem; color:#999;">
@@ -761,7 +842,14 @@
     </div>
 
     <div class="card">
-        <h2>🪔 Festivals This Month</h2>
+        <h2>🪔 Festivals & Vratas This Month</h2>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+            <button onclick="filterCalFests('all')" class="cal-filter active" id="calFilterAll" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--gold); background:var(--gold); color:#000;">All</button>
+            <button onclick="filterCalFests('festival')" class="cal-filter" id="calFilterFest" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Festivals</button>
+            <button onclick="filterCalFests('ekadashi')" class="cal-filter" id="calFilterEka" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Ekadashi</button>
+            <button onclick="filterCalFests('vrata')" class="cal-filter" id="calFilterVrata" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Vratas</button>
+            <button onclick="filterCalFests('sankranti')" class="cal-filter" id="calFilterSank" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Sankranti</button>
+        </div>
         <div id="calFestList" style="font-size:0.85rem;"></div>
     </div>
 
@@ -1311,6 +1399,11 @@ function renderPanchanga(p) {
     // Sun/Moon
     document.getElementById('valSunrise').textContent = fmt(p.sunrise);
     document.getElementById('valSunset').textContent = fmt(p.sunset);
+
+    // --- Moonrise / Moonset ---
+    const moonRS = computeMoonRiseSet(y, m, d, lat, lon);
+    document.getElementById('valMoonrise').textContent = moonRS.riseHrs !== null ? formatHoursToTime(moonRS.riseHrs + tzOff) : 'N/A';
+    document.getElementById('valMoonset').textContent = moonRS.setHrs !== null ? formatHoursToTime(moonRS.setHrs + tzOff) : 'N/A';
     document.getElementById('valSunRashi').textContent = `${p.sunRashi.en} · ${p.sunRashi.kn}`;
     document.getElementById('valMoonRashi').textContent = `${p.moonRashi.en} · ${p.moonRashi.kn}`;
 
@@ -2272,7 +2365,43 @@ function generateJathaka() {
                 </div>`
             ).join('');
 
+            
+            // --- Navamsha (D9) Chart ---
+            for(let i=0; i<12; i++) {
+                const navCell = document.getElementById('nav-g-' + i);
+                if (navCell) navCell.innerHTML = '';
+            }
+            birthGrahas.forEach(g => {
+                const navRashi = getNavamshaRashi(g.lon);
+                const navCell = document.getElementById('nav-g-' + navRashi);
+                if (navCell) {
+                    const span = document.createElement('div');
+                    span.style.fontSize = '0.9rem';
+                    span.innerHTML = g.icon + ' <span style="font-size:0.7rem;">' + g.name.substring(0,2) + '</span>';
+                    navCell.appendChild(span);
+                }
+            });
+            document.getElementById('jGrahaNavamsha').innerHTML = birthGrahas.map(g => {
+                const navRashi = getNavamshaRashi(g.lon);
+                return '<div style="text-align:center;padding:6px;border:1px solid #ddd;border-radius:4px;">' +
+                    '<div style="font-size:0.9rem;">' + g.icon + '</div>' +
+                    '<div style="font-size:0.7rem;color:#666;">' + g.name + '</div>' +
+                    '<div style="font-weight:600;font-size:0.8rem;">' + RASHI_EN[navRashi] + '</div>' +
+                    '<div style="font-size:0.65rem;color:#999;">D9</div></div>';
+            }).join('');
+
             // Store current for sharing
+            // Cache for North/South and D1/D9 toggles
+            const lagnaLng = getSiderealAscendant(jdBirthUTC, lat, lon);
+            const lagnaRashiIdx = Math.floor(lagnaLng / 30);
+            const lagnaNavamshaIdx = getNavamshaRashi(lagnaLng);
+            cachedBirthData = {
+                lagnaRashiIdx,
+                lagnaNavamshaIdx,
+                birthGrahas
+            };
+            renderActiveKundali();
+
             currentJathakaData = {
                 name, dobStr: dobLocaleStr, nakName, pada, moonRashi: moonRashiStr, sunRashi: sunRashiStr, tithi: tithiStr, dashaBalance: dashaBalanceStr
             };
@@ -2303,6 +2432,458 @@ function generateJathaka() {
             document.getElementById('jathakaLoading').style.display = 'none';
         }
     }, 500); // 500ms delay to ensure loading UI renders smoothly
+}
+
+
+// ============================================================
+//  MOONRISE / MOONSET COMPUTATION
+// ============================================================
+function computeMoonRiseSet(year, month, day, lat, lon) {
+    try {
+        const dUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+        const startTime = new Astronomy.AstroTime(dUTC);
+        const obs = new Astronomy.Observer(lat, lon, 0);
+        const rise = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, 1, startTime, 1);
+        const set = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, startTime, 1);
+        const baseJD = julianDay(year, month, day, 0);
+        return {
+            riseHrs: rise ? (rise.ut + 2451545.0 - baseJD) * 24 : null,
+            setHrs: set ? (set.ut + 2451545.0 - baseJD) * 24 : null
+        };
+    } catch(e) { return { riseHrs: null, setHrs: null }; }
+}
+
+// ============================================================
+//  NAVAMSHA (D9) CALCULATION
+// ============================================================
+function getNavamshaRashi(siderealDeg) {
+    // Navamsha = divide each rashi (30 deg) into 9 parts of 3.333 deg each
+    // The navamsha rashi cycles through from the rashi's element start:
+    // Fire signs (Ar,Le,Sg) start from Aries
+    // Earth signs (Ta,Vi,Cp) start from Capricorn
+    // Air signs (Ge,Li,Aq) start from Libra
+    // Water signs (Ca,Sc,Pi) start from Cancer
+    const rashi = Math.floor(siderealDeg / 30);
+    const posInRashi = siderealDeg % 30;
+    const navamshaNum = Math.floor(posInRashi / 3.333333); // 0-8
+
+    const startRashi = [0,9,6,3][rashi % 4]; // Fire=0, Earth=9, Air=6, Water=3
+    return (startRashi + navamshaNum) % 12;
+}
+
+function toggleChartView(view) {
+    const rasiChart = document.querySelector('.si-chart');
+    const rasiGraha = document.getElementById('jGrahaAtBirth');
+    const navContainer = document.getElementById('navamshaChartContainer');
+    const btnRasi = document.getElementById('btnRasiChart');
+    const btnNav = document.getElementById('btnNavamshaChart');
+
+    if (view === 'navamsha') {
+        if (rasiChart) rasiChart.style.display = 'none';
+        if (rasiGraha) rasiGraha.style.display = 'none';
+        if (navContainer) navContainer.style.display = 'block';
+        if (btnRasi) { btnRasi.style.background = '#eee'; btnRasi.style.color = '#333'; btnRasi.style.border = '1px solid #ccc'; }
+        if (btnNav) { btnNav.style.background = 'var(--maroon)'; btnNav.style.color = '#fff'; btnNav.style.border = 'none'; }
+    } else {
+        if (rasiChart) rasiChart.style.display = 'grid';
+        if (rasiGraha) rasiGraha.style.display = 'grid';
+        if (navContainer) navContainer.style.display = 'none';
+        if (btnRasi) { btnRasi.style.background = 'var(--maroon)'; btnRasi.style.color = '#fff'; btnRasi.style.border = 'none'; }
+        if (btnNav) { btnNav.style.background = '#eee'; btnNav.style.color = '#333'; btnNav.style.border = '1px solid #ccc'; }
+    }
+}
+
+// ============================================================
+//  LIVE NOW INDICATOR (Updates every 30 seconds)
+// ============================================================
+let liveNowInterval = null;
+let cachedHoraData = null;
+let cachedChogData = null;
+
+function updateLiveNowIndicators() {
+    const nowJD = (Date.now() / 86400000) + 2440587.5;
+
+    // --- HORA ---
+    if (cachedHoraData && cachedHoraData.length > 0) {
+        let currentHora = null;
+        for (const h of cachedHoraData) {
+            if (nowJD >= h.startJD && nowJD < h.endJD) { currentHora = h; break; }
+        }
+        const horaDiv = document.getElementById('horaLiveNow');
+        if (currentHora && horaDiv) {
+            horaDiv.style.display = 'block';
+            const qualEmoji = currentHora.quality === 'good' ? '✅' : (currentHora.quality === 'bad' ? '🔴' : '⚪');
+            document.getElementById('horaLiveNowText').textContent = qualEmoji + ' ' + currentHora.icon + ' ' + currentHora.planet + ' (' + currentHora.planetKn + ')';
+            const minsLeft = Math.max(1, Math.round((currentHora.endJD - nowJD) * 1440));
+            document.getElementById('horaLiveNowCountdown').textContent = 'Ends in ' + minsLeft + ' min (' + currentHora.timeStr + ')';
+        } else if (horaDiv) {
+            horaDiv.style.display = 'none';
+        }
+    }
+
+    // --- CHOGHADIYA ---
+    if (cachedChogData && cachedChogData.length > 0) {
+        let currentChog = null;
+        for (const c of cachedChogData) {
+            if (nowJD >= c.startJD && nowJD < c.endJD) { currentChog = c; break; }
+        }
+        const chogDiv = document.getElementById('chogLiveNow');
+        if (currentChog && chogDiv) {
+            chogDiv.style.display = 'block';
+            const qualEmoji = currentChog.quality === 'good' || currentChog.quality === 'best' ? '✅' : (currentChog.quality === 'neutral' ? '⚪' : '🔴');
+            document.getElementById('chogLiveNowText').textContent = qualEmoji + ' ' + currentChog.name + ' (' + currentChog.nameKn + ') — ' + currentChog.quality.toUpperCase();
+            const minsLeft = Math.max(1, Math.round((currentChog.endJD - nowJD) * 1440));
+            document.getElementById('chogLiveNowCountdown').textContent = 'Ends in ' + minsLeft + ' min (' + currentChog.timeStr + ')';
+        } else if (chogDiv) {
+            chogDiv.style.display = 'none';
+        }
+    }
+}
+
+function startLiveNowTimer() {
+    if (liveNowInterval) clearInterval(liveNowInterval);
+    updateLiveNowIndicators();
+    liveNowInterval = setInterval(updateLiveNowIndicators, 30000); // every 30s
+}
+
+// ============================================================
+//  DAILY RASHIFAL (Transit-Based Moon Sign Horoscope)
+// ============================================================
+const RASHIFAL_TEXTS = {
+    good: [
+        "Today is highly favourable. Financial gains and career progress are indicated. Important decisions taken today will bear fruit.",
+        "An auspicious day ahead. Relationships improve, and new opportunities may present themselves. Health remains strong.",
+        "Stars align in your favour today. Recognition at work is possible. Family life brings joy and harmony.",
+    ],
+    neutral: [
+        "A mixed day with both opportunities and minor obstacles. Stay patient and avoid impulsive decisions. Routine matters proceed smoothly.",
+        "Average results today. Focus on completing pending tasks rather than starting new ventures. Evening brings relaxation.",
+        "A day of steady progress. No major highs or lows expected. Good for planning and preparation for the week ahead.",
+    ],
+    bad: [
+        "Exercise caution today. Avoid major financial commitments and travel if possible. Health needs attention — rest is important.",
+        "Challenging planetary transits today. Patience is key. Avoid arguments and confrontations. Postpone important decisions.",
+        "A day requiring careful navigation. Unexpected expenses possible. Focus on spiritual practices for inner peace.",
+    ]
+};
+
+function generateRashifal(moonRashiIdx, dayGrahas) {
+    if (moonRashiIdx === undefined || moonRashiIdx === null) return;
+    cachedDailyGrahas = dayGrahas;
+    const card = document.getElementById('rashifalCard');
+    if (!card) return;
+
+    const select = document.getElementById('rashifalSelect');
+    if (select) select.value = moonRashiIdx;
+
+    let score = 0;
+    const FAVOURABLE = {
+        0: [3,6,10,11], 1: [1,3,6,7,10,11], 2: [3,6,11], 3: [2,4,6,8,10,11],
+        4: [2,5,7,9,11], 5: [1,2,3,4,5,8,9,11,12], 6: [3,6,11]
+    };
+    const details = [];
+    if (dayGrahas) {
+        dayGrahas.slice(0, 7).forEach((g, i) => {
+            const house = ((g.rashiIdx - moonRashiIdx + 12) % 12) + 1;
+            const isFav = FAVOURABLE[i] && FAVOURABLE[i].includes(house);
+            if (isFav) score++;
+            if (g.name === 'Jupiter') {
+                details.push(isFav ? '✨ Guru Bala: Auspicious Jupiter transit in House ' + house : '⚪ Jupiter in House ' + house);
+            } else if (g.name === 'Saturn') {
+                if ([12, 1, 2].includes(house)) details.push('⚠️ Shani Sade Sati active (House ' + house + ') — perform Hanuman Chalisa');
+                else if (house === 4) details.push('⚠️ Ardhashtama Shani (House 4) — avoid risky speculation');
+                else if (house === 8) details.push('⚠️ Ashtama Shani (House 8) — drive carefully, pray to Lord Shiva');
+                else if (isFav) details.push('🛡️ Favourable Saturn transit in House ' + house);
+            }
+        });
+    }
+
+    const luckyColors = ['Red & Crimson','White & Silver','Green & Emerald','Milky White & Gold','Gold & Orange','Green & Beige','White & Pink','Deep Red & Maroon','Yellow & Saffron','Blue & Black','Royal Blue','Yellow & Gold'];
+    const luckyNumbers = [9, 6, 5, 2, 1, 5, 6, 9, 3, 8, 8, 3];
+    const category = score >= 5 ? 'good' : (score >= 3 ? 'neutral' : 'bad');
+    const texts = RASHIFAL_TEXTS[category];
+    const text = texts[moonRashiIdx % texts.length];
+
+    const stars = score >= 5 ? '⭐⭐⭐⭐⭐ Highly Auspicious' : (score >= 3 ? '⭐⭐⭐ Moderate / Mixed' : '⭐⭐ Needs Caution');
+
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:6px;">
+        <div style="font-weight:700; color:var(--gold); font-size:1rem;">${RASHI_EN[moonRashiIdx]} (${RASHI_KN[moonRashiIdx]})</div>
+        <div style="font-size:0.8rem; font-weight:600; color:${score >= 5 ? 'var(--green)' : (score >= 3 ? 'var(--gold)' : 'var(--red)')};">${stars} (${score}/7 Favourable)</div>
+    </div>
+    <p style="margin:0 0 10px 0; color:var(--text); line-height:1.5;">${text}</p>`;
+
+    if (details.length > 0) {
+        html += `<div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:8px;">${details.join(' &bull; ')}</div>`;
+    }
+
+    html += `<div style="display:flex; gap:16px; font-size:0.75rem; color:var(--gold); font-weight:600; padding-top:6px; border-top:1px dashed var(--card-border);">
+        <div>🎨 Lucky Colour: <span style="color:var(--text);">${luckyColors[moonRashiIdx]}</span></div>
+        <div>🔢 Lucky Number: <span style="color:var(--text);">${luckyNumbers[moonRashiIdx]}</span></div>
+    </div>`;
+
+    document.getElementById('rashifalContent').innerHTML = html;
+    card.style.display = 'block';
+}
+
+// ============================================================
+//  SUVARNA & PATTU MUHURTHA (Gold & Silk Buying)
+// ============================================================
+function checkSuvarnaMuhurtha(p, dayOfWeek, horaData) {
+    const card = document.getElementById('suvarnaCard');
+    if (!card) return;
+
+    const results = [];
+    const nakIdx = p.nakshatra.idx;
+
+    // Pushya Nakshatra = universally best for gold buying
+    if (nakIdx === 7) {
+        if (dayOfWeek === 0) results.push({type:'best', text:'🌟 Ravi Pushya Yoga — Extremely rare & auspicious! Best day of the year for Gold & Silk buying.'});
+        else if (dayOfWeek === 4) results.push({type:'best', text:'🌟 Guru Pushya Yoga — Highly auspicious for buying Gold, Jewellery, and precious Silk.'});
+        else results.push({type:'good', text:'⭐ Pushya Nakshatra today — Auspicious for buying Gold and Silk.'});
+    }
+
+    // Dhanteras / Akshaya Tritiya check via festival
+    // Shukra Hora (Venus Hora) = good for silk/jewellery
+    if (horaData) {
+        const venusHoras = horaData.filter(h => h.planet === 'Venus' || h.planet === 'Shukra');
+        if (venusHoras.length > 0) {
+            const times = venusHoras.map(h => formatHoursToTime(h.startHrs) + ' - ' + formatHoursToTime(h.endHrs));
+            results.push({type:'info', text:'💎 Shukra (Venus) Hora timings for silk & jewellery shopping: ' + times.join(', ')});
+        }
+    }
+
+    // Jupiter Hora = good for gold
+    if (horaData) {
+        const jupHoras = horaData.filter(h => h.planet === 'Jupiter' || h.planet === 'Guru');
+        if (jupHoras.length > 0) {
+            const times = jupHoras.map(h => formatHoursToTime(h.startHrs) + ' - ' + formatHoursToTime(h.endHrs));
+            results.push({type:'info', text:'🪙 Guru (Jupiter) Hora timings for gold investment: ' + times.join(', ')});
+        }
+    }
+
+    // Wednesday & Friday = good for textiles
+    if (dayOfWeek === 3 || dayOfWeek === 5) {
+        results.push({type:'good', text: dayOfWeek === 5 ? '🧵 Shukravar — auspicious day for purchasing silk and new clothes.' : '📿 Budhvar — good for making smart purchases and investments.'});
+    }
+
+    if (results.length > 0) {
+        card.style.display = 'block';
+        card.querySelector('#suvarnaContent').innerHTML = results.map(r =>
+            '<div style="padding:8px 10px; margin-bottom:6px; border-radius:6px; border-left:3px solid ' +
+            (r.type === 'best' ? 'var(--gold)' : r.type === 'good' ? 'var(--green)' : '#6366f1') +
+            '; background:' + (r.type === 'best' ? 'rgba(212,175,55,0.1)' : r.type === 'good' ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.1)') +
+            '; font-size:0.85rem;">' + r.text + '</div>'
+        ).join('');
+    } else {
+        card.style.display = 'none';
+    }
+}
+
+// ============================================================
+//  CALENDAR VRATA FILTER
+// ============================================================
+function filterCalFests(type) {
+    // Update button styles
+    document.querySelectorAll('.cal-filter').forEach(btn => {
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text)';
+        btn.style.border = '1px solid var(--card-border)';
+    });
+    const activeBtn = document.getElementById('calFilter' + type.charAt(0).toUpperCase() + type.slice(1));
+    if (activeBtn) {
+        activeBtn.style.background = 'var(--gold)';
+        activeBtn.style.color = '#000';
+        activeBtn.style.border = '1px solid var(--gold)';
+    }
+    // Special case for 'all' button id
+    if (type === 'all') {
+        const allBtn = document.getElementById('calFilterAll');
+        if (allBtn) { allBtn.style.background = 'var(--gold)'; allBtn.style.color = '#000'; allBtn.style.border = '1px solid var(--gold)'; }
+    }
+
+    const items = document.querySelectorAll('#calFestList > div');
+    items.forEach(item => {
+        if (type === 'all') { item.style.display = ''; return; }
+        const text = (item.textContent || '').toLowerCase();
+        const isEkadashi = text.includes('ekadashi') || text.includes('ಏಕಾದಶಿ');
+        const isVrata = text.includes('vrata') || text.includes('pradosh') || text.includes('chaturthi') || text.includes('purnima') || text.includes('amavasya') || isEkadashi;
+        const isSankranti = text.includes('sankranti') || text.includes('sankrant');
+        const isFestival = !isVrata && !isSankranti;
+
+        if (type === 'ekadashi') item.style.display = isEkadashi ? '' : 'none';
+        else if (type === 'vrata') item.style.display = isVrata ? '' : 'none';
+        else if (type === 'sankranti') item.style.display = isSankranti ? '' : 'none';
+        else if (type === 'festival') item.style.display = isFestival ? '' : 'none';
+    });
+}
+
+// ============================================================
+//  EXPANDED MUHURTHA SCORING for new categories
+// ============================================================
+
+// ============================================================
+//  NORTH INDIAN CHART & ADVANCED CHART TOGGLES
+// ============================================================
+let currentChartType = 'rasi'; // 'rasi' or 'navamsha'
+let currentChartStyle = 'south'; // 'south' or 'north'
+let cachedBirthData = null;
+
+function setChartType(type) {
+    currentChartType = type;
+    const btnRasi = document.getElementById('btnRasiChart');
+    const btnNav = document.getElementById('btnNavamshaChart');
+    if (type === 'rasi') {
+        if (btnRasi) { btnRasi.style.background = 'var(--maroon)'; btnRasi.style.color = '#fff'; btnRasi.style.border = 'none'; }
+        if (btnNav) { btnNav.style.background = '#eee'; btnNav.style.color = '#333'; btnNav.style.border = '1px solid #ccc'; }
+    } else {
+        if (btnRasi) { btnRasi.style.background = '#eee'; btnRasi.style.color = '#333'; btnRasi.style.border = '1px solid #ccc'; }
+        if (btnNav) { btnNav.style.background = 'var(--maroon)'; btnNav.style.color = '#fff'; btnNav.style.border = 'none'; }
+    }
+    renderActiveKundali();
+}
+
+function setChartStyle(style) {
+    currentChartStyle = style;
+    const btnSouth = document.getElementById('btnSouthChart');
+    const btnNorth = document.getElementById('btnNorthChart');
+    if (style === 'south') {
+        if (btnSouth) { btnSouth.style.background = 'var(--gold)'; btnSouth.style.color = '#000'; btnSouth.style.border = 'none'; }
+        if (btnNorth) { btnNorth.style.background = '#eee'; btnNorth.style.color = '#333'; btnNorth.style.border = '1px solid #ccc'; }
+    } else {
+        if (btnSouth) { btnSouth.style.background = '#eee'; btnSouth.style.color = '#333'; btnSouth.style.border = '1px solid #ccc'; }
+        if (btnNorth) { btnNorth.style.background = 'var(--gold)'; btnNorth.style.color = '#000'; btnNorth.style.border = 'none'; }
+    }
+    renderActiveKundali();
+}
+
+function renderActiveKundali() {
+    if (!cachedBirthData) return;
+    const { lagnaRashiIdx, lagnaNavamshaIdx, birthGrahas } = cachedBirthData;
+    const southRasiChart = document.querySelector('.si-chart');
+    const southNavChart = document.getElementById('navamshaChartContainer');
+    const northContainer = document.getElementById('northIndianChartContainer');
+    const rasiGrahaList = document.getElementById('jGrahaAtBirth');
+
+    if (currentChartStyle === 'south') {
+        if (northContainer) northContainer.style.display = 'none';
+        if (currentChartType === 'rasi') {
+            if (southRasiChart) southRasiChart.style.display = 'grid';
+            if (southNavChart) southNavChart.style.display = 'none';
+            if (rasiGrahaList) rasiGrahaList.style.display = 'grid';
+        } else {
+            if (southRasiChart) southRasiChart.style.display = 'none';
+            if (southNavChart) southNavChart.style.display = 'block';
+            if (rasiGrahaList) rasiGrahaList.style.display = 'none';
+        }
+    } else {
+        // North Indian SVG style
+        if (southRasiChart) southRasiChart.style.display = 'none';
+        if (southNavChart) southNavChart.style.display = 'none';
+        if (rasiGrahaList) rasiGrahaList.style.display = 'grid';
+        if (northContainer) {
+            northContainer.style.display = 'block';
+            const lagnaIdxToUse = (currentChartType === 'rasi') ? lagnaRashiIdx : lagnaNavamshaIdx;
+            const grahaListToUse = birthGrahas.map(g => ({
+                name: g.name,
+                icon: g.icon,
+                rashiIdx: (currentChartType === 'rasi') ? g.rashiIdx : getNavamshaRashi(g.lon)
+            }));
+            northContainer.innerHTML = generateNorthIndianChartSVG(lagnaIdxToUse, grahaListToUse);
+        }
+    }
+}
+
+function generateNorthIndianChartSVG(lagnaRashiIdx, grahas) {
+    const houseCenters = [
+        null,
+        { x: 150, y: 70 },  { x: 75,  y: 35 },  { x: 35,  y: 75 },
+        { x: 70,  y: 150 }, { x: 35,  y: 225 }, { x: 75,  y: 265 },
+        { x: 150, y: 230 }, { x: 225, y: 265 }, { x: 265, y: 225 },
+        { x: 230, y: 150 }, { x: 265, y: 75 },  { x: 225, y: 35 }
+    ];
+
+    const signCoords = [
+        null,
+        { x: 150, y: 105 }, { x: 105, y: 22 },  { x: 22,  y: 50 },
+        { x: 110, y: 150 }, { x: 22,  y: 250 }, { x: 105, y: 285 },
+        { x: 150, y: 195 }, { x: 195, y: 285 }, { x: 280, y: 250 },
+        { x: 190, y: 150 }, { x: 280, y: 50 },  { x: 195, y: 22 }
+    ];
+
+    const signPlanets = Array.from({ length: 12 }, () => []);
+    grahas.forEach(g => {
+        signPlanets[g.rashiIdx].push(g.icon + ' ' + g.name.substring(0, 2));
+    });
+    signPlanets[lagnaRashiIdx].unshift('📍 As');
+
+    let svg = `<svg viewBox="0 0 300 300" style="width:100%; max-width:320px; aspect-ratio:1; display:block; margin:auto; background:#fff; font-family:'Segoe UI',sans-serif; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+        <rect x="2" y="2" width="296" height="296" fill="#fffdf8" stroke="#8b1a2b" stroke-width="2.5"/>
+        <line x1="2" y1="2" x2="298" y2="298" stroke="#8b1a2b" stroke-width="1.5"/>
+        <line x1="2" y1="298" x2="298" y2="2" stroke="#8b1a2b" stroke-width="1.5"/>
+        <polygon points="150,2 298,150 150,298 2,150" fill="none" stroke="#8b1a2b" stroke-width="1.5"/>`;
+
+    for (let h = 1; h <= 12; h++) {
+        const signIdx = (lagnaRashiIdx + h - 1) % 12;
+        const signNum = signIdx + 1;
+        const planets = signPlanets[signIdx];
+        const sc = signCoords[h];
+        const hc = houseCenters[h];
+
+        svg += `\n        <text x="${sc.x}" y="${sc.y}" font-size="9" font-weight="bold" fill="#888" text-anchor="middle">${signNum}</text>`;
+
+        if (planets.length > 0) {
+            planets.forEach((p, pIdx) => {
+                const yOff = hc.y + (pIdx - (planets.length - 1) / 2) * 11;
+                svg += `\n        <text x="${hc.x}" y="${yOff}" font-size="9.5" font-weight="600" fill="#8b1a2b" text-anchor="middle">${p}</text>`;
+            });
+        }
+    }
+
+    svg += `\n    </svg>`;
+    return svg;
+}
+
+// ============================================================
+//  INTERACTIVE RASHIFAL CONTROLLER
+// ============================================================
+let cachedDailyGrahas = null;
+
+function onSelectRashifal(rashiIdx) {
+    const idx = parseInt(rashiIdx, 10);
+    localStorage.setItem('kuberan_moon_rashi', idx);
+    generateRashifal(idx, cachedDailyGrahas);
+}
+
+function scoreForNewPurpose(p, purpose) {
+    let bonus = 0;
+    const nakIdx = p.nakshatra.idx;
+    const tithiNum = p.tithi.no;
+
+    if (purpose === 'property') {
+        // Good Nakshatras for property: Rohini, Mrigashira, Uttara Phalguni, Hasta, Swati, Anuradha, Uttara Ashadha, Uttara Bhadrapada, Revati
+        if ([3,4,11,12,14,16,20,25,26].includes(nakIdx)) bonus += 15;
+        if ([2,3,5,7,10,11,13].includes(tithiNum <= 15 ? tithiNum : tithiNum - 15)) bonus += 10;
+    } else if (purpose === 'upanayana') {
+        // Good months: Chaitra, Vaishakha, Phalguna, Magha. Good Nakshatras: Hasta, Chitra, Swati, Pushya, Ashwini, Mrigashira, Punarvasu, Shravana, Dhanishta, Revati
+        if ([0,4,6,7,12,13,14,21,22,26].includes(nakIdx)) bonus += 15;
+        if ([2,3,5,7,10].includes(tithiNum <= 15 ? tithiNum : tithiNum - 15)) bonus += 10;
+    } else if (purpose === 'mundan') {
+        // Good: Ashwini, Mrigashira, Pushya, Hasta, Chitra, Swati, Jyeshtha, Shravana, Dhanishta, Revati
+        if ([0,4,7,12,13,14,17,21,22,26].includes(nakIdx)) bonus += 15;
+        if ([2,3,5,7,10,11].includes(tithiNum <= 15 ? tithiNum : tithiNum - 15)) bonus += 10;
+    } else if (purpose === 'namakarana') {
+        if ([0,3,4,6,7,12,13,14,21,26].includes(nakIdx)) bonus += 15;
+        if ([2,3,5,7,10,11].includes(tithiNum <= 15 ? tithiNum : tithiNum - 15)) bonus += 10;
+    } else if (purpose === 'gold_silk') {
+        // Pushya is the gold standard
+        if (nakIdx === 7) bonus += 25;
+        // Other good: Rohini, Hasta, Chitra, Swati, Shravana, Revati
+        else if ([3,12,13,14,21,26].includes(nakIdx)) bonus += 15;
+        // Venus/Jupiter day bonus
+        const dow = p.vara;
+        if (dow === 4 || dow === 5) bonus += 10; // Thursday (Guru), Friday (Shukra)
+    }
+    return bonus;
 }
 
 // ============================================================
