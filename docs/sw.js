@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kuberan-panchangam-v34';
+const CACHE_NAME = 'kuberan-panchangam-v35';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -24,18 +24,22 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// FIXED: Stale-while-revalidate with response validation
+// - Only cache GET requests with http/https schemes
+// - Only cache 200 OK responses to prevent cache poisoning (404/500/captive portals)
+// - Serve cached content immediately, then update cache in background
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // If network fetch succeeds, cache the fresh response and return it
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-        return response;
-      })
-      .catch(() => {
-        // If network fails (offline), fallback to cache
-        return caches.match(event.request);
-      })
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+        }
+        return networkResponse;
+      }).catch(() => cachedResponse);
+      return cachedResponse || fetchPromise;
+    })
   );
 });

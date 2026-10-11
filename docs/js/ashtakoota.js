@@ -15,15 +15,15 @@ const NAK_PROPS = [
     {nadi:0, gana:0, yoni:5},  // 7. Punarvasu
     {nadi:1, gana:0, yoni:2},  // 8. Pushya
     {nadi:2, gana:2, yoni:5},  // 9. Ashlesha
-    {nadi:0, gana:2, yoni:6},  // 10. Magha
+    {nadi:2, gana:2, yoni:6},  // 10. Magha (FIXED: was nadi:0)
     {nadi:1, gana:1, yoni:6},  // 11. Purva Phalguni
-    {nadi:2, gana:1, yoni:7},  // 12. Uttara Phalguni
-    {nadi:2, gana:0, yoni:8},  // 13. Hasta
+    {nadi:0, gana:1, yoni:7},  // 12. Uttara Phalguni (FIXED: was nadi:2)
+    {nadi:0, gana:0, yoni:8},  // 13. Hasta (FIXED: was nadi:2)
     {nadi:1, gana:2, yoni:9},  // 14. Chitra
-    {nadi:0, gana:0, yoni:8},  // 15. Swati
-    {nadi:0, gana:2, yoni:9},  // 16. Vishakha
+    {nadi:2, gana:0, yoni:8},  // 15. Swati (FIXED: was nadi:0)
+    {nadi:2, gana:2, yoni:9},  // 16. Vishakha (FIXED: was nadi:0)
     {nadi:1, gana:0, yoni:10}, // 17. Anuradha
-    {nadi:2, gana:2, yoni:10}, // 18. Jyeshtha
+    {nadi:0, gana:2, yoni:10}, // 18. Jyeshtha (FIXED: was nadi:2)
     {nadi:0, gana:2, yoni:4},  // 19. Mula
     {nadi:1, gana:1, yoni:11}, // 20. Purvashadha
     {nadi:2, gana:1, yoni:12}, // 21. Uttarashadha
@@ -86,9 +86,9 @@ const MAITRI_MATRIX = [
 // GANA MATCHING MATRIX
 // Boy=rows, Girl=cols. 0=Deva, 1=Manushya, 2=Rakshasa
 const GANA_MATRIX = [
-    [6, 6, 1], // Boy Deva
-    [5, 6, 0], // Boy Manushya
-    [1, 0, 6]  // Boy Rakshasa
+    [6, 5, 1], // Boy Deva: D-D=6, D-M=5, D-R=1
+    [5, 6, 0], // Boy Manushya: M-D=5, M-M=6, M-R=0
+    [0, 0, 6]  // Boy Rakshasa: R-D=0, R-M=0, R-R=6 (FIXED: per BPHS)
 ];
 
 // BHAKOOT DISTANCE MATCHING
@@ -132,10 +132,12 @@ function calculateAshtakoota(boyNak, boyPada, girlNak, girlPada) {
     else vashyaScore = 0;
     result.vashya = { score: vashyaScore, max: 2, desc: vashyaScore === 2 ? 'Highly Compatible' : (vashyaScore === 1 ? 'Average' : 'Incompatible') };
 
-    // 3. TARA (Max 3)
-    let bToG = (girlNak - boyNak) % 9; if (bToG <= 0) bToG += 9;
-    let gToB = (boyNak - girlNak) % 9; if (gToB <= 0) gToB += 9;
-    const tScore = (t) => [3,5,7].includes(t) ? 0 : 1.5; // Janma(1) is 1.5, Vipat(3)=0, Pratyak(5)=0, Naidhana(7)=0
+    // 3. TARA (Max 3) — 1-based inclusive Nakshatra counting (FIXED: was off-by-one)
+    let countBtoG = ((girlNak - boyNak) % 27 + 27) % 27 + 1; // 1-based distance
+    let bToG = countBtoG % 9 === 0 ? 9 : countBtoG % 9;
+    let countGtoB = ((boyNak - girlNak) % 27 + 27) % 27 + 1;
+    let gToB = countGtoB % 9 === 0 ? 9 : countGtoB % 9;
+    const tScore = (t) => [3,5,7].includes(t) ? 0 : 1.5; // Vipat(3)=0, Pratyak(5)=0, Naidhana(7)=0
     const taraScore = tScore(bToG) + tScore(gToB);
     result.tara = { score: taraScore, max: 3, desc: taraScore >= 2 ? 'Good' : 'Poor' };
 

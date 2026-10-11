@@ -916,7 +916,7 @@ const NAK_KN = ["ಅಶ್ವಿನಿ","ಭರಣಿ","ಕೃತ್ತಿಕಾ
 // Yoga names
 const YOGA_EN = ["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarma","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyana","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"];
 const INAUSPICIOUS_YOGAS = [0,5,8,9,12,14,16,18,26]; // indices
-const GOOD_NAK = [0,2,3,5,6,7,10,11,12,14,16,19,20,21,26];
+const GOOD_NAK = [0,3,6,7,10,11,12,13,14,16,20,21,25,26]; // FIXED: removed Krittika(2)/Ardra(5), added Chitra(13)/U.Bhadrapada(25)
 const BAD_TITHI = [4,9,14,8,30];
 
 // Karana names
@@ -939,7 +939,7 @@ const VARA_KN = ["ಭಾನುವಾರ","ಸೋಮವಾರ","ಮಂಗಳವ�
 
 // Rahu/Yama/Gulika tables (Sun=0 .. Sat=6) — which 1/8th of day
 const RAHU   = [8,2,7,5,6,4,3];
-const YAMA   = [5,4,3,7,2,1,6];
+const YAMA   = [5,4,3,2,1,7,6]; // FIXED: Wed=2,Thu=1,Fri=7 (was corrupted)
 const GULIKA = [7,6,5,4,3,2,1];
 
 // Samvatsara names
@@ -1027,14 +1027,19 @@ function moonLongitude(jd) {
     return ((elon % 360) + 360) % 360;
 }
 
-// Lahiri Ayanamsa (IAU 2006 precession polynomial — accurate over millennia)
+// Lahiri (Chitrapaksha) Ayanamsa — IAU 2006 precession + nutation correction
+// Epoch value: 23°51'25.532" = 23.857092° at J2000.0 (Indian Astronomical Ephemeris)
+// FIXED: Was 23.853211° (13.97" too low). Now includes nutation for True Ayanamsa.
 function lahiriAyanamsa(jd) {
     const T = (jd - 2451545.0) / 36525.0;
     // IAU 2006 general precession in longitude (arcseconds)
     const psiArcsec = 5028.796195 * T + 1.1054348 * T*T
                     + 0.00007964 * T*T*T - 0.000023857 * T*T*T*T;
-    // Lahiri epoch value: 23 deg 51 min 11.56 sec = 23.853211 deg at J2000.0
-    return 23.853211 + psiArcsec / 3600.0;
+    // True Ayanamsa = Mean Ayanamsa + Nutation in longitude
+    // This cancels the nutation already present in apparent (true) tropical longitudes
+    const t = new Astronomy.AstroTime(jd - 2451545.0);
+    const nutation = Astronomy.e_tilt(t).dpsi; // nutation in longitude (degrees)
+    return 23.857092 + psiArcsec / 3600.0 + nutation;
 }
 
 // Sidereal longitudes
@@ -1147,10 +1152,11 @@ function getAllGrahaPositions(jd) {
 // ============================================================
 //  SUNRISE / SUNSET — Astronomy Engine (high-precision)
 // ============================================================
-function computeSunrise(year, month, day, lat, lon) {
-    // Use UTC midnight as the search start to avoid browser timezone issues
-    const dUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
-    const startTime = new Astronomy.AstroTime(dUTC);
+function computeSunrise(year, month, day, lat, lon, tzOff) {
+    // FIXED: Start search from LOCAL midnight (in UTC) to prevent finding next-day
+    // sunrise in eastern time zones (Tokyo, Sydney etc.)
+    const localMidnightJD = julianDay(year, month, day, 0) - ((tzOff || 5.5) / 24);
+    const startTime = new Astronomy.AstroTime(localMidnightJD - 2451545.0);
     const obs = new Astronomy.Observer(lat, lon, 0);
     const rise = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, 1, startTime, 1);
     const set = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, -1, startTime, 1);
@@ -1159,10 +1165,9 @@ function computeSunrise(year, month, day, lat, lon) {
     const baseJD = julianDay(year, month, day, 0); 
     const riseJD = rise ? (rise.ut + 2451545.0) : (baseJD + 6/24);
     const setJD = set ? (set.ut + 2451545.0) : (baseJD + 18/24);
-    // Upper-limb correction: subtract Sun semidiameter (~16') from rise time
-    // This gives ~1.1 minutes earlier sunrise (traditional Drik standard)
-    const upperLimbCorrDays = 16 / 60 / 360; // 16 arcmin in day fraction (approx)
-    return { rise: (riseJD - baseJD) * 24 - 1.1/60, set: (setJD - baseJD) * 24 + 1.1/60 };
+    // Astronomy Engine already applies 16' upper-limb + 34' refraction correction
+    // Do NOT manually adjust — was causing double-correction of ~66 seconds (FIXED)
+    return { rise: (riseJD - baseJD) * 24, set: (setJD - baseJD) * 24 };
 }
 
 // ============================================================
@@ -1171,10 +1176,22 @@ function computeSunrise(year, month, day, lat, lon) {
 function nextBoundary(jd, angleFn, unit) {
     const cur = angleFn(jd);
     const target = (Math.floor(cur / unit) + 1) * unit % 360;
-    let lo = jd, hi = jd + 1.8;
+    // FIXED: Step forward in small increments to bracket the FIRST crossing,
+    // then bisect. Prevents skipping multiple boundaries for small units (Karana=6°).
+    const maxSpan = (unit <= 6) ? 0.8 : (unit <= 12 ? 1.4 : 1.6);
+    const step = 0.04; // ~58 minutes
+    let lo = jd, hi = jd + step;
+    while (hi - jd < maxSpan) {
+        const diffLo = ((angleFn(lo) - target + 540) % 360) - 180;
+        const diffHi = ((angleFn(hi) - target + 540) % 360) - 180;
+        if (diffLo < 0 && diffHi >= 0) break;
+        lo = hi;
+        hi = lo + step;
+    }
+    // Bisect within verified bracket (50 iterations → ~0.05 second precision)
     for (let i = 0; i < 50; i++) {
         const mid = (lo + hi) / 2;
-        const diff = ((angleFn(mid) - target + 180) % 360 + 360) % 360 - 180;
+        const diff = ((angleFn(mid) - target + 540) % 360) - 180;
         if (diff >= 0) hi = mid; else lo = mid;
     }
     return hi;
@@ -1184,20 +1201,29 @@ function nextBoundary(jd, angleFn, unit) {
 //  FORMAT HELPERS
 // ============================================================
 function pad2(n) { return String(n).padStart(2, '0'); }
+// Helper: convert fractional hours (0-24) to "HH:MM AM/PM" string
+function formatHoursToTime(hrs) {
+    hrs = ((hrs % 24) + 24) % 24;
+    const h = Math.floor(hrs);
+    const m = Math.floor((hrs - h) * 60);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return pad2(h12) + ':' + pad2(m) + ' ' + ampm;
+}
+
 
 function jdToLocalTimeStr(jd, tzOffsetHours) {
     const utc = jdToDate(jd);
-    // Add timezone offset
     let totalMin = utc.hour * 60 + utc.minute + utc.second / 60 + tzOffsetHours * 60;
-    // Handle day overflow (simplified for display)
-    if (totalMin < 0) totalMin += 1440;
-    if (totalMin >= 1440) totalMin -= 1440;
+    // Track day rollover for next-day indicator (FIXED: was silently wrapping)
+    const dayShift = Math.floor(totalMin / 1440);
+    totalMin = ((totalMin % 1440) + 1440) % 1440;
     const h = Math.floor(totalMin / 60);
     const m = Math.floor(totalMin % 60);
-    const s = Math.floor((totalMin * 60) % 60);
     const ampm = h >= 12 ? 'PM' : 'AM';
     const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-    return `${pad2(h12)}:${pad2(m)} ${ampm}`;
+    const suffix = dayShift > 0 ? ' (+1)' : dayShift < 0 ? ' (-1)' : '';
+    return `${pad2(h12)}:${pad2(m)} ${ampm}${suffix}`;
 }
 
 function jdToLocalTimeStr24(jd, tzOffsetHours) {
@@ -1277,7 +1303,7 @@ function getAmantaMasaIdx(baseJD) {
 
 function computePanchanga(year, month, day, lat, lon, tzName) {
     const tzOff = getTzOffset(tzName, year, month, day);
-    const sr = computeSunrise(year, month, day, lat, lon);
+    const sr = computeSunrise(year, month, day, lat, lon, tzOff);
     if (!sr) return null;
 
     const riseJD = julianDay(year, month, day, sr.rise);
@@ -1301,7 +1327,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
 
     // Nakshatra
     const nakIdx = Math.floor(m / (360 / 27));
-    const pada = Math.floor((m % (360 / 27)) / (360 / 108)) + 1;
+    const pada = Math.min(4, Math.floor((m % (360 / 27)) / (360 / 108)) + 1); // FIXED: guard against FP overflow producing pada=5
     const nakEnd = nextBoundary(riseJD, siderealMoon, 360 / 27);
 
     // Yoga
@@ -1409,7 +1435,8 @@ function renderPanchanga(p) {
     document.getElementById('glKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️' : ' ✓');
     // Quick verdict
     let vScore = 0;
-    if (!BAD_TITHI.includes(p.tithi.no)) vScore++;
+    const tInPaksha = p.tithi.no <= 15 ? p.tithi.no : p.tithi.no - 15;
+    if (![4,8,9,14].includes(tInPaksha) && p.tithi.no !== 30) vScore++; // FIXED: check within-paksha
     if (GOOD_NAK.includes(p.nakshatra.idx)) vScore++;
     if (!INAUSPICIOUS_YOGAS.includes(p.yoga.idx)) vScore++;
     if (!p.karana.isVishti) vScore++;
@@ -1485,11 +1512,15 @@ function renderPanchanga(p) {
         + row('good', 'Brahma Muhurta (ಬ್ರಹ್ಮ)', p.brahma.start, p.brahma.end);
 
     // --- CHOGHADIYA ---
+    let chogDataCache = [];
     const CHOG_SEQ = ['Udveg', 'Char', 'Labh', 'Amrit', 'Kaal', 'Shubh', 'Rog'];
     const CHOG_KN = {'Udveg':'ಉದ್ವೇಗ','Char':'ಚರ','Labh':'ಲಾಭ','Amrit':'ಅಮೃತ','Kaal':'ಕಾಲ','Shubh':'ಶುಭ','Rog':'ರೋಗ'};
     const CHOG_QUALITY = {'Amrit':'good','Shubh':'good','Labh':'good','Char':'neutral','Rog':'bad','Kaal':'bad','Udveg':'bad'};
     const CHOG_DAY_START = [0, 3, 6, 2, 5, 1, 4]; // Sun=0..Sat=6
-    const CHOG_NIGHT_START = [5, 4, 2, 0, 3, 6, 1];
+    // Night Choghadiya uses reversed sequence: Shubh→Amrit→Char→Rog→Kaal→Labh→Udveg
+    const CHOG_NIGHT_SEQ = ['Shubh', 'Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg'];
+    // FIXED: Mon=Char(2), Tue=Kaal(4), Sat=Labh(5) — were corrupted
+    const CHOG_NIGHT_START = [0, 2, 4, 6, 1, 3, 5];
 
     // Night length: approximate sunset to next sunrise (more accurate than 1.0 - dayLen)
     const nightLen = (1.0 - dayLen); // Approximation: true night = nextSunrise - sunset
@@ -1506,17 +1537,20 @@ function renderPanchanga(p) {
         const e = p.sunrise + (i + 1) * daySlot;
         const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
         chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        chogDataCache.push({name, quality: q, startJD: s, endJD: e});
     }
     chogHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Nighttime</div>';
     let nightIdx = CHOG_NIGHT_START[dow];
     for (let i = 0; i < 8; i++) {
-        const name = CHOG_SEQ[(nightIdx + i) % 7];
+        const name = CHOG_NIGHT_SEQ[(nightIdx + i) % 7]; // FIXED: use night sequence
         const q = CHOG_QUALITY[name];
         const s = p.sunset + i * nightSlot;
         const e = p.sunset + (i + 1) * nightSlot;
         const dot = q === 'good' ? 'good' : (q === 'bad' ? 'bad' : 'neutral');
         chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        chogDataCache.push({name, quality: q, startJD: s, endJD: e});
     }
+    cachedChogData = chogDataCache; // FIXED: was never populated
     document.getElementById('choghadiyaList').innerHTML = chogHtml;
 
     // --- FESTIVALS ---
@@ -1682,6 +1716,7 @@ function renderPanchanga(p) {
         const good = ['Jupiter','Venus','Mercury'].includes(planet);
         const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
         horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        horaDataCache.push({planet, startJD: s, endJD: e, quality: dot});
     }
     horaHtml += '<div style="font-size:0.8rem; font-weight:600; color:var(--gold); margin:10px 0 6px;">🌙 Night Horas</div>';
     for (let i = 0; i < 12; i++) {
@@ -1691,7 +1726,9 @@ function renderPanchanga(p) {
         const good = ['Jupiter','Venus','Mercury'].includes(planet);
         const dot = good ? 'good' : (['Saturn','Mars'].includes(planet) ? 'bad' : 'neutral');
         horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+        horaDataCache.push({planet, startJD: s, endJD: e, quality: dot});
     }
+    cachedHoraData = horaDataCache; // FIXED: was never populated
     document.getElementById('horaList').innerHTML = horaHtml;
 
     // --- GOWRI PANCHANGAM ---
@@ -2478,17 +2515,15 @@ function generateJathaka() {
 // ============================================================
 //  MOONRISE / MOONSET COMPUTATION
 // ============================================================
-function computeMoonRiseSet(year, month, day, lat, lon) {
-    try {
-        const dUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
-        const startTime = new Astronomy.AstroTime(dUTC);
+function computeMoonRiseSet(year, month, day, lat, lon, tzOff) {
+        // FIXED: Start from local midnight in UTC (was UTC midnight causing misses in India)
+        const localMidnightJD = julianDay(year, month, day, 0) - ((tzOff || 5.5) / 24);
+        const startTime = new Astronomy.AstroTime(localMidnightJD - 2451545.0);
         const obs = new Astronomy.Observer(lat, lon, 0);
-        const rise = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, 1, startTime, 1);
-        const set = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, startTime, 1);
-        return {
-            riseJD: rise ? (rise.ut + 2451545.0) : null,
-            setJD: set ? (set.ut + 2451545.0) : null
-        };
+        const moonRise = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, 1, startTime, 1.5);
+        const moonSet = Astronomy.SearchRiseSet(Astronomy.Body.Moon, obs, -1, startTime, 1.5);
+        return { moonRise, moonSet };
+    };
     } catch(e) { return { riseJD: null, setJD: null }; }
 }
 
@@ -2504,33 +2539,13 @@ function getNavamshaRashi(siderealDeg) {
     // Water signs (Ca,Sc,Pi) start from Cancer
     const rashi = Math.floor(siderealDeg / 30);
     const posInRashi = siderealDeg % 30;
-    const navamshaNum = Math.floor(posInRashi / 3.333333); // 0-8
+    const navamshaNum = Math.floor(posInRashi * 9 / 30); // 0-8 (FIXED: exact division instead of magic number)
 
     const startRashi = [0,9,6,3][rashi % 4]; // Fire=0, Earth=9, Air=6, Water=3
     return (startRashi + navamshaNum) % 12;
 }
 
-function toggleChartView(view) {
-    const rasiChart = document.querySelector('.si-chart');
-    const rasiGraha = document.getElementById('jGrahaAtBirth');
-    const navContainer = document.getElementById('navamshaChartContainer');
-    const btnRasi = document.getElementById('btnRasiChart');
-    const btnNav = document.getElementById('btnNavamshaChart');
-
-    if (view === 'navamsha') {
-        if (rasiChart) rasiChart.style.display = 'none';
-        if (rasiGraha) rasiGraha.style.display = 'none';
-        if (navContainer) navContainer.style.display = 'block';
-        if (btnRasi) { btnRasi.style.background = '#eee'; btnRasi.style.color = '#333'; btnRasi.style.border = '1px solid #ccc'; }
-        if (btnNav) { btnNav.style.background = 'var(--maroon)'; btnNav.style.color = '#fff'; btnNav.style.border = 'none'; }
-    } else {
-        if (rasiChart) rasiChart.style.display = 'grid';
-        if (rasiGraha) rasiGraha.style.display = 'grid';
-        if (navContainer) navContainer.style.display = 'none';
-        if (btnRasi) { btnRasi.style.background = 'var(--maroon)'; btnRasi.style.color = '#fff'; btnRasi.style.border = 'none'; }
-        if (btnNav) { btnNav.style.background = '#eee'; btnNav.style.color = '#333'; btnNav.style.border = '1px solid #ccc'; }
-    }
-}
+// toggleChartView removed — replaced by setChartType() and setChartStyle()
 
 // ============================================================
 //  LIVE NOW INDICATOR (Updates every 30 seconds)
@@ -2543,6 +2558,7 @@ function updateLiveNowIndicators() {
     const nowJD = (Date.now() / 86400000) + 2440587.5;
 
     // --- HORA ---
+    let horaDataCache = [];
     if (cachedHoraData && cachedHoraData.length > 0) {
         let currentHora = null;
         for (const h of cachedHoraData) {
@@ -2934,7 +2950,8 @@ function scoreDayForMuhurtham(p, purpose) {
     let score = 50;
     const tithiNum = p.tithi.no;
     const nakIdx = p.nakshatra.idx;
-    if (BAD_TITHI.includes(tithiNum)) score -= 20;
+    const tInP = tithiNum <= 15 ? tithiNum : tithiNum - 15;
+    if ([4,8,9,14].includes(tInP) || tithiNum === 30) score -= 20; // FIXED: check within-paksha for both Shukla/Krishna
     if ([2,3,5,7,10,11,13].includes(tithiNum <= 15 ? tithiNum : tithiNum - 15)) score += 10;
     if (tithiNum === 15) score += 5;
     if (GOOD_NAK.includes(nakIdx)) score += 15;
@@ -2943,11 +2960,13 @@ function scoreDayForMuhurtham(p, purpose) {
     if (p.karana.isVishti) score -= 15;
     if ([2].includes(p.wd)) score -= 10;
     if ([1,3,4,5].includes(p.wd)) score += 5;
-    if (purpose === 'marriage' && [3,6,7,11,12,21,26].includes(nakIdx)) score += 10;
+    if (purpose === 'marriage' && [3,4,11,12,16,20,21,25,26].includes(nakIdx)) score += 10; // FIXED: removed Pushya(7), added Mrigashira(4)/Anuradha(16)/U.Ashadha(20)/U.Bhadrapada(25)
     if ((purpose === 'business' || purpose === 'vehicle') && p.wd === 4) score += 10;
-    if (purpose === 'travel' && [2,6,12,21,26].includes(nakIdx)) score += 10;
+    if (purpose === 'travel' && [6,12,21,25,26].includes(nakIdx)) score += 10; // FIXED: removed Krittika(2), added U.Bhadrapada(25)
     const fests = matchFestivals(p);
     if (fests.some(f => f.shopping_peak)) score += 5;
+    // Wire in specialized purpose scoring (FIXED: was disconnected)
+    if (typeof scoreForNewPurpose === 'function') score += scoreForNewPurpose(p, purpose);
     return Math.max(0, Math.min(100, score));
 }
 
