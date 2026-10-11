@@ -1563,7 +1563,7 @@ function renderPanchanga(p) {
         chogHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name} (${CHOG_KN[name]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
         chogDataCache.push({ name, nameKn: CHOG_KN[name], quality: q, startJD: s, endJD: e, timeStr: fmt(s) + ' – ' + fmt(e) });
     }
-    cachedChogData = chogDataCache; // FIXED: was never populated
+    window.cachedChogData = cachedChogData = chogDataCache; // FIXED: was never populated
     document.getElementById('choghadiyaList').innerHTML = chogHtml;
 
     // --- FESTIVALS ---
@@ -1742,7 +1742,7 @@ function renderPanchanga(p) {
         horaHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${HORA_ICONS[planet]} ${planet} (${HORA_KN[planet]})</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
         horaDataCache.push({ planet, planetKn: HORA_KN[planet], icon: HORA_ICONS[planet], quality: dot, startJD: s, endJD: e, timeStr: fmt(s) + ' – ' + fmt(e) });
     }
-    cachedHoraData = horaDataCache; // FIXED: was never populated
+    window.cachedHoraData = cachedHoraData = horaDataCache; // FIXED: was never populated
     document.getElementById('horaList').innerHTML = horaHtml;
 
     // --- GOWRI PANCHANGAM ---
@@ -2032,6 +2032,10 @@ function goToday() {
 document.getElementById('dateInput').addEventListener('change', recalculate);
 
 // Tab navigation
+function switchTab(tabName) {
+    const btn = document.querySelector(`.tab-nav[data-tab="${tabName}"]`);
+    if (btn) btn.click();
+}
 let personCount = 1;
 document.querySelectorAll('.tab-nav').forEach(btn => {
     btn.addEventListener('click', () => {
