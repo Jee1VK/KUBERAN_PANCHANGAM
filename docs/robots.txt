@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jee1vk.github.io/KUBERAN_PANCHANGAM/sitemap.xml

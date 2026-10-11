@@ -264,6 +264,31 @@
     </div>
 </div>
 
+
+<!-- PRIVACY POLICY MODAL -->
+<div id="privacyModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+    <div class="modal-content" style="max-width:500px; text-align:left; max-height:85vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:10px; margin-bottom:15px;">
+            <h2 style="color:var(--gold); margin:0; font-size:1.3rem;">🔒 Privacy & Data Transparency</h2>
+            <button onclick="closePrivacyModal()" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <div style="font-size:0.85rem; line-height:1.6; color:var(--text);">
+            <p><b>1. 100% Client-Side Computation:</b><br>
+            All astronomical and Vedic astrology calculations (Tithi, Nakshatra, Janma Kundali, D9 Navamsha, and Marriage Matching) are performed locally in your browser. No birth dates, coordinates, or names are sent to any remote server.</p>
+            
+            <p style="margin-top:10px;"><b>2. Zero Tracking Cookies:</b><br>
+            Kuberan Panchangam does not use advertising cookies, third-party tracking pixels, or telemetry SDKs.</p>
+
+            <p style="margin-top:10px;"><b>3. Local Device Storage:</b><br>
+            Your recent Jathaka generation history and selected Moon sign are stored exclusively on your own phone or computer via browser <code>localStorage</code>. You can clear this data at any time from the app.</p>
+
+            <p style="margin-top:10px;"><b>4. Free Service by Kuberan Silks:</b><br>
+            This software is provided freely as a cultural service for the devotees and patrons of Kuberan Silks, Chickpet, Bengaluru.</p>
+        </div>
+        <button onclick="closePrivacyModal()" style="margin-top:20px; width:100%; background:var(--gold); color:#000; border:none; padding:10px; border-radius:6px; font-weight:700; cursor:pointer;">Close</button>
+    </div>
+</div>
+
 <!-- DISCLAIMER MODAL -->
 <div id="disclaimerModal">
     <div class="modal-content">
@@ -1916,6 +1941,20 @@ function recalculate() {
 }
 
 // DISCLAIMER LOGIC
+
+function openPrivacyModal() {
+    const m = document.getElementById('privacyModal');
+    if (m) m.style.display = 'flex';
+}
+function closePrivacyModal() {
+    const m = document.getElementById('privacyModal');
+    if (m) m.style.display = 'none';
+}
+function openDisclaimerModal() {
+    const m = document.getElementById('disclaimerModal');
+    if (m) m.style.display = 'flex';
+}
+
 function acceptDisclaimer() {
     document.getElementById('disclaimerModal').style.display = 'none';
 }
