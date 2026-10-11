@@ -1092,19 +1092,31 @@ function getSiderealAscendant(jd, lat, lon) {
 
 function computeDailyLagnas(jdStart, lat, lon) {
     const lagnas = [];
-    const step = 2 / 1440; // 2 minute resolution
+    const step = 2 / 1440; // 2 minute scanning step
     let currentJD = jdStart;
     let prevLagnaIdx = Math.floor(getSiderealAscendant(currentJD, lat, lon) / 30);
     let blockStart = currentJD;
     
     while (currentJD < jdStart + 1.0) {
-        currentJD += step;
-        let lagnaIdx = Math.floor(getSiderealAscendant(currentJD, lat, lon) / 30);
+        const nextJD = currentJD + step;
+        let lagnaIdx = Math.floor(getSiderealAscendant(nextJD, lat, lon) / 30);
         if (lagnaIdx !== prevLagnaIdx) {
-            lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: currentJD });
-            blockStart = currentJD;
+            // FIXED: Bisect across boundary crossing to achieve sub-second transition accuracy
+            let lo = currentJD, hi = nextJD;
+            for (let b = 0; b < 10; b++) {
+                const mid = (lo + hi) / 2;
+                if (Math.floor(getSiderealAscendant(mid, lat, lon) / 30) === prevLagnaIdx) {
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+            const exactTransition = (lo + hi) / 2;
+            lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: exactTransition });
+            blockStart = exactTransition;
             prevLagnaIdx = lagnaIdx;
         }
+        currentJD = nextJD;
     }
     lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: currentJD });
     return lagnas;
@@ -1364,9 +1376,10 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     const masaIdx = getAmantaMasaIdx(riseJD);
 
     // Samvatsara
-    // Approximate Shaka year: if before ~March 22, use previous year
-    const ugadiApproxMonth = 3;
-    const shakaYear = (month < ugadiApproxMonth || (month === ugadiApproxMonth && day < 22)) ? year - 79 : year - 78;
+    // Shaka year & Samvatsara: Exact astronomical transition on Chaitra Shukla Prathama (Ugadi)
+    // (FIXED: replaces arbitrary March 22 approximation with true Amanta lunar month boundary)
+    const isPastUgadi = (month > 4) || ((month === 3 || month === 4) && ((masaIdx === 0 && paksha === "Shukla") || (masaIdx > 0 && masaIdx < 6)));
+    const shakaYear = isPastUgadi ? year - 78 : year - 79;
     const samvatsaraIdx = ((shakaYear + 12) % 60) || 60;
     const samvatsaraName = SAMVATSARA[samvatsaraIdx - 1];
 
@@ -1508,7 +1521,7 @@ function renderPanchanga(p) {
     wl.innerHTML = row('bad', 'Rahu Kala (ರಾಹುಕಾಲ)', p.rahu.start, p.rahu.end)
         + row('bad', 'Yamaganda (ಯಮಗಂಡ)', p.yama.start, p.yama.end)
         + row('neutral', 'Gulika Kala (ಗುಳಿಕ)', p.gulika.start, p.gulika.end)
-        + row('good', 'Abhijit Muhurta (ಅಭಿಜಿತ್)', p.abhijit.start, p.abhijit.end)
+        + row(p.wd === 3 ? 'bad' : 'good', 'Abhijit Muhurta (ಅಭಿಜಿತ್)' + (p.wd === 3 ? ' ⚠️ (Prohibited on Wed)' : ''), p.abhijit.start, p.abhijit.end)
         + row('good', 'Brahma Muhurta (ಬ್ರಹ್ಮ)', p.brahma.start, p.brahma.end);
 
     // --- CHOGHADIYA ---
@@ -1881,9 +1894,8 @@ function matchFestivals(p) {
         // Varamahalakshmi Vrata: the Friday closest to (and before/on) Shravana Purnima
     // Only trigger if tithi is in the range where the next Purnima is within 7 days
     if (p.vara.en === "Friday" && masaStr === "Shravana" && pakshaStr === "Shukla") {
-        if (tithiNum >= 10 && tithiNum <= 15) {
-            // Check that no closer Friday exists (tithi must be > 3 days from Purnima)
-            // This ensures only the LAST Friday before Purnima triggers
+        // FIXED: Allows Shukla Navami (tithi 9) and Ashtami (tithi 8) when Purnima falls midweek (e.g. Wednesday)
+        if (tithiNum >= 8 && tithiNum <= 15 && (tithiNum + 7.2 > 15)) {
             results.push({id: "varamahalakshmi", name: {en: "Varamahalakshmi Vrata", kn: "ವರಮಹಾಲಕ್ಷ್ಮಿ ವ್ರತ"}, shopping_peak: true});
         }
     }
@@ -2323,24 +2335,26 @@ function generateJathaka() {
             let paksha = tithiIdx < 15 ? "Shukla" : "Krishna";
             let tName = TITHI_EN[tithiIdx % 15];
 
-            // Calculate Exact Nakshatra at birth
-            const exactNakIdx = Math.floor(moonLng / 13.333333);
+            // Calculate Exact Nakshatra at birth (FIXED: exact fractional constants)
+            const NAK_SPAN = 360 / 27;
+            const PADA_SPAN = 360 / 108;
+            const exactNakIdx = Math.floor(moonLng / NAK_SPAN);
             const nakName = NAK_EN[exactNakIdx];
-            const pada = Math.floor((moonLng % 13.333333) / 3.333333) + 1;
+            const pada = Math.min(4, Math.floor((moonLng % NAK_SPAN) / PADA_SPAN) + 1);
 
             // Calculate Exact Rashi
             const exactMoonRashiIdx = Math.floor(moonLng / 30);
             const exactSunRashiIdx = Math.floor(sunLng / 30);
 
             // Calculate Yoga at birth
-            const yogaIdx = Math.floor((sunLng + moonLng) / 13.333333) % 27;
+            const yogaIdx = Math.floor(((sunLng + moonLng) % 360) / NAK_SPAN);
 
             // Calculate Vimshottari Dasha Balance
             const nakLordIdx = exactNakIdx % 9;
             const lordName = NAKSHATRA_LORDS[nakLordIdx];
             const dashaTotalYears = DASHA_YEARS[nakLordIdx];
             
-            const padaFraction = (moonLng % 13.333333) / 13.333333;
+            const padaFraction = (moonLng % NAK_SPAN) / NAK_SPAN;
             const remainingFraction = 1.0 - padaFraction;
             
             const balanceYearsDecimal = remainingFraction * dashaTotalYears;
@@ -2400,12 +2414,15 @@ function generateJathaka() {
             for (let i = 1; i <= 8; i++) {
                 const idx = (firstDashaIdx + i) % 9;
                 const yrs = DASHA_YEARS[idx];
-                const startStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
-                curDate = new Date(d.getTime() + (totalElapsedDays + yrs * 365.25) * 86400000);
-                totalElapsedDays += yrs * 365.25;
-                const endStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
+                                const startDate = new Date(curDate.getTime());
+                const startStr = startDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
+                const endDate = new Date(d.getTime() + (totalElapsedDays + yrs * 365.2425) * 86400000);
+                curDate = endDate;
+                totalElapsedDays += yrs * 365.2425;
+                const endStr = endDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
                 const now = new Date();
-                const isCurrent = (now >= new Date(startStr) && now <= new Date(endStr));
+                // FIXED: Direct timestamp comparison prevents locale string parsing NaN bugs on WebViews
+                const isCurrent = (now >= startDate && now < endDate);
                 dashaTimelineHtml += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;${isCurrent ? 'background:#e8f5e9;' : 'background:#fafafa;'}border-radius:4px;border-left:4px solid ${DASHA_COLORS[idx]};">
                     <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[idx]}${isCurrent ? ' ◀' : ''}</div>
                     <div style="flex:1;font-size:0.8rem;color:#555;">${startStr} → ${endStr}</div>
