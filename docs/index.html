@@ -585,22 +585,58 @@
             <div><label style="font-size:0.7rem;color:var(--text-dim);">From Date</label><input type="date" id="scanFrom" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;"></div>
             <div><label style="font-size:0.7rem;color:var(--text-dim);">To Date</label><input type="date" id="scanTo" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;"></div>
         </div>
-        <div style="margin-bottom:12px;">
-            <label style="font-size:0.7rem;color:var(--text-dim);">Purpose</label>
-            <select id="scanPurpose" style="background:var(--card);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
-                <option value="general">General Auspicious</option>
-                <option value="marriage">Marriage / Engagement</option>
-                <option value="griha_pravesha">Griha Pravesha (Housewarming)</option>
-                <option value="business">Business / Shop Opening</option>
-                <option value="travel">Travel / Journey</option>
-                <option value="vehicle">Vehicle Purchase</option>
-                <option value="education">Education / Study Start</option>
-                <option value="property">Property Registration / Land</option>
-                <option value="upanayana">Upanayana (Thread Ceremony)</option>
-                <option value="mundan">Mundan / Chaula (First Haircut)</option>
-                <option value="namakarana">Namakarana (Naming Ceremony)</option>
-                <option value="gold_silk">Gold & Silk Buying (Suvarna Muhurtha)</option>
-            </select>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div>
+                <label style="font-size:0.7rem;color:var(--text-dim);">Purpose (ಮುಹೂರ್ತ ಉದ್ದೇಶ)</label>
+                <select id="scanPurpose" style="background:var(--card);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
+                    <option value="general">General Auspicious</option>
+                    <option value="marriage">Marriage / Engagement</option>
+                    <option value="griha_pravesha">Griha Pravesha (Housewarming)</option>
+                    <option value="business">Business / Shop Opening</option>
+                    <option value="travel">Travel / Journey</option>
+                    <option value="vehicle">Vehicle Purchase</option>
+                    <option value="education">Education / Study Start</option>
+                    <option value="property">Property Registration / Land</option>
+                    <option value="upanayana">Upanayana (Thread Ceremony)</option>
+                    <option value="mundan">Mundan / Chaula (First Haircut)</option>
+                    <option value="namakarana">Namakarana (Naming Ceremony)</option>
+                    <option value="gold_silk">Gold & Silk Buying (Suvarna Muhurtha)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:0.7rem;color:var(--text-dim);">Filter by Nakshatra (ನಕ್ಷತ್ರ ಆಧಾರಿತ ಶೋಧನೆ)</label>
+                <select id="scanNakshatra" style="background:var(--card);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
+                    <option value="all">✨ Any / All Nakshatras (ಎಲ್ಲಾ)</option>
+                    <option value="auspicious_only">🌟 Shubha Nakshatras Only (ಶುಭ ಮಾತ್ರ)</option>
+                    <option value="0">01. Ashwini (ಅಶ್ವಿನಿ)</option>
+                    <option value="1">02. Bharani (ಭರಣಿ)</option>
+                    <option value="2">03. Krittika (ಕೃತ್ತಿಕಾ)</option>
+                    <option value="3">04. Rohini (ರೋಹಿಣಿ)</option>
+                    <option value="4">05. Mrigashira (ಮೃಗಶಿರ)</option>
+                    <option value="5">06. Ardra (ಆರ್ದ್ರಾ)</option>
+                    <option value="6">07. Punarvasu (ಪುನರ್ವಸು)</option>
+                    <option value="7">08. Pushya (ಪುಷ್ಯ)</option>
+                    <option value="8">09. Ashlesha (ಆಶ್ಲೇಷ)</option>
+                    <option value="9">10. Magha (ಮಘ)</option>
+                    <option value="10">11. Purva Phalguni (ಪೂರ್ವ ಫಲ್ಗುಣಿ)</option>
+                    <option value="11">12. Uttara Phalguni (ಉತ್ತರ ಫಲ್ಗುಣಿ)</option>
+                    <option value="12">13. Hasta (ಹಸ್ತ)</option>
+                    <option value="13">14. Chitra (ಚಿತ್ರಾ)</option>
+                    <option value="14">15. Swati (ಸ್ವಾತಿ)</option>
+                    <option value="15">16. Vishakha (ವಿಶಾಖ)</option>
+                    <option value="16">17. Anuradha (ಅನುರಾಧ)</option>
+                    <option value="17">18. Jyeshtha (ಜ್ಯೇಷ್ಠ)</option>
+                    <option value="18">19. Mula (ಮೂಲ)</option>
+                    <option value="19">20. Purva Ashadha (ಪೂರ್ವಾಷಾಢ)</option>
+                    <option value="20">21. Uttara Ashadha (ಉತ್ತರಾಷಾಢ)</option>
+                    <option value="21">22. Shravana (ಶ್ರವಣ)</option>
+                    <option value="22">23. Dhanishta (ಧನಿಷ್ಠ)</option>
+                    <option value="23">24. Shatabhisha (ಶತಭಿಷ)</option>
+                    <option value="24">25. Purva Bhadrapada (ಪೂರ್ವಾಭಾದ್ರ)</option>
+                    <option value="25">26. Uttara Bhadrapada (ಉತ್ತರಾಭಾದ್ರ)</option>
+                    <option value="26">27. Revati (ರೇವತಿ)</option>
+                </select>
+            </div>
         </div>
         <button class="btn-calc" onclick="scanDates()">🔍 Scan for Auspicious Dates</button>
         <div id="scanLoading" style="display:none;text-align:center;margin-top:12px;color:var(--gold);">⏳ Scanning dates...</div>
@@ -3302,9 +3338,9 @@ function onSelectRashifal(rashiIdx) {
     generateRashifal(validIdx, cachedDailyGrahas, lastPanchanga);
 }
 
-function scoreForNewPurpose(p, purpose) {
+function scoreForNewPurpose(p, purpose, evalNakIdx) {
     let bonus = 0;
-    const nakIdx = p.nakshatra.idx;
+    const nakIdx = (evalNakIdx !== undefined && evalNakIdx !== null) ? evalNakIdx : p.nakshatra.idx;
     const tithiNum = p.tithi.no;
 
     if (purpose === 'property') {
@@ -3339,10 +3375,10 @@ function scoreForNewPurpose(p, purpose) {
 // ============================================================
 
 
-function scoreDayForMuhurtham(p, purpose) {
+function scoreDayForMuhurtham(p, purpose, evalNakIdx) {
     let score = 50;
     const tithiNum = p.tithi.no;
-    const nakIdx = p.nakshatra.idx;
+    const nakIdx = (evalNakIdx !== undefined && evalNakIdx !== null) ? evalNakIdx : p.nakshatra.idx;
     const tInP = tithiNum <= 15 ? tithiNum : tithiNum - 15;
     if ([4,8,9,14].includes(tInP) || tithiNum === 30) score -= 20; // FIXED: check within-paksha for both Shukla/Krishna
     if ([2,3,5,7,10,11,13].includes(tithiNum <= 15 ? tithiNum : tithiNum - 15)) score += 10;
@@ -3359,7 +3395,7 @@ function scoreDayForMuhurtham(p, purpose) {
     const fests = matchFestivals(p);
     if (fests.some(f => f.shopping_peak)) score += 5;
     // Wire in specialized purpose scoring (FIXED: was disconnected)
-    if (typeof scoreForNewPurpose === 'function') score += scoreForNewPurpose(p, purpose);
+    if (typeof scoreForNewPurpose === 'function') score += scoreForNewPurpose(p, purpose, nakIdx);
     return Math.max(0, Math.min(100, score));
 }
 
@@ -3367,6 +3403,7 @@ function scanDates() {
     const fromStr = document.getElementById('scanFrom').value;
     const toStr = document.getElementById('scanTo').value;
     const purpose = document.getElementById('scanPurpose').value;
+    const nakFilter = document.getElementById('scanNakshatra') ? document.getElementById('scanNakshatra').value : 'all';
     if (!fromStr || !toStr) { alert("Please select From and To dates."); return; }
     const from = new Date(fromStr), to = new Date(toStr);
     if (to - from > 365 * 86400000) { alert("Max scan range is 365 days."); return; }
@@ -3377,28 +3414,100 @@ function scanDates() {
     const results = [];
     let cur = new Date(from);
     const CHUNK = 7;
+    let totalDaysScanned = 0;
+
     function scanChunk() {
         let n = 0;
         while (cur <= to && n < CHUNK) {
+            totalDaysScanned++;
             const y = cur.getFullYear(), m = cur.getMonth() + 1, d = cur.getDate();
             const p = computePanchanga(y, m, d, loc.lat, loc.lon, loc.tz);
             if (p) {
-                const score = scoreDayForMuhurtham(p, purpose);
-                const fests = matchFestivals(p);
-                results.push({ date: new Date(cur), score, p, fests });
+                let matchesNak = true;
+                let nakBadge = '';
+                let evalNakIdx = p.nakshatra.idx;
+
+                if (nakFilter === 'auspicious_only') {
+                    matchesNak = GOOD_NAK.includes(p.nakshatra.idx);
+                    if (matchesNak) nakBadge = '✨ ಶುಭ ನಕ್ಷತ್ರ (Auspicious)';
+                } else if (nakFilter !== 'all') {
+                    const targetIdx = parseInt(nakFilter, 10);
+                    const isSunriseNak = (p.nakshatra.idx === targetIdx);
+                    const nextNakIdx = (p.nakshatra.idx + 1) % 27;
+                    const isNextNak = (nextNakIdx === targetIdx);
+
+                    if (isSunriseNak) {
+                        matchesNak = true;
+                        evalNakIdx = targetIdx;
+                        const nakEndTimeStr = p.nakshatra.endJD ? jdToLocalTimeStr(p.nakshatra.endJD, loc.tz) : '';
+                        nakBadge = `⭐ ${NAK_EN[targetIdx]} (${NAK_KN[targetIdx]}) · Ends ${nakEndTimeStr}`;
+                    } else if (isNextNak) {
+                        matchesNak = true;
+                        evalNakIdx = targetIdx;
+                        const nakStartTimeStr = p.nakshatra.endJD ? jdToLocalTimeStr(p.nakshatra.endJD, loc.tz) : '';
+                        nakBadge = `⭐ ${NAK_EN[targetIdx]} (${NAK_KN[targetIdx]}) · Enters ${nakStartTimeStr}`;
+                    } else {
+                        matchesNak = false;
+                    }
+                }
+
+                if (matchesNak) {
+                    const score = scoreDayForMuhurtham(p, purpose, evalNakIdx);
+                    const fests = matchFestivals(p);
+                    results.push({ 
+                        date: new Date(cur), 
+                        score, 
+                        p, 
+                        fests,
+                        nakBadge,
+                        evalNakIdx
+                    });
+                }
             }
             cur.setDate(cur.getDate() + 1);
             n++;
         }
         if (cur <= to) { requestAnimationFrame(scanChunk); return; }
+        
         results.sort((a, b) => b.score - a.score);
-        let html = `<div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:8px;">Scanned ${results.length} days. Top results:</div>`;
+
+        if (results.length === 0) {
+            const nakName = (nakFilter !== 'all' && nakFilter !== 'auspicious_only') 
+                ? (NAK_EN[parseInt(nakFilter, 10)] + ' (' + NAK_KN[parseInt(nakFilter, 10)] + ')') 
+                : 'selected criteria';
+            document.getElementById('scanResults').innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-dim);background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed var(--card-border);">
+                No matching dates found with <strong>${nakName}</strong> between ${fromStr} and ${toStr}. Try expanding the date range.
+            </div>`;
+            document.getElementById('scanLoading').style.display = 'none';
+            return;
+        }
+
+        const filterSummary = (nakFilter !== 'all' && nakFilter !== 'auspicious_only')
+            ? ` filtered for <strong>${NAK_EN[parseInt(nakFilter, 10)]} (${NAK_KN[parseInt(nakFilter, 10)]})</strong>`
+            : (nakFilter === 'auspicious_only' ? ' filtered for <strong>Shubha Nakshatras</strong>' : '');
+
+        let html = `<div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:8px;">
+            Scanned ${totalDaysScanned} days${filterSummary}. Found ${results.length} matching date${results.length > 1 ? 's' : ''} (Top ${Math.min(15, results.length)} shown):
+        </div>`;
+
         results.slice(0, 15).forEach(r => {
             const ds = r.date.toLocaleDateString('en-IN', {weekday:'short',year:'numeric',month:'short',day:'numeric'});
-            const c = r.score >= 70 ? 'var(--green)' : (r.score >= 50 ? 'var(--orange)' : 'var(--red)');
-            const lb = r.score >= 70 ? '✅ Excellent' : (r.score >= 50 ? '🟡 Moderate' : '⚠️ Avoid');
+            const c = r.score >= 70 ? 'var(--green)' : (r.score >= 50 ? 'var(--gold)' : 'var(--red)');
+            const lb = r.score >= 70 ? '✅ Excellent' : (r.score >= 50 ? '🟡 Moderate' : '⚠️ Caution');
             const fs = r.fests.length > 0 ? ` · 🪔 ${r.fests[0].name.en}` : '';
-            html += `<div class="window-row"><div style="min-width:32px;text-align:center;font-weight:700;color:${c};">${r.score}</div><div class="window-name"><div>${ds}${fs}</div><div style="font-size:0.7rem;color:var(--text-dim);">${r.p.tithi.paksha} ${r.p.tithi.name} · ${r.p.nakshatra.name} · ${r.p.yoga.name}${r.p.karana.isVishti ? ' · ⚠️Vishti' : ''}</div></div><div class="window-time" style="color:${c};font-size:0.75rem;">${lb}</div></div>`;
+            const badgeHtml = r.nakBadge ? `<div style="font-size:0.75rem;color:var(--gold);font-weight:600;margin-top:2px;">${r.nakBadge}</div>` : '';
+            
+            html += `<div class="window-row" style="padding:8px 10px;margin-bottom:6px;border-radius:6px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <div style="min-width:36px;text-align:center;font-weight:700;font-size:1rem;color:${c};border:1px solid ${c};border-radius:6px;padding:2px 4px;">${r.score}</div>
+                <div class="window-name" style="flex:1;">
+                    <div style="font-weight:600;color:var(--text);">${ds}${fs}</div>
+                    ${badgeHtml}
+                    <div style="font-size:0.72rem;color:var(--text-dim);margin-top:1px;">
+                        ${r.p.tithi.paksha} ${r.p.tithi.name} · ${r.p.nakshatra.name} (Pada ${r.p.nakshatra.pada}) · ${r.p.yoga.name}${r.p.karana.isVishti ? ' · <span style="color:var(--red);">⚠️Vishti</span>' : ''}
+                    </div>
+                </div>
+                <div class="window-time" style="color:${c};font-size:0.75rem;font-weight:600;white-space:nowrap;">${lb}</div>
+            </div>`;
         });
         document.getElementById('scanResults').innerHTML = html;
         document.getElementById('scanLoading').style.display = 'none';
