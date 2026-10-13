@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1774,6 +1774,18 @@ function renderPanchanga(p) {
         gowriHtml += `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${g.en} <span style="font-family:var(--font-kn);color:var(--gold-light);font-size:0.8rem;">(${g.kn})</span></div><div class="window-time" style="${style}">${fmt(s)} – ${fmt(e)}</div></div>`;
     }
     document.getElementById('gowriList').innerHTML = gowriHtml;
+
+    // --- SUVARNA & PATTU MUHURTHA ---
+    checkSuvarnaMuhurtha(p, dow, cachedHoraData);
+
+    // --- DAILY RASHIFAL (Gochara Transit Analysis) ---
+    cachedDailyGrahas = grahas;
+    const storedRashi = localStorage.getItem('kuberan_moon_rashi');
+    const rashiToUse = (storedRashi !== null && !isNaN(parseInt(storedRashi, 10))) ? parseInt(storedRashi, 10) : 0;
+    generateRashifal(rashiToUse, grahas, p);
+
+    // --- START REAL-TIME COUNTDOWN TIMER ---
+    startLiveNowTimer();
 }
 
 // ============================================================
@@ -2628,78 +2640,428 @@ function startLiveNowTimer() {
 }
 
 // ============================================================
-//  DAILY RASHIFAL (Transit-Based Moon Sign Horoscope)
+//  AUTHORITATIVE VEDIC DAILY RASHIFAL (ದೈನಿಕ ರಾಶಿಫಲ)
+//  Powered by Classical Chandra Gochara, Chandrashtama Detection,
+//  and Complete 9-Graha Vedic Transit Planetary Science
 // ============================================================
-const RASHIFAL_TEXTS = {
-    good: [
-        "Today is highly favourable. Financial gains and career progress are indicated. Important decisions taken today will bear fruit.",
-        "An auspicious day ahead. Relationships improve, and new opportunities may present themselves. Health remains strong.",
-        "Stars align in your favour today. Recognition at work is possible. Family life brings joy and harmony.",
-    ],
-    neutral: [
-        "A mixed day with both opportunities and minor obstacles. Stay patient and avoid impulsive decisions. Routine matters proceed smoothly.",
-        "Average results today. Focus on completing pending tasks rather than starting new ventures. Evening brings relaxation.",
-        "A day of steady progress. No major highs or lows expected. Good for planning and preparation for the week ahead.",
-    ],
-    bad: [
-        "Exercise caution today. Avoid major financial commitments and travel if possible. Health needs attention — rest is important.",
-        "Challenging planetary transits today. Patience is key. Avoid arguments and confrontations. Postpone important decisions.",
-        "A day requiring careful navigation. Unexpected expenses possible. Focus on spiritual practices for inner peace.",
-    ]
+
+// Classical 12 Houses of Chandra Gochara (Moon Transit from Natal Moon Sign)
+const CHANDRA_GOCHARA_DATA = {
+    1: {
+        houseNameEn: "Janma Chandra (Self & Vitality)",
+        houseNameKn: "ಜನ್ಮ ಚಂದ್ರ (ಆತ್ಮವಿಶ್ವಾಸ & ದೇಹಸ್ಥಿತಿ)",
+        quality: "neutral",
+        baseScore: 55,
+        theme: "Physical sensitivity, heightened emotional perception, and routine focus.",
+        careerEn: "Focus on consolidating existing tasks. Avoid impulsive career moves or heated workplace arguments.",
+        careerKn: "ದೈನಂದಿನ ಕೆಲಸಗಳಿಗೆ ಆದ್ಯತೆ ನೀಡಿ; ಆತುರದ ನಿರ್ಧಾರಗಳು ಹಾಗೂ ಸಹೋದ್ಯೋಗಿಗಳೊಂದಿಗೆ ವಾಗ್ವಾದ ಬೇಡ.",
+        financeEn: "Finances remain stable, but personal shopping and lifestyle expenses may rise. Spend mindfully.",
+        financeKn: "ಆರ್ಥಿಕ ಸ್ಥಿತಿ ಸಾಧಾರಣ; ವೈಯಕ್ತಿಕ ಖರ್ಚುಗಳು ಹೆಚ್ಚಾಗುವ ಸಾಧ್ಯತೆ, ಹಿಡಿತವಿರಲಿ.",
+        familyEn: "Heightened emotions. Practice patience with spouse and close relatives to maintain harmony.",
+        familyKn: "ಭಾವನಾತ್ಮಕ ಏರಿಳಿತಗಳಿರಬಹುದು; ಕುಟುಂಬ ಸದಸ್ಯರೊಂದಿಗೆ ಪ್ರೀತಿಯಿಂದ ಸಂಭಾಷಿಸಿ.",
+        healthEn: "Stay well hydrated and ensure peaceful sleep. Avoid overexertion.",
+        healthKn: "ಆರೋಗ್ಯದ ಕಡೆ ಗಮನವಿರಲಿ; ಸಾಕಷ್ಟು ವಿಶ್ರಾಂತಿ ಮತ್ತು ಮಾನಸಿಕ ಶಾಂತಿ ಅಗತ್ಯ.",
+        remedyEn: "Chant 'Om Som Somaya Namaha' and offer water or milk to Lord Shiva.",
+        remedyKn: "ಶಿವನಿಗೆ ಜಲಾಭಿಷೇಕ ಮಾಡಿ ಅಥವಾ 'ಓಂ ನಮಃ ಶಿವಾಯ' 108 ಬಾರಿ ಜಪಿಸಿ."
+    },
+    2: {
+        houseNameEn: "Dhana Chandra (Wealth & Speech)",
+        houseNameKn: "ಧನ ಚಂದ್ರ (ಆರ್ಥಿಕತೆ & ಮಾತು)",
+        quality: "caution",
+        baseScore: 50,
+        theme: "Financial prudence, speech vigilance, and domestic expenditures.",
+        careerEn: "Use diplomatic words in business dialogues. Guard against sharp speech with clients or associates.",
+        careerKn: "ಉದ್ಯೋಗದಲ್ಲಿ ಮಾತಿನ ಮೇಲೆ ಹಿಡಿತವಿರಲಿ; ಸೌಮ್ಯ ವರ್ತನೆಯಿಂದ ಸಮಸ್ಯೆಗಳು ಬಗೆಹರಿಯುತ್ತವೆ.",
+        financeEn: "Unplanned family expenses or domestic purchases may emerge. Postpone speculative investments.",
+        financeKn: "ಅನಿರೀಕ್ಷಿತ ಕುಟುಂಬ ಖರ್ಚುಗಳು ಎದುರಾಗಬಹುದು; ಷೇರು ಮಾರುಕಟ್ಟೆ ಹಾಗೂ ಸಾಲದಿಂದ ದೂರವಿರಿ.",
+        familyEn: "Matters regarding family assets or relatives come to the forefront. Listen patiently.",
+        familyKn: "ಕುಟುಂಬದ ಹಿರಿಯರೊಂದಿಗೆ ಸಮಾಲೋಚನೆ ನಡೆಸಿ; ಅನಗತ್ಯ ವಾದ-ವಿವಾದಗಳಿಂದ ದೂರವಿರಿ.",
+        healthEn: "Pay attention to throat, teeth, or facial health. Avoid excessive spicy or oily foods.",
+        healthKn: "ಆಹಾರ ನಿಯಮ ಪಾಲಿಸಿ; ಗಂಟಲು ಹಾಗೂ ಕಣ್ಣಿನ ಆರೈಕೆ ಅಗತ್ಯ.",
+        remedyEn: "Pray to Goddess Mahalakshmi and speak truthful, sweet words.",
+        remedyKn: "ಮಹಾಲಕ್ಷ್ಮಿ ಪ್ರಾರ್ಥನೆ ಮಾಡಿ; ಸತ್ಯ ಹಾಗೂ ಮಧುರ ಮಾತುಗಳನ್ನಾಡಿ."
+    },
+    3: {
+        houseNameEn: "Bhratri / Vikrama Chandra (Courage & Success)",
+        houseNameKn: "ತೃತೀಯ ಚಂದ್ರ (ಧೈರ್ಯ, ಉತ್ಸಾಹ & ಜಯ)",
+        quality: "best",
+        baseScore: 90,
+        theme: "High energy, victory over obstacles, sibling support, and profitable initiatives.",
+        careerEn: "Highly productive day for presentations, new proposals, and client outreach. Courage yields success.",
+        careerKn: "ಹೊಸ ಪ್ರಯತ್ನಗಳಿಗೆ ಯಶಸ್ಸು; ಸಹೋದ್ಯೋಗಿಗಳು ಹಾಗೂ ಸಹೋದರರ ಸಹಕಾರ ಲಭ್ಯ.",
+        financeEn: "Favourable financial momentum. Gains from trade, short journeys, or commission are indicated.",
+        financeKn: "ವ್ಯಾಪಾರದಲ್ಲಿ ಲಾಭ; ಆರ್ಥಿಕ ಪ್ರಗತಿಗೆ ಹೊಸ ಮಾರ್ಗಗಳು ಗೋಚರಿಸುತ್ತವೆ.",
+        familyEn: "Warm bonds with siblings, neighbors, and close friends. Short pleasant travels bring joy.",
+        familyKn: "ಸಹೋದರ-ಸಹೋದರಿಯರ ಪ್ರೀತಿ-ವಿಶ್ವಾಸ ಹೆಚ್ಚುತ್ತದೆ; ಕಿರುಪ್ರಯಾಣ ಯಶಸ್ವಿ.",
+        healthEn: "High stamina and cheerful vitality. Excellent day for physical activity and sports.",
+        healthKn: "ಉತ್ತಮ ಶಕ್ತಿ ಮತ್ತು ಉತ್ಸಾಹ; ಮನಸ್ಸು ಉಲ್ಲಾಸದಿಂದ ಕೂಡಿರುತ್ತದೆ.",
+        remedyEn: "Chant the Hanuman Chalisa or worship Lord Kartikeya / Subrahmanya.",
+        remedyKn: "ಹನುಮಾನ್ ಚಾಲೀಸಾ ಪಠಿಸಿ ಅಥವಾ ಸುಬ್ರಹ್ಮಣ್ಯ ಸ್ವಾಮಿ ಪ್ರಾರ್ಥನೆ ಮಾಡಿ."
+    },
+    4: {
+        houseNameEn: "Sukha Chandra (Ardhashtama - Domestic Calm)",
+        houseNameKn: "ಅರ್ಧಾಷ್ಟಮ ಚಂದ್ರ (ಮನಃಶಾಂತಿ & ಗೃಹ ಕ್ಷೇಮ)",
+        quality: "caution",
+        baseScore: 42,
+        theme: "Domestic commitments, peace of mind sought, and vehicle care.",
+        careerEn: "Focus on steady, patient execution. Avoid clashes with senior colleagues; balance work with home.",
+        careerKn: "ಕೆಲಸದಲ್ಲಿ ತಾಳ್ಮೆ ಅಗತ್ಯ; ಹಿರಿಯ ಅಧಿಕಾರಿಗಳೊಂದಿಗೆ ವಾಗ್ವಾದ ತಪ್ಪಿಸಿ.",
+        financeEn: "Expenses on property, home maintenance, or vehicle repairs. Avoid lending money today.",
+        financeKn: "ವಾಹನ ಅಥವಾ ಮನೆ ರಿಪೇರಿ ಖರ್ಚುಗಳು ಸಂಭವನೀಯ; ಸಾಲ ಕೊಡುವುದು ಬೇಡ.",
+        familyEn: "Mother's health or domestic welfare requires care. Create a soothing atmosphere at home.",
+        familyKn: "ತಾಯಿಯ ಆರೋಗ್ಯದ ಕಡೆ ಗಮನವಿರಲಿ; ಗೃಹ ಸೌಹಾರ್ದತೆ ಕಾಪಾಡಿಕೊಳ್ಳಿ.",
+        healthEn: "Emotional stress or digestive sluggishness. Practice pranayama and ensure peaceful sleep.",
+        healthKn: "ಎದೆ ಅಥವಾ ಜೀರ್ಣಾಂಗ ಸಂಬಂಧಿ ತೊಂದರೆಗಳಿದ್ದರೆ ವಿಶ್ರಾಂತಿ ತೆಗೆದುಕೊಳ್ಳಿ.",
+        remedyEn: "Worship Goddess Durga / Parvati or light a ghee lamp at home in the evening.",
+        remedyKn: "ಶ್ರೀ ದುರ್ಗಾ ಸ್ತೋತ್ರ ಪಠಿಸಿ; ಸಂಜೆ ತುಪ್ಪದ ದೀಪ ಹಚ್ಚಿ."
+    },
+    5: {
+        houseNameEn: "Putra / Buddhi Chandra (Intellect & Wisdom)",
+        houseNameKn: "ಪಂಚಮ ಚಂದ್ರ (ಬುದ್ಧಿವಂತಿಕೆ & ಅಧ್ಯಯನ)",
+        quality: "neutral",
+        baseScore: 58,
+        theme: "Intellectual clarity, creative insights, children's matters, and spiritual study.",
+        careerEn: "Great day for research, learning, and creative problem-solving. Avoid risky speculative bets.",
+        careerKn: "ಸೃಜನಶೀಲ ಚಿಂತನೆಗಳಿಗೆ ಪ್ರಶಂಸೆ; ಹೊಸ ವಿದ್ಯೆ ಅಥವಾ ಕಲೆ ಕಲಿಯಲು ಉತ್ತಮ.",
+        financeEn: "Steady finances, but strictly avoid speculative trading or gambling. Plan long-term budgets.",
+        financeKn: "ಆರ್ಥಿಕ ಉಳಿತಾಯಕ್ಕೆ ಯೋಜನೆ ರೂಪಿಸಿ; ಲಾಟರಿ, ಷೇರುಗಳಿಂದ ದೂರವಿರಿ.",
+        familyEn: "Joy through children or good news from students/youngsters. Romantic warmth is pleasant.",
+        familyKn: "ಮಕ್ಕಳ ಪ್ರಗತಿಯಿಂದ ಸಂತೋಷ; ಪ್ರೇಮ ಜೀವನದಲ್ಲಿ ಪ್ರಶಾಂತತೆ.",
+        healthEn: "Good overall mental sharpness. Stay grounded through meditation and balanced meals.",
+        healthKn: "ಬುದ್ಧಿ ಚುರುಕಾಗಿರುತ್ತದೆ; ಧ್ಯಾನದಿಂದ ಮಾನಸಿಕ ಶಾಂತಿ ಪಡೆಯಿರಿ.",
+        remedyEn: "Chant the Gayatri Mantra or worship Lord Dakshinamurthy / Saraswati.",
+        remedyKn: "ಗಾಯತ್ರಿ ಮಂತ್ರ ಜಪಿಸಿ ಅಥವಾ ದಕ್ಷಿಣಾಮೂರ್ತಿ ಪ್ರಾರ್ಥನೆ ಮಾಡಿ."
+    },
+    6: {
+        houseNameEn: "Shatru Jaya Chandra (Triumph over Obstacles)",
+        houseNameKn: "ಶತ್ರು ಜಯ ಚಂದ್ರ (ವಿಜಯ & ಶ್ರಮಫಲ)",
+        quality: "best",
+        baseScore: 88,
+        theme: "Overcoming competition, health recovery, debt relief, and work triumph.",
+        careerEn: "Superb day for clearing backlogs, resolving disputes, and outperforming competitors.",
+        careerKn: "ವಿರೋಧಿಗಳ ಮೇಲೆ ಜಯ; ಬಾಕಿ ಉಳಿದ ಕಠಿಣ ಕೆಲಸಗಳು ಸುಲಭವಾಗಿ ಪೂರ್ಣಗೊಳ್ಳುತ್ತವೆ.",
+        financeEn: "Relief from debt pressures; unexpected gains through hard work and recovery of dues.",
+        financeKn: "ಹಣಕಾಸಿನ ಹರಿವು ಸುಗಮ; ಬರಬೇಕಾದ ಹಣ ಕೈಸೇರುವ ಸಂಭವ.",
+        familyEn: "Support from maternal relatives and peers. Your helpful nature earns genuine respect.",
+        familyKn: "ಸಂಬಂಧಿಕರ ಸಹಾಯ ಲಭ್ಯ; ಸಮಾಜದಲ್ಲಿ ನಿಮ್ಮ ಗೌರವ ಹೆಚ್ಚುತ್ತದೆ.",
+        healthEn: "Physical vitality rebounds. Favourable period for recovery from chronic ailments.",
+        healthKn: "ಆರೋಗ್ಯದಲ್ಲಿ ಗಮನಾರ್ಹ ಸುಧಾರಣೆ; ರೋಗ ನಿರೋಧಕ ಶಕ್ತಿ ಹೆಚ್ಚಳ.",
+        remedyEn: "Chant Lord Subrahmanya Ashtakam or Narasimha Karavalamba Stotram.",
+        remedyKn: "ಶ್ರೀ ಸುಬ್ರಹ್ಮಣ್ಯ ಅಷ್ಟಕಂ ಅಥವಾ ನರಸಿಂಹ ಸ್ತೋತ್ರ ಪಠಿಸಿ."
+    },
+    7: {
+        houseNameEn: "Kalatra Chandra (Partnership & Social Joy)",
+        houseNameKn: "ಸಪ್ತಮ ಚಂದ್ರ (ಸೌಹಾರ್ದ & ಸಾರ್ವಜನಿಕ ಯಶಸ್ಸು)",
+        quality: "good",
+        baseScore: 82,
+        theme: "Partnership harmony, social popularity, pleasant travels, and mutual affection.",
+        careerEn: "Excellent for partnership agreements, public relations, trade deals, and collaborative projects.",
+        careerKn: "ವ್ಯಾಪಾರ ಪಾಲುದಾರಿಕೆಯಲ್ಲಿ ಉತ್ತಮ ಲಾಭ; ಸಾರ್ವಜನಿಕ ಸಂಪರ್ಕಗಳು ಫಲಪ್ರದ.",
+        financeEn: "Profits through commercial ventures, spouse, or business partners. Pleasant shopping likely.",
+        financeKn: "ವಾಣಿಜ್ಯ ವ್ಯವಹಾರಗಳಲ್ಲಿ ಲಾಭ; ನವವಸ್ತ್ರ ಹಾಗೂ ಸಂತೋಷದಾಯಕ ವೆಚ್ಚಗಳು.",
+        familyEn: "Marital harmony blossoms. Joyful quality time with spouse and pleasant family gatherings.",
+        familyKn: "ದಾಂಪತ್ಯ ಜೀವನದಲ್ಲಿ ಮಧುರತೆ; ಸಂಗಾತಿಯೊಂದಿಗೆ ಸಂತೋಷದ ಕ್ಷಣಗಳು.",
+        healthEn: "Fresh and vibrant energy. Enjoy wholesome meals during outings.",
+        healthKn: "ಉತ್ತಮ ಆರೋಗ್ಯ; ಹೊರಗಿನ ಆಹಾರ ಸೇವನೆಯಲ್ಲಿ ಮಿತಿಯಿರಲಿ.",
+        remedyEn: "Worship Lord Venkateshwara and Goddess Mahalakshmi.",
+        remedyKn: "ಶ್ರೀ ಲಕ್ಷ್ಮೀ ವೆಂಕಟೇಶ್ವರ ಸ್ವಾಮಿಯ ಧ್ಯಾನ ಮಾಡಿ."
+    },
+    8: {
+        houseNameEn: "Ashtama Chandra / CHANDRASHTAMA (Day of Caution)",
+        houseNameKn: "ಚಂದ್ರಾಷ್ಟಮ (ಅಷ್ಟಮ ಚಂದ್ರ - ಎಚ್ಚರಿಕೆ ದಿನ)",
+        quality: "warning",
+        baseScore: 22,
+        theme: "CHANDRASHTAMA — Day requiring utmost vigilance, calm mind, and avoidance of risks.",
+        careerEn: "Postpone signing major agreements, job switches, or sensitive confrontations. Stick strictly to routine duties.",
+        careerKn: "ಹೊಸ ಕೆಲಸಗಳನ್ನು ಆರಂಭಿಸಬೇಡಿ; ಪ್ರಮುಖ ಒಪ್ಪಂದಗಳಿಗೆ ಸಹಿ ಹಾಕುವುದನ್ನು ಮುಂದೂಡಿ.",
+        financeEn: "High risk of unexpected expenditure, lost items, or monetary disputes. Guard your wallet.",
+        financeKn: "ಅನಗತ್ಯ ಖರ್ಚುಗಳು ಹಾಗೂ ನಷ್ಟದ ಸಂಭವ; ಹಣದ ವಹಿವಾಟಿನಲ್ಲಿ ಎಚ್ಚರ.",
+        familyEn: "Tempers may flare easily. Practice silence and patience; avoid arguments with family members.",
+        familyKn: "ಮನಸ್ತಾಪಗಳು ಉಂಟಾಗಬಹುದು; ಮೌನ ಮತ್ತು ಸಂಯಮ ಕಾಪಾಡಿಕೊಳ್ಳಿ.",
+        healthEn: "Mental anxiety, fatigue, headaches, or body aches. Drive carefully; avoid late night travel.",
+        healthKn: "ಮಾನಸಿಕ ಆತಂಕ, ಶ್ರಮ; ವಾಹನ ಚಾಲನೆಯಲ್ಲಿ ಅತ್ಯಂತ ಜಾಗರೂಕರಾಗಿರಿ.",
+        remedyEn: "Offer milk or water to Lord Shiva, chant 'Om Namah Shivaya', and feed birds or animals.",
+        remedyKn: "ಶಿವನಿಗೆ ಕ್ಷೀರಾಭಿಷೇಕ ಮಾಡಿ, 'ಓಂ ನಮಃ ಶಿವಾಯ' 108 ಬಾರಿ ಜಪಿಸಿ; ಪ್ರಾಣಿ-ಪಕ್ಷಿಗಳಿಗೆ ಆಹಾರ ನೀಡಿ."
+    },
+    9: {
+        houseNameEn: "Bhagya Chandra (Dharma & Guidance)",
+        houseNameKn: "ಭಾಗ್ಯ ಚಂದ್ರ (ಧರ್ಮ & ಹಿರಿಯರ ಆಶೀರ್ವಾದ)",
+        quality: "neutral",
+        baseScore: 62,
+        theme: "Spiritual inclinations, temple visits, philosophical wisdom, and mentorship.",
+        careerEn: "Work progresses through ethical discipline and guidance of experienced mentors. Travel may bring learning.",
+        careerKn: "ಗುರು-ಹಿರಿಯರ ಮಾರ್ಗದರ್ಶನದಿಂದ ಕಾರ್ಯಸಿದ್ಧಿ; ಧಾರ್ಮಿಕ ಚಿಂತನೆಗಳು.",
+        financeEn: "Expenses on charitable, spiritual, or family travel matters. Long-term investments are favoured.",
+        financeKn: "ಧರ್ಮ ಕಾರ್ಯಗಳಿಗೆ ಖರ್ಚು; ದೀರ್ಘಾವಧಿ ಯೋಜನೆಗಳಿಗೆ ಶುಭ.",
+        familyEn: "Respectful bonding with father, preceptors, and elders. Visiting a temple brings deep peace.",
+        familyKn: "ತಂದೆ ಮತ್ತು ಹಿರಿಯರ ಆಶೀರ್ವಾದ ಪಡೆಯಿರಿ; ದೇವಸ್ಥಾನ ಭೇಟಿ ಶಾಂತಿ ನೀಡುತ್ತದೆ.",
+        healthEn: "Spiritual peace calms the nervous system. Guard against travel fatigue.",
+        healthKn: "ಮನಸ್ಸಿಗೆ ಆಧ್ಯಾತ್ಮಿಕ ನೆಮ್ಮದಿ; ಪ್ರಯಾಣದ ಶ್ರಮ ನಿವಾರಿಸಿಕೊಳ್ಳಿ.",
+        remedyEn: "Offer prayers to your Kula Devata (family deity) and chant Vishnu Sahasranama.",
+        remedyKn: "ಕುಲದೇವತೆಯ ಸ್ಮರಣೆ ಮಾಡಿ; ಶ್ರೀ ವಿಷ್ಣು ಸಹಸ್ರನಾಮ ಪಠಿಸಿ."
+    },
+    10: {
+        houseNameEn: "Karma Chandra (Career Honour & Status)",
+        houseNameKn: "ಕರ್ಮ ಚಂದ್ರ (ಕಾರ್ಯಸಿದ್ಧಿ & ಕೀರ್ತಿ)",
+        quality: "best",
+        baseScore: 90,
+        theme: "Professional status, career accomplishments, respect from superiors, and leadership.",
+        careerEn: "Outstanding career momentum! Recognition from superiors, accomplishment of pending tasks, and leadership success.",
+        careerKn: "ಉದ್ಯೋಗದಲ್ಲಿ ಅಧಿಕಾರ, ಕೀರ್ತಿ ಮತ್ತು ಯಶಸ್ಸು; ಮೇಲಧಿಕಾರಿಗಳ ಪ್ರಶಂಸೆ.",
+        financeEn: "Sound financial rewards and professional perks. Trade investments yield productive returns.",
+        financeKn: "ವೃತ್ತಿಪರ ಲಾಭಗಳು; ಆರ್ಥಿಕ ಬೆಳವಣಿಗೆಗೆ ಅನುಕೂಲಕರ ವಾತಾವರಣ.",
+        familyEn: "Father and family take pride in your achievements. Favourable social interactions.",
+        familyKn: "ಕುಟುಂಬದಲ್ಲಿ ನಿಮ್ಮ ಸಾಧನೆಗೆ ಮನ್ನಣೆ; ಸಮಾಜದಲ್ಲಿ ಗೌರವ.",
+        healthEn: "Dynamic vitality. Take mindful breaks to avoid overworking.",
+        healthKn: "ಉತ್ತಮ ಶಕ್ತಿ ಮತ್ತು ಚೈತನ್ಯ; ಕೆಲಸದ ನಡುವೆ ಸಣ್ಣ ವಿರಾಮ ತೆಗೆದುಕೊಳ್ಳಿ.",
+        remedyEn: "Offer Surya Arghya in the morning with a copper vessel and chant the Gayatri Mantra.",
+        remedyKn: "ಸೂರ್ಯ ದೇವರಿಗೆ ಅರ್ಘ್ಯ ನೀಡಿ, 'ಓಂ ಸೂರ್ಯಾಯ ನಮಃ' ಜಪಿಸಿ."
+    },
+    11: {
+        houseNameEn: "Labha Chandra (Abundance & Gains)",
+        houseNameKn: "ಲಾಭ ಚಂದ್ರ (ಸರ್ವ ಲಾಭ & ಸಂತೋಷ)",
+        quality: "best",
+        baseScore: 96,
+        theme: "Maximum gains, fulfillment of desires, celebration with friends, and financial influx.",
+        careerEn: "Day of fulfillment! Great support from colleagues, network contacts, and superiors. Deals close profitably.",
+        careerKn: "ಇಷ್ಟಾರ್ಥ ಸಿದ್ಧಿ; ಉದ್ಯೋಗ ಹಾಗೂ ವ್ಯಾಪಾರದಲ್ಲಿ ಅನಿರೀಕ್ಷಿತ ಯಶಸ್ಸು.",
+        financeEn: "Excellent inflow of wealth, recovery of dues, bonus or profits. Highly auspicious for gold/luxury shopping.",
+        financeKn: "ಉತ್ತಮ ಧನಾಗಮನ; ಆಸ್ತಿ, ಬಂಗಾರ ಅಥವಾ ಒಡವೆ ಖರೀದಿಗೆ ಅತ್ಯಂತ ಪ್ರಶಸ್ತ.",
+        familyEn: "Celebration with elder siblings, children, and close friends. Warmth and happiness everywhere.",
+        familyKn: "ಸ್ನೇಹಿತರು ಮತ್ತು ಹಿರಿಯರ ಭೇಟಿಯಿಂದ ಸಂತೋಷ; ಗೃಹದಲ್ಲಿ ಸಂಭ್ರಮ.",
+        healthEn: "Peak health and joyful spirits. Heart feels light and optimistic.",
+        healthKn: "ಆರೋಗ್ಯ ಅತ್ಯುತ್ತಮವಾಗಿರುತ್ತದೆ; ಮನಸ್ಸು ಪ್ರಫುಲ್ಲವಾಗಿರುತ್ತದೆ.",
+        remedyEn: "Worship Goddess Mahalakshmi and Lord Kubera with lotus or white flowers.",
+        remedyKn: "ಶ್ರೀ ಮಹಾಲಕ್ಷ್ಮಿ ಮತ್ತು ಕುಬೇರ ದೇವರ ಪೂಜೆ ಮಾಡಿ."
+    },
+    12: {
+        houseNameEn: "Vyaya Chandra (Expenditure & Solitude)",
+        houseNameKn: "ವ್ಯಯ ಚಂದ್ರ (ಖರ್ಚು ನಿಯಂತ್ರಣ & ಧ್ಯಾನ)",
+        quality: "caution",
+        baseScore: 40,
+        theme: "Unplanned expenditures, need for quiet contemplation, and sufficient sleep.",
+        careerEn: "Work quietly behind the scenes. Avoid getting involved in office politics or unsolicited disputes.",
+        careerKn: "ಶಾಂತವಾಗಿ ನಿಮ್ಮ ಕರ್ತವ್ಯ ನಿರ್ವಹಿಸಿ; ಅನ್ಯರ ವಿವಾದಗಳಲ್ಲಿ ಭಾಗಿಯಾಗಬೇಡಿ.",
+        financeEn: "Heavy drain on finances due to unplanned shopping, travel tickets, or medical bills. Avoid loans.",
+        financeKn: "ಅಧಿಕ ಧನವ್ಯಯ ಸಂಭವ; ಆನ್‌ಲೈನ್ ಶಾಪಿಂಗ್ ಹಾಗೂ ದುಂದುವೆಚ್ಚ ನಿಯಂತ್ರಿಸಿ.",
+        familyEn: "Desire for solitude or quiet time. Attend to distant relatives or foreign matters calmly.",
+        familyKn: "ಏಕಾಂತ ಬಯಸುವಿರಿ; ದೂರದ ಊರಿನ ಬಂಧುಗಳೊಂದಿಗೆ ಸಂಭಾಷಣೆ.",
+        healthEn: "Disturbed sleep or eye strain. Disconnect from screens early and meditate before bed.",
+        healthKn: "ಕಣ್ಣಿನ ಆಯಾಸ ಮತ್ತು ನಿದ್ರಾಹೀನತೆ; ರಾತ್ರಿ ಬೇಗ ಮಲಗಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ.",
+        remedyEn: "Donate food or clothes to the needy and chant 'Om Namo Narayanaya'.",
+        remedyKn: "ಬಡವರಿಗೆ ಅನ್ನದಾನ ಮಾಡಿ; ಶ್ರೀ ಕೃಷ್ಣ ಅಥವಾ ನಾರಾಯಣ ನಾಮಸ್ಮರಣೆ ಮಾಡಿ."
+    }
 };
 
-function generateRashifal(moonRashiIdx, dayGrahas) {
-    if (moonRashiIdx === undefined || moonRashiIdx === null) return;
-    cachedDailyGrahas = dayGrahas;
+// Classical Sign Correspondences (Lords, Colours, Digbala, Auspicious Horas)
+const RASHI_ASTRO_PROPS = [
+    { lord: "Mars (Kuja)", lordKn: "ಕುಜ", element: "Fire", colour: "Red, Coral & Saffron (ಕೆಂಪು & ಕೇಸರಿ)", number: "9, 1", dir: "East (ಪೂರ್ವ)", favHoras: ["Mars","Sun","Jupiter"] },
+    { lord: "Venus (Shukra)", lordKn: "ಶುಕ್ರ", element: "Earth", colour: "White, Cream & Silver (ಬಿಳಿ & ಬೆಳ್ಳಿ)", number: "6, 5", dir: "South-East (ಆಗ್ನೇಯ)", favHoras: ["Venus","Mercury","Saturn"] },
+    { lord: "Mercury (Budha)", lordKn: "ಬುಧ", element: "Air", colour: "Emerald Green (ಹಸಿರು)", number: "5, 3", dir: "North (ಉತ್ತರ)", favHoras: ["Mercury","Venus"] },
+    { lord: "Moon (Chandra)", lordKn: "ಚಂದ್ರ", element: "Water", colour: "Milky White & Pearl (ಮುತ್ತಿನ ಬಿಳಿ)", number: "2, 7", dir: "North-West (ವಾಯುವ್ಯ)", favHoras: ["Moon","Jupiter"] },
+    { lord: "Sun (Surya)", lordKn: "ಸೂರ್ಯ", element: "Fire", colour: "Gold, Orange & Ruby Red (ಚಿನ್ನ & ಕಿತ್ತಳೆ)", number: "1, 3", dir: "East (ಪೂರ್ವ)", favHoras: ["Sun","Jupiter","Mars"] },
+    { lord: "Mercury (Budha)", lordKn: "ಬುಧ", element: "Earth", colour: "Dark Green & Khaki (ಗಾಢ ಹಸಿರು)", number: "5, 6", dir: "North (ಉತ್ತರ)", favHoras: ["Mercury","Venus"] },
+    { lord: "Venus (Shukra)", lordKn: "ಶುಕ್ರ", element: "Air", colour: "Rose Pink & Sky Blue (ಗುಲಾಬಿ & ಆಕಾಶ ನೀಲಿ)", number: "6, 7", dir: "West (ಪಶ್ಚಿಮ)", favHoras: ["Venus","Saturn","Mercury"] },
+    { lord: "Mars (Kuja)", lordKn: "ಕುಜ", element: "Water", colour: "Maroon & Deep Red (ಮೆರೂನ್ & ಕಡುಗೆಂಪು)", number: "9, 2", dir: "North (ಉತ್ತರ)", favHoras: ["Mars","Sun","Moon"] },
+    { lord: "Jupiter (Guru)", lordKn: "ಗುರು", element: "Fire", colour: "Golden Yellow & Saffron (ಹಳದಿ & ಕೇಸರಿ)", number: "3, 9", dir: "North-East (ಈಶಾನ್ಯ)", favHoras: ["Jupiter","Sun","Mars"] },
+    { lord: "Saturn (Shani)", lordKn: "ಶನಿ", element: "Earth", colour: "Navy Blue & Charcoal (ನೀಲಿ & ಕಪ್ಪು)", number: "8, 4", dir: "South (ದಕ್ಷಿಣ)", favHoras: ["Saturn","Venus","Mercury"] },
+    { lord: "Saturn (Shani)", lordKn: "ಶನಿ", element: "Air", colour: "Electric Blue & Purple (ನೀಲಿ & ನೇರಳೆ)", number: "8, 7", dir: "West (ಪಶ್ಚಿಮ)", favHoras: ["Saturn","Mercury","Venus"] },
+    { lord: "Jupiter (Guru)", lordKn: "ಗುರು", element: "Water", colour: "Yellow & Sea Green (ಹಳದಿ & ಹಸಿರು)", number: "3, 2", dir: "North-East (ಈಶಾನ್ಯ)", favHoras: ["Jupiter","Moon","Mars"] }
+];
+
+function generateRashifal(moonRashiIdx, dayGrahas, p) {
+    if (moonRashiIdx === undefined || moonRashiIdx === null || isNaN(moonRashiIdx)) {
+        const storedRashi = typeof localStorage !== 'undefined' ? localStorage.getItem('kuberan_moon_rashi') : null;
+        moonRashiIdx = (storedRashi !== null && !isNaN(parseInt(storedRashi, 10))) ? parseInt(storedRashi, 10) : 0;
+    }
+    moonRashiIdx = ((parseInt(moonRashiIdx, 10) % 12) + 12) % 12;
     const card = document.getElementById('rashifalCard');
     if (!card) return;
 
     const select = document.getElementById('rashifalSelect');
     if (select) select.value = moonRashiIdx;
 
-    let score = 0;
-    const FAVOURABLE = {
-        0: [3,6,10,11], 1: [1,3,6,7,10,11], 2: [3,6,11], 3: [2,4,6,8,10,11],
-        4: [2,5,7,9,11], 5: [1,2,3,4,5,8,9,11,12], 6: [3,6,11]
+    if (!dayGrahas && window.cachedDailyGrahas) dayGrahas = window.cachedDailyGrahas;
+    if (!dayGrahas && window.lastPanchanga) dayGrahas = getAllGrahaPositions(window.lastPanchanga.sunrise);
+    if (!dayGrahas) return;
+    cachedDailyGrahas = dayGrahas;
+
+    if (!p && window.lastPanchanga) p = window.lastPanchanga;
+
+    // 1. Identify Transit Moon & Chandra Gochara House
+    const moonGraha = dayGrahas.find(g => g.name === 'Moon') || dayGrahas[1];
+    const moonHouse = ((moonGraha.rashiIdx - moonRashiIdx + 12) % 12) + 1;
+    const isChandrashtama = (moonHouse === 8);
+    const isArdhashtama = (moonHouse === 4);
+    const chandraInfo = CHANDRA_GOCHARA_DATA[moonHouse];
+
+    // 2. Classical Gochara Favourability for All 9 Planets
+    const GOCHARA_FAV = {
+        'Sun': [3,6,10,11], 'Moon': [1,3,6,7,10,11], 'Mars': [3,6,11],
+        'Mercury': [2,4,6,8,10,11], 'Jupiter': [2,5,7,9,11],
+        'Venus': [1,2,3,4,5,8,9,11,12], 'Saturn': [3,6,11],
+        'Rahu': [3,6,10,11], 'Ketu': [3,6,9,11]
     };
-    const details = [];
-    if (dayGrahas) {
-        dayGrahas.slice(0, 7).forEach((g, i) => {
-            const house = ((g.rashiIdx - moonRashiIdx + 12) % 12) + 1;
-            const isFav = FAVOURABLE[i] && FAVOURABLE[i].includes(house);
-            if (isFav) score++;
-            if (g.name === 'Jupiter') {
-                details.push(isFav ? '✨ Guru Bala: Auspicious Jupiter transit in House ' + house : '⚪ Jupiter in House ' + house);
-            } else if (g.name === 'Saturn') {
-                if ([12, 1, 2].includes(house)) details.push('⚠️ Shani Sade Sati active (House ' + house + ') — perform Hanuman Chalisa');
-                else if (house === 4) details.push('⚠️ Ardhashtama Shani (House 4) — avoid risky speculation');
-                else if (house === 8) details.push('⚠️ Ashtama Shani (House 8) — drive carefully, pray to Lord Shiva');
-                else if (isFav) details.push('🛡️ Favourable Saturn transit in House ' + house);
+
+    let favPlanetCount = 0;
+    const badges = [];
+
+    dayGrahas.forEach(g => {
+        const house = ((g.rashiIdx - moonRashiIdx + 12) % 12) + 1;
+        const isFav = GOCHARA_FAV[g.name] && GOCHARA_FAV[g.name].includes(house);
+        if (isFav) favPlanetCount++;
+
+        // Specialized Vedic Badges
+        if (g.name === 'Jupiter') {
+            if ([2, 5, 7, 9, 11].includes(house)) {
+                badges.push({ text: '✨ ಗುರು ಬಲ (Guru Bala Active)', type: 'best', desc: 'Jupiter in House ' + house + ' grants fortune and wisdom.' });
+            } else if ([6, 8, 12].includes(house)) {
+                badges.push({ text: '⚪ ಗುರು ಪ್ರಾರ್ಥನೆ (Jupiter in House ' + house + ')', type: 'info', desc: 'Chant Guru Stotra for smooth progress.' });
             }
+        } else if (g.name === 'Saturn') {
+            if (house === 12) {
+                badges.push({ text: '⚠️ ಏಳರೆ ಶನಿ - ಆದ್ಯ ಹಂತ (Sade Sati Phase 1)', type: 'warn', desc: 'Saturn in 12th House — manage expenses and sleep.' });
+            } else if (house === 1) {
+                badges.push({ text: '⚠️ ಏಳರೆ ಶನಿ - ಜನ್ಮ ಶನಿ (Sade Sati Peak)', type: 'warn', desc: 'Saturn in Janma Rashi — maintain calm and patience.' });
+            } else if (house === 2) {
+                badges.push({ text: '⚠️ ಏಳರೆ ಶನಿ - ಅಂತ್ಯ ಹಂತ (Sade Sati Phase 3)', type: 'warn', desc: 'Saturn in 2nd House — guard speech and family wealth.' });
+            } else if (house === 4) {
+                badges.push({ text: '⚠️ ಅರ್ಧಾಷ್ಟಮ ಶನಿ (Ardhashtama Shani)', type: 'warn', desc: 'Saturn in 4th House — prioritize domestic peace.' });
+            } else if (house === 8) {
+                badges.push({ text: '⚠️ ಅಷ್ಟಮ ಶನಿ (Ashtama Shani)', type: 'warn', desc: 'Saturn in 8th House — caution in travel; pray to Hanuman.' });
+            } else if (isFav) {
+                badges.push({ text: '🛡️ ಶುಭ ಶನಿ (Saturn Favourable - House ' + house + ')', type: 'good', desc: 'Saturn provides steady victory and stamina.' });
+            }
+        } else if (g.name === 'Sun' && isFav) {
+            badges.push({ text: '☀️ ಸೂರ್ಯ ಬಲ (Sun in House ' + house + ')', type: 'good', desc: 'Vitality, authority, and government favour.' });
+        } else if (g.name === 'Mars' && isFav) {
+            badges.push({ text: '🔥 ಮಂಗಳ ಬಲ (Mars in House ' + house + ')', type: 'good', desc: 'Courage, technical triumph, and bold energy.' });
+        } else if (g.name === 'Rahu' && isFav) {
+            badges.push({ text: '⚡ ರಾಹು ಅನುಕೂಲ (Rahu in House ' + house + ')', type: 'good', desc: 'Out-of-the-box success and strategic gains.' });
+        }
+    });
+
+    // 3. Mathematical Integrated Rating Calculation
+    let finalScore = chandraInfo.baseScore;
+    // Add bonus from other planetary transits (up to +25 points)
+    finalScore += Math.round((favPlanetCount / 8) * 25);
+    // Day limb adjustments
+    if (p) {
+        if ([4, 9, 14, 30].includes(p.tithi.no <= 15 ? p.tithi.no : p.tithi.no - 15)) finalScore -= 4;
+        if (p.karana.isVishti) finalScore -= 5;
+    }
+    // Hard cap for Chandrashtama
+    if (isChandrashtama) {
+        finalScore = Math.min(25, finalScore);
+    }
+    finalScore = Math.max(15, Math.min(98, finalScore));
+
+    const starRating = finalScore >= 80 ? '⭐⭐⭐⭐⭐ Highly Auspicious (ಉತ್ತಮ ಫಲ)'
+        : (finalScore >= 65 ? '⭐⭐⭐⭐ Favourable (ಶುಭ ಫಲ)'
+        : (finalScore >= 45 ? '⭐⭐⭐ Moderate / Mixed (ಸಾಧಾರಣ ಫಲ)'
+        : '⭐⭐ Needs Caution (ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ)'));
+
+    const scoreColor = finalScore >= 80 ? 'var(--green)'
+        : (finalScore >= 65 ? 'var(--gold)'
+        : (finalScore >= 45 ? '#eab308' : 'var(--red)'));
+
+    // 4. Lucky Attributes for this Rashi
+    const rProps = RASHI_ASTRO_PROPS[moonRashiIdx];
+
+    // Find best auspicious hora today for this sign
+    let bestHoraStr = 'Abhijit Muhurtha';
+    if (window.cachedHoraData && window.cachedHoraData.length > 0) {
+        const matchingHoras = window.cachedHoraData.filter(h => rProps.favHoras.includes(h.planet));
+        if (matchingHoras.length > 0) {
+            bestHoraStr = matchingHoras.slice(0, 2).map(h => h.planet + ' Hora (' + h.timeStr + ')').join(' · ');
+        }
+    }
+
+    // 5. Construct Rich HTML Presentation
+    let html = '';
+
+    // Header with Sign, Rashi Lord, and Rating
+    html += `<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; border-bottom:1px solid rgba(212,175,55,0.25); padding-bottom:8px;">
+        <div>
+            <div style="font-size:1.15rem; font-weight:700; color:var(--gold); display:flex; align-items:center; gap:6px;">
+                <span>${RASHI_EN[moonRashiIdx]} (${RASHI_KN[moonRashiIdx]})</span>
+                <span style="font-size:0.75rem; font-weight:normal; color:var(--text-dim); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:12px;">Lord: ${rProps.lord}</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-dim); margin-top:2px;">
+                🌙 Moon Transiting: <strong>House ${moonHouse} (${moonGraha.rashi})</strong> · ${chandraInfo.houseNameKn}
+            </div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:0.85rem; font-weight:700; color:${scoreColor};">${finalScore}% Auspicious</div>
+            <div style="font-size:0.7rem; color:var(--text-dim);">${starRating}</div>
+        </div>
+    </div>`;
+
+    // Chandrashtama Alert Banner (High Priority)
+    if (isChandrashtama) {
+        html += `<div style="background:rgba(239,68,68,0.15); border:1px solid var(--red); border-radius:8px; padding:10px 12px; margin-bottom:12px;">
+            <div style="font-weight:700; color:var(--red); font-size:0.95rem; display:flex; align-items:center; gap:6px;">
+                ⚠️ ಚಂದ್ರಾಷ್ಟಮ (CHANDRASHTAMA) ACTIVE TODAY
+            </div>
+            <div style="font-size:0.8rem; color:var(--text); margin-top:4px; line-height:1.5;">
+                The Moon is transiting the 8th house from your Janma Rashi. According to Vedic tradition, this day requires heightened caution. Avoid major financial commitments, arguments, signing important contracts, or risky travel. Maintain a calm mind and worship Lord Shiva.
+            </div>
+        </div>`;
+    }
+
+    // Planetary Gochara Badges
+    if (badges.length > 0) {
+        html += `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">`;
+        badges.forEach(b => {
+            const bg = b.type === 'best' ? 'rgba(212,175,55,0.18)'
+                : (b.type === 'good' ? 'rgba(34,197,94,0.15)'
+                : (b.type === 'warn' ? 'rgba(239,68,68,0.15)' : 'rgba(99,102,241,0.15)'));
+            const border = b.type === 'best' ? 'var(--gold)'
+                : (b.type === 'good' ? 'var(--green)'
+                : (b.type === 'warn' ? 'var(--red)' : '#6366f1'));
+            const col = b.type === 'best' ? 'var(--gold)'
+                : (b.type === 'good' ? 'var(--green)'
+                : (b.type === 'warn' ? 'var(--red)' : '#a5b4fc'));
+            html += `<span style="font-size:0.72rem; padding:3px 9px; border-radius:14px; background:${bg}; border:1px solid ${border}; color:${col}; font-weight:600;" title="${b.desc}">${b.text}</span>`;
         });
+        html += `</div>`;
     }
 
-    const luckyColors = ['Red & Crimson','White & Silver','Green & Emerald','Milky White & Gold','Gold & Orange','Green & Beige','White & Pink','Deep Red & Maroon','Yellow & Saffron','Blue & Black','Royal Blue','Yellow & Gold'];
-    const luckyNumbers = [9, 6, 5, 2, 1, 5, 6, 9, 3, 8, 8, 3];
-    const category = score >= 5 ? 'good' : (score >= 3 ? 'neutral' : 'bad');
-    const texts = RASHIFAL_TEXTS[category];
-    const text = texts[moonRashiIdx % texts.length];
+    // Four-Pillars Daily Forecast (Career, Finance, Family, Health)
+    html += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--card-border); padding:8px 10px; border-radius:6px;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--gold); margin-bottom:3px;">💼 Career & Work (ಉದ್ಯೋಗ)</div>
+            <div style="font-size:0.78rem; color:var(--text); line-height:1.45;">${chandraInfo.careerEn}</div>
+            <div style="font-size:0.72rem; color:var(--text-dim); margin-top:3px; font-family:var(--font-kn);">${chandraInfo.careerKn}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--card-border); padding:8px 10px; border-radius:6px;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--gold); margin-bottom:3px;">💰 Finance & Wealth (ಆರ್ಥಿಕತೆ)</div>
+            <div style="font-size:0.78rem; color:var(--text); line-height:1.45;">${chandraInfo.financeEn}</div>
+            <div style="font-size:0.72rem; color:var(--text-dim); margin-top:3px; font-family:var(--font-kn);">${chandraInfo.financeKn}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--card-border); padding:8px 10px; border-radius:6px;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--gold); margin-bottom:3px;">❤️ Family & Love (ಕುಟುಂಬ)</div>
+            <div style="font-size:0.78rem; color:var(--text); line-height:1.45;">${chandraInfo.familyEn}</div>
+            <div style="font-size:0.72rem; color:var(--text-dim); margin-top:3px; font-family:var(--font-kn);">${chandraInfo.familyKn}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--card-border); padding:8px 10px; border-radius:6px;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--gold); margin-bottom:3px;">🌿 Health & Vitality (ಆರೋಗ್ಯ)</div>
+            <div style="font-size:0.78rem; color:var(--text); line-height:1.45;">${chandraInfo.healthEn}</div>
+            <div style="font-size:0.72rem; color:var(--text-dim); margin-top:3px; font-family:var(--font-kn);">${chandraInfo.healthKn}</div>
+        </div>
+    </div>`;
 
-    const stars = score >= 5 ? '⭐⭐⭐⭐⭐ Highly Auspicious' : (score >= 3 ? '⭐⭐⭐ Moderate / Mixed' : '⭐⭐ Needs Caution');
+    // Lucky Details Bar
+    html += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.75rem; background:rgba(212,175,55,0.05); padding:8px 10px; border-radius:6px; border:1px dashed var(--card-border); margin-bottom:10px;">
+        <div>🎨 <strong>Lucky Colour:</strong> <span style="color:var(--text);">${rProps.colour}</span></div>
+        <div>🔢 <strong>Lucky Number:</strong> <span style="color:var(--text);">${rProps.number}</span></div>
+        <div>🧭 <strong>Lucky Direction:</strong> <span style="color:var(--text);">${rProps.dir}</span></div>
+        <div>⏰ <strong>Best Hora Today:</strong> <span style="color:var(--text);">${bestHoraStr}</span></div>
+    </div>`;
 
-    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:6px;">
-        <div style="font-weight:700; color:var(--gold); font-size:1rem;">${RASHI_EN[moonRashiIdx]} (${RASHI_KN[moonRashiIdx]})</div>
-        <div style="font-size:0.8rem; font-weight:600; color:${score >= 5 ? 'var(--green)' : (score >= 3 ? 'var(--gold)' : 'var(--red)')};">${stars} (${score}/7 Favourable)</div>
-    </div>
-    <p style="margin:0 0 10px 0; color:var(--text); line-height:1.5;">${text}</p>`;
-
-    if (details.length > 0) {
-        html += `<div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:8px;">${details.join(' &bull; ')}</div>`;
-    }
-
-    html += `<div style="display:flex; gap:16px; font-size:0.75rem; color:var(--gold); font-weight:600; padding-top:6px; border-top:1px dashed var(--card-border);">
-        <div>🎨 Lucky Colour: <span style="color:var(--text);">${luckyColors[moonRashiIdx]}</span></div>
-        <div>🔢 Lucky Number: <span style="color:var(--text);">${luckyNumbers[moonRashiIdx]}</span></div>
+    // Vedic Remedy of the Day
+    html += `<div style="font-size:0.75rem; padding:8px 10px; border-radius:6px; background:rgba(34,197,94,0.08); border-left:3px solid var(--green);">
+        <strong style="color:var(--green);">🪔 ದಿನದ ಪರಿಹಾರ (Vedic Remedy of the Day):</strong> ${chandraInfo.remedyEn} (${chandraInfo.remedyKn})
     </div>`;
 
     document.getElementById('rashifalContent').innerHTML = html;
@@ -2728,7 +3090,7 @@ function checkSuvarnaMuhurtha(p, dayOfWeek, horaData) {
     if (horaData) {
         const venusHoras = horaData.filter(h => h.planet === 'Venus' || h.planet === 'Shukra');
         if (venusHoras.length > 0) {
-            const times = venusHoras.map(h => formatHoursToTime(h.startHrs) + ' - ' + formatHoursToTime(h.endHrs));
+            const times = venusHoras.map(h => h.timeStr || (formatHoursToTime(h.startHrs) + ' – ' + formatHoursToTime(h.endHrs)));
             results.push({type:'info', text:'💎 Shukra (Venus) Hora timings for silk & jewellery shopping: ' + times.join(', ')});
         }
     }
@@ -2737,7 +3099,7 @@ function checkSuvarnaMuhurtha(p, dayOfWeek, horaData) {
     if (horaData) {
         const jupHoras = horaData.filter(h => h.planet === 'Jupiter' || h.planet === 'Guru');
         if (jupHoras.length > 0) {
-            const times = jupHoras.map(h => formatHoursToTime(h.startHrs) + ' - ' + formatHoursToTime(h.endHrs));
+            const times = jupHoras.map(h => h.timeStr || (formatHoursToTime(h.startHrs) + ' – ' + formatHoursToTime(h.endHrs)));
             results.push({type:'info', text:'🪙 Guru (Jupiter) Hora timings for gold investment: ' + times.join(', ')});
         }
     }
@@ -2930,9 +3292,14 @@ function generateNorthIndianChartSVG(lagnaRashiIdx, grahas) {
 let cachedDailyGrahas = null;
 
 function onSelectRashifal(rashiIdx) {
+    if (rashiIdx === undefined || rashiIdx === null) {
+        const sel = document.getElementById('rashifalSelect');
+        if (sel) rashiIdx = sel.value;
+    }
     const idx = parseInt(rashiIdx, 10);
-    localStorage.setItem('kuberan_moon_rashi', idx);
-    generateRashifal(idx, cachedDailyGrahas);
+    const validIdx = (!isNaN(idx) && idx >= 0 && idx < 12) ? idx : 0;
+    if (typeof localStorage !== 'undefined') localStorage.setItem('kuberan_moon_rashi', validIdx);
+    generateRashifal(validIdx, cachedDailyGrahas, lastPanchanga);
 }
 
 function scoreForNewPurpose(p, purpose) {
