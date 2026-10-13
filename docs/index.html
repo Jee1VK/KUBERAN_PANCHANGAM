@@ -88,6 +88,7 @@
         .seg-yama { background: rgba(249,115,22,0.5); }
         .seg-gulika { background: rgba(168,85,247,0.5); }
         .seg-abhijit { background: rgba(34,197,94,0.5); }
+        .seg-amrit { background: rgba(212,175,55,0.6); }
         .timeline-labels { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-dim); }
 
         /* WINDOWS LIST */
@@ -474,6 +475,62 @@
         <div class="timeline-bar" id="timelineBar"></div>
         <div class="timeline-labels" id="timelineLabels"></div>
         <div style="margin-top: 14px;" id="windowsList"></div>
+    </div>
+
+    <!-- AMRIT KALAM & AUSPICIOUS MUHURTHA GUIDE -->
+    <div class="card" id="amritKalamCard">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h2 style="margin:0;">🍯 Amrit Kalam (ಅಮೃತ ಕಾಲ)</h2>
+            <span id="amritStatusBadge" style="font-size:0.75rem; font-weight:700; padding:3px 10px; border-radius:12px; background:rgba(34,197,94,0.15); color:var(--green); border:1px solid var(--green);">✨ Nectar Window</span>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:12px;">
+            The sacred 4-Ghatika (approx. 96-minute) nectar period dynamically derived from the prevailing Nakshatra. All negative planetary influences are neutralized during this divine window.
+        </p>
+
+        <!-- Dynamic Timings Display -->
+        <div id="amritTimingsBox" style="background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.25); border-radius:8px; padding:12px; margin-bottom:12px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div>
+                    <div style="font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Today's Amrit Kalam (ಅಮೃತ ಕಾಲ)</div>
+                    <div id="amritTimeVal" style="font-size:1.05rem; font-weight:700; color:var(--gold); margin-top:2px; line-height:1.4;">—</div>
+                </div>
+                <div>
+                    <div style="font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Varjyam / Visha Ghatika (ವರ್ಜ್ಯಂ)</div>
+                    <div id="varjyamTimeVal" style="font-size:1.05rem; font-weight:700; color:var(--red); margin-top:2px; line-height:1.4;">—</div>
+                </div>
+            </div>
+            <div id="amritLiveNow" style="display:none; margin-top:10px; padding:8px 10px; border-radius:6px; font-size:0.8rem; font-weight:600; text-align:center;"></div>
+        </div>
+
+        <!-- Information & Vedic Guide -->
+        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:12px;">
+            <div style="font-size:0.85rem; font-weight:700; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                <span>📖 Vedic Muhurtha Science & Guidelines (ಅಮೃತ ಕಾಲದ ಮಹತ್ವ & ನಿಯಮಗಳು)</span>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.78rem; line-height:1.5;">
+                <div style="background:rgba(34,197,94,0.05); border:1px solid rgba(34,197,94,0.2); padding:10px; border-radius:6px;">
+                    <div style="font-weight:700; color:var(--green); margin-bottom:4px;">✅ Best Auspicious Deeds (ಮಾಡಬಹುದಾದ ಶುಭ ಕಾರ್ಯಗಳು)</div>
+                    <ul style="margin:0; padding-left:16px; color:var(--text);">
+                        <li>Buying Gold, Jewelry & Silk Sarees (ಬಂಗಾರ & ರೇಷ್ಮೆ ಖರೀದಿ)</li>
+                        <li>Business / Shop Opening (ಹೊಸ ಉದ್ಯಮ, ಕಚೇರಿ ಆರಂಭ)</li>
+                        <li>Signing Contracts & Deeds (ಪ್ರಮುಖ ಒಪ್ಪಂದಗಳು, ರಿಜಿಸ್ಟ್ರೇಷನ್)</li>
+                        <li>Vehicle Purchase & Delivery (ಹೊಸ ವಾಹನ ಖರೀದಿ)</li>
+                        <li>Griha Pravesha & Pujas (ಗೃಹಪ್ರವೇಶ, ಧಾರ್ಮಿಕ ಪೂಜೆಗಳು)</li>
+                        <li>Starting Medication & Healing (ಔಷಧ ಸೇವನೆ, ಚಿಕಿತ್ಸೆ ಆರಂಭ)</li>
+                    </ul>
+                </div>
+
+                <div style="background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.2); padding:10px; border-radius:6px;">
+                    <div style="font-weight:700; color:var(--red); margin-bottom:4px;">⚠️ Golden Rules & Cautions (ಮುಖ್ಯ ನಿಯಮಗಳು)</div>
+                    <ul style="margin:0; padding-left:16px; color:var(--text);">
+                        <li><strong>Avoid Varjyam (ವರ್ಜ್ಯಂ):</strong> The 4-Ghatika toxic phase of the same star must strictly be avoided for beginnings.</li>
+                        <li><strong>Rahu Kala Priority:</strong> If Amrit Kalam overlaps with Rahu Kala or Yamaganda, wait until the inauspicious period concludes.</li>
+                        <li><strong>Dynamic Scaling:</strong> Derived proportionally from the Moon's true transit velocity (each Nakshatra = 60 Ghatis).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- CHOGHADIYA -->
@@ -1219,6 +1276,38 @@ function computeSunrise(year, month, day, lat, lon, tzOff) {
 }
 
 // ============================================================
+//  AMRITA GHATIKA & VARJYAM (Nakshatra-Proportional Tables)
+//  Classical 27 Nakshatra offsets in Ghatikas (out of 60)
+// ============================================================
+const AMRITA_GHATIKAS = [
+    42, 48, 54, 52, 38, 35, 54, 44, 56, 54, 44, 42, 45, 44, 38, 38, 28, 38, 44, 48, 44, 34, 34, 42, 40, 48, 54
+];
+const VARJYAM_GHATIKAS = [
+    50, 24, 30, 40, 14, 21, 30, 20, 32, 30, 20, 18, 21, 20, 14, 14, 10, 14, 56, 24, 20, 10, 10, 18, 16, 24, 30
+];
+
+function prevBoundary(jd, angleFn, unit) {
+    const cur = angleFn(jd);
+    const target = ((Math.floor(cur / unit) * unit) % 360 + 360) % 360;
+    const maxSpan = 1.6;
+    const step = 0.04;
+    let hi = jd, lo = jd - step;
+    while (jd - lo < maxSpan) {
+        const diffLo = ((angleFn(lo) - target + 540) % 360) - 180;
+        const diffHi = ((angleFn(hi) - target + 540) % 360) - 180;
+        if (diffLo <= 0 && diffHi > 0) break;
+        hi = lo;
+        lo = hi - step;
+    }
+    for (let i = 0; i < 50; i++) {
+        const mid = (lo + hi) / 2;
+        const diff = ((angleFn(mid) - target + 540) % 360) - 180;
+        if (diff >= 0) hi = mid; else lo = mid;
+    }
+    return hi;
+}
+
+// ============================================================
 //  BOUNDARY FINDER — bisect to find next angle crossing
 // ============================================================
 function nextBoundary(jd, angleFn, unit) {
@@ -1407,6 +1496,47 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     const brahmaStart = riseJD - 96 / 1440;
     const brahmaEnd = riseJD - 48 / 1440;
 
+    // Amrit Kalam & Varjyam (Scaled to true Nakshatra duration in Ghatikas)
+    const nakStart1 = prevBoundary(riseJD, siderealMoon, 360 / 27);
+    const dur1 = nakEnd - nakStart1;
+    const nextDaySr = computeSunrise(year, month, day + 1, lat, lon, tzOff);
+    const nextRiseJD = nextDaySr ? julianDay(year, month, day + 1, nextDaySr.rise) : (riseJD + 1.0);
+
+    const amritWindows = [];
+    const varjyamWindows = [];
+
+    // Window 1: Sunrise Nakshatra
+    const aStart1 = nakStart1 + (dur1 * (AMRITA_GHATIKAS[nakIdx] / 60));
+    const aEnd1 = aStart1 + (dur1 * (4 / 60));
+    if (aEnd1 >= riseJD && aStart1 < nextRiseJD) {
+        amritWindows.push({ start: aStart1, end: aEnd1, nakIdx, nakName: NAK_EN[nakIdx], nakNameKn: NAK_KN[nakIdx] });
+    }
+
+    const vStart1 = nakStart1 + (dur1 * (VARJYAM_GHATIKAS[nakIdx] / 60));
+    const vEnd1 = vStart1 + (dur1 * (4 / 60));
+    if (vEnd1 >= riseJD && vStart1 < nextRiseJD) {
+        varjyamWindows.push({ start: vStart1, end: vEnd1, nakIdx, nakName: NAK_EN[nakIdx], nakNameKn: NAK_KN[nakIdx] });
+    }
+
+    // Window 2: Next Nakshatra if it enters during this Panchang day
+    if (nakEnd < nextRiseJD) {
+        const nextNakIdx = (nakIdx + 1) % 27;
+        const nextNakEnd = nextBoundary(nakEnd + 0.01, siderealMoon, 360 / 27);
+        const dur2 = nextNakEnd - nakEnd;
+
+        const aStart2 = nakEnd + (dur2 * (AMRITA_GHATIKAS[nextNakIdx] / 60));
+        const aEnd2 = aStart2 + (dur2 * (4 / 60));
+        if (aStart2 < nextRiseJD && aEnd2 >= riseJD) {
+            amritWindows.push({ start: aStart2, end: aEnd2, nakIdx: nextNakIdx, nakName: NAK_EN[nextNakIdx], nakNameKn: NAK_KN[nextNakIdx] });
+        }
+
+        const vStart2 = nakEnd + (dur2 * (VARJYAM_GHATIKAS[nextNakIdx] / 60));
+        const vEnd2 = vStart2 + (dur2 * (4 / 60));
+        if (vStart2 < nextRiseJD && vEnd2 >= riseJD) {
+            varjyamWindows.push({ start: vStart2, end: vEnd2, nakIdx: nextNakIdx, nakName: NAK_EN[nextNakIdx], nakNameKn: NAK_KN[nextNakIdx] });
+        }
+    }
+
     // Masa (approximate from Sun's sidereal sign at previous new moon)
     // Masa: Amanta lunar month from true New Moon conjunction
     const masaIdx = getAmantaMasaIdx(riseJD);
@@ -1449,6 +1579,9 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
         rahu: seg(RAHU[wd]), yama: seg(YAMA[wd]), gulika: seg(GULIKA[wd]),
         abhijit: { start: abhijitStart, end: abhijitEnd },
         brahma: { start: brahmaStart, end: brahmaEnd },
+        amritKalam: amritWindows,
+        varjyam: varjyamWindows,
+        amrit: amritWindows[0] || { start: aStart1, end: aEnd1 },
         masa: { en: MASA_EN[masaIdx], kn: MASA_KN[masaIdx] },
         samvatsara: { name: samvatsaraName, idx: samvatsaraIdx, shaka: shakaYear },
         ayana: { en: ayana, kn: ayanaKn },
@@ -1548,17 +1681,63 @@ function renderPanchanga(p) {
     addSeg(p.yama.start, p.yama.end, 'seg-yama', 'Yama');
     addSeg(p.gulika.start, p.gulika.end, 'seg-gulika', 'Gulika');
     addSeg(p.abhijit.start, p.abhijit.end, 'seg-abhijit', 'Abhijit');
+    if (p.amritKalam) {
+        p.amritKalam.forEach(w => {
+            if (w.start >= p.sunrise && w.end <= p.sunset) addSeg(w.start, w.end, 'seg-amrit', 'Amrit');
+        });
+    }
 
     const labels = document.getElementById('timelineLabels');
     labels.innerHTML = `<span>${fmt(p.sunrise)}</span><span>Noon</span><span>${fmt(p.sunset)}</span>`;
 
     const wl = document.getElementById('windowsList');
     const row = (dot, name, s, e) => `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name}</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+    
+    let amritRows = '';
+    if (p.amritKalam && p.amritKalam.length > 0) {
+        p.amritKalam.forEach(w => {
+            amritRows += row('good', `Amrit Kalam (ಅಮೃತ ಕಾಲ · ${w.nakNameKn})`, w.start, w.end);
+        });
+    } else if (p.amrit) {
+        amritRows = row('good', 'Amrit Kalam (ಅಮೃತ ಕಾಲ)', p.amrit.start, p.amrit.end);
+    }
+
+    let varjyamRows = '';
+    if (p.varjyam && p.varjyam.length > 0) {
+        p.varjyam.forEach(w => {
+            varjyamRows += row('bad', `Varjyam (ವರ್ಜ್ಯಂ / ವಿಷ ಘಟಿಕಾ · ${w.nakNameKn})`, w.start, w.end);
+        });
+    }
+
     wl.innerHTML = row('bad', 'Rahu Kala (ರಾಹುಕಾಲ)', p.rahu.start, p.rahu.end)
         + row('bad', 'Yamaganda (ಯಮಗಂಡ)', p.yama.start, p.yama.end)
         + row('neutral', 'Gulika Kala (ಗುಳಿಕ)', p.gulika.start, p.gulika.end)
         + row(p.wd === 3 ? 'bad' : 'good', 'Abhijit Muhurta (ಅಭಿಜಿತ್)' + (p.wd === 3 ? ' ⚠️ (Prohibited on Wed)' : ''), p.abhijit.start, p.abhijit.end)
-        + row('good', 'Brahma Muhurta (ಬ್ರಹ್ಮ)', p.brahma.start, p.brahma.end);
+        + row('good', 'Brahma Muhurta (ಬ್ರಹ್ಮ)', p.brahma.start, p.brahma.end)
+        + amritRows
+        + varjyamRows;
+
+    // Populate Amrit Kalam Dedicated Guide Card
+    window.cachedAmritData = cachedAmritData = p.amritKalam || [];
+    window.cachedVarjyamData = cachedVarjyamData = p.varjyam || [];
+
+    const amritTimeEl = document.getElementById('amritTimeVal');
+    if (amritTimeEl) {
+        if (p.amritKalam && p.amritKalam.length > 0) {
+            amritTimeEl.innerHTML = p.amritKalam.map(w => `<div>${fmt(w.start)} – ${fmt(w.end)} <span style="font-size:0.75rem;color:var(--text-dim);font-weight:normal;">(${w.nakNameKn})</span></div>`).join('');
+        } else {
+            amritTimeEl.textContent = 'None during active day';
+        }
+    }
+
+    const varjyamTimeEl = document.getElementById('varjyamTimeVal');
+    if (varjyamTimeEl) {
+        if (p.varjyam && p.varjyam.length > 0) {
+            varjyamTimeEl.innerHTML = p.varjyam.map(w => `<div>${fmt(w.start)} – ${fmt(w.end)} <span style="font-size:0.75rem;color:var(--text-dim);font-weight:normal;">(${w.nakNameKn})</span></div>`).join('');
+        } else {
+            varjyamTimeEl.textContent = 'None during active day';
+        }
+    }
 
     // --- CHOGHADIYA ---
     let chogDataCache = [];
@@ -1959,7 +2138,8 @@ function shareDailyPanchangam() {
     const tz = p.tzOff;
     const fmt = (jd) => jdToLocalTimeStr(jd, tz);
     const dateStr = `${p.day}/${p.month}/${p.year}`;
-    const text = `*Kuberan Panchangam*\n📅 ${dateStr}\n${p.samvatsara.name} · ${p.masa.en} ${p.tithi.paksha} · ${p.ritu}\n\n☀️ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\n🔸 Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.endJD)})\n⭐ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.endJD)})\n🔹 Yoga: ${p.yoga.name} (until ${fmt(p.yoga.endJD)})\n📐 Karana: ${p.karana.name}\n📆 Vara: ${p.vara.en}\n\n⚠️ Rahu Kala: ${fmt(p.rahu.start)}–${fmt(p.rahu.end)}\n⚠️ Yamaganda: ${fmt(p.yama.start)}–${fmt(p.yama.end)}\n✅ Abhijit: ${fmt(p.abhijit.start)}–${fmt(p.abhijit.end)}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
+    const amritStr = (p.amritKalam && p.amritKalam.length > 0) ? p.amritKalam.map(w => fmt(w.start) + '–' + fmt(w.end)).join(', ') : 'N/A';
+    const text = `*Kuberan Panchangam*\n📅 ${dateStr}\n${p.samvatsara.name} · ${p.masa.en} ${p.tithi.paksha} · ${p.ritu}\n\n☀️ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\n🔸 Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.endJD)})\n⭐ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.endJD)})\n🔹 Yoga: ${p.yoga.name} (until ${fmt(p.yoga.endJD)})\n📐 Karana: ${p.karana.name}\n📆 Vara: ${p.vara.en}\n\n⚠️ Rahu Kala: ${fmt(p.rahu.start)}–${fmt(p.rahu.end)}\n⚠️ Yamaganda: ${fmt(p.yama.start)}–${fmt(p.yama.end)}\n✅ Abhijit: ${fmt(p.abhijit.start)}–${fmt(p.abhijit.end)}\n🍯 Amrit Kalam: ${amritStr}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
 
     if (navigator.share) {
         navigator.share({ title: `Panchangam ${dateStr}`, text }).catch(() => {});
@@ -2627,6 +2807,8 @@ function getNavamshaRashi(siderealDeg) {
 let liveNowInterval = null;
 let cachedHoraData = null;
 let cachedChogData = null;
+let cachedAmritData = null;
+let cachedVarjyamData = null;
 
 function updateLiveNowIndicators() {
     const nowJD = (Date.now() / 86400000) + 2440587.5;
@@ -2665,6 +2847,52 @@ function updateLiveNowIndicators() {
             document.getElementById('chogLiveNowCountdown').textContent = 'Ends in ' + minsLeft + ' min (' + currentChog.timeStr + ')';
         } else if (chogDiv) {
             chogDiv.style.display = 'none';
+        }
+    }
+
+    // --- AMRIT KALAM & VARJYAM LIVE INDICATOR ---
+    const amritLiveDiv = document.getElementById('amritLiveNow');
+    if (amritLiveDiv) {
+        let isAmritNow = false;
+        let isVarjyamNow = false;
+        let currentWindow = null;
+
+        if (cachedAmritData && cachedAmritData.length > 0) {
+            for (const w of cachedAmritData) {
+                if (nowJD >= w.start && nowJD < w.end) {
+                    isAmritNow = true;
+                    currentWindow = w;
+                    break;
+                }
+            }
+        }
+
+        if (!isAmritNow && cachedVarjyamData && cachedVarjyamData.length > 0) {
+            for (const w of cachedVarjyamData) {
+                if (nowJD >= w.start && nowJD < w.end) {
+                    isVarjyamNow = true;
+                    currentWindow = w;
+                    break;
+                }
+            }
+        }
+
+        if (isAmritNow && currentWindow) {
+            amritLiveDiv.style.display = 'block';
+            amritLiveDiv.style.background = 'rgba(34,197,94,0.15)';
+            amritLiveDiv.style.color = 'var(--green)';
+            amritLiveDiv.style.border = '1px solid var(--green)';
+            const minsLeft = Math.max(1, Math.round((currentWindow.end - nowJD) * 1440));
+            amritLiveDiv.innerHTML = `🟢 <strong>Amrit Kalam Active Now (ಅಮೃತ ಕಾಲ ನಡೆಯುತ್ತಿದೆ)!</strong> Ends in ${minsLeft} min · Highly auspicious for new beginnings.`;
+        } else if (isVarjyamNow && currentWindow) {
+            amritLiveDiv.style.display = 'block';
+            amritLiveDiv.style.background = 'rgba(239,68,68,0.15)';
+            amritLiveDiv.style.color = 'var(--red)';
+            amritLiveDiv.style.border = '1px solid var(--red)';
+            const minsLeft = Math.max(1, Math.round((currentWindow.end - nowJD) * 1440));
+            amritLiveDiv.innerHTML = `⚠️ <strong>Varjyam Active Now (ವರ್ಜ್ಯಂ / ವಿಷ ಘಟಿಕಾ)!</strong> Ends in ${minsLeft} min · Avoid commencing important deeds.`;
+        } else {
+            amritLiveDiv.style.display = 'none';
         }
     }
 }
