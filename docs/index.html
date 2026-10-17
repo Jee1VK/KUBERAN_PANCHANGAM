@@ -1028,6 +1028,10 @@
                 </div>
                 <div id="jGrahaNavamsha" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px;"></div>
             </div>
+        <!-- KUJA DOSHA (MANGLIK) ANALYSIS -->
+        <div id="jKujaDoshaCard" style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
+            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:8px; text-align:center;">Kuja Dosha (Manglik) Analysis / ಕುಜ ದೋಷ ವಿಶ್ಲೇಷಣೆ</div>
+            <div id="jKujaDoshaContent"></div>
         </div>
 
         <div style="margin-top:30px; text-align:center; font-size:0.75rem; color:#999;">
@@ -1130,8 +1134,19 @@
             <button onclick="filterCalFests('ekadashi')" class="cal-filter" id="calFilterEka" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Ekadashi</button>
             <button onclick="filterCalFests('vrata')" class="cal-filter" id="calFilterVrata" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Vratas</button>
             <button onclick="filterCalFests('sankranti')" class="cal-filter" id="calFilterSank" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Sankranti</button>
+            <button onclick="filterCalFests('eclipse')" class="cal-filter" id="calFilterEclipse" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--card-border); background:transparent; color:var(--text);">Eclipses (ಗ್ರಹಣ)</button>
         </div>
         <div id="calFestList" style="font-size:0.85rem;"></div>
+    </div>
+
+    <!-- ECLIPSE FINDER CARD -->
+    <div class="card" id="eclipseFinderCard">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h2 style="margin:0; font-size:1.05rem;">🌑 Surya & Chandra Grahanam (Eclipses)</h2>
+            <button onclick="toggleYearEclipses()" id="btnToggleEclipses" style="background:var(--gold); border:none; color:#000; padding:5px 12px; border-radius:6px; font-weight:700; cursor:pointer; font-size:0.75rem;">View Year Eclipses</button>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:8px;">Astronomical calculation of Solar & Lunar eclipses, contact times (Sparsha, Madhya, Moksha), Sutaka Kala, and visibility in India.</p>
+        <div id="eclipseList" style="display:none; flex-direction:column; gap:8px; margin-top:10px;"></div>
     </div>
 
     <button onclick="exportMonthICS()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">📥 Export Festivals to Calendar (.ics)</button>
@@ -1389,18 +1404,27 @@ const NAK_SYLLABLES = [
     ["Se","So","Da","Di"],["Du","Tha","Jha","Na"],["De","Do","Cha","Chi"]
 ];
 
-// Get all 9 graha positions
+// Combustion limits (degrees from Sun) per classical Surya Siddhanta
+const COMBUST_LIMITS = {
+    'Mars': 17,
+    'Mercury': 14, // 12 when retrograde
+    'Jupiter': 11,
+    'Venus': 10,   // 8 when retrograde
+    'Saturn': 15
+};
+
+// Get all 9 graha positions with Vakri (Retrograde) & Moudhya (Combustion)
 function getAllGrahaPositions(jd) {
     const grahas = [
-        { name: 'Sun', nameKn: 'ಸೂರ್ಯ', icon: '☀️', lon: siderealSun(jd) },
-        { name: 'Moon', nameKn: 'ಚಂದ್ರ', icon: '🌙', lon: siderealMoon(jd) },
-        { name: 'Mars', nameKn: 'ಮಂಗಳ', icon: '🔴', lon: siderealPlanet(jd, 'Mars') },
-        { name: 'Mercury', nameKn: 'ಬುಧ', icon: '🟢', lon: siderealPlanet(jd, 'Mercury') },
-        { name: 'Jupiter', nameKn: 'ಗುರು', icon: '🟡', lon: siderealPlanet(jd, 'Jupiter') },
-        { name: 'Venus', nameKn: 'ಶುಕ್ರ', icon: '⚪', lon: siderealPlanet(jd, 'Venus') },
-        { name: 'Saturn', nameKn: 'ಶನಿ', icon: '🔵', lon: siderealPlanet(jd, 'Saturn') },
-        { name: 'Rahu', nameKn: 'ರಾಹು', icon: '🐍', lon: siderealRahu(jd) },
-        { name: 'Ketu', nameKn: 'ಕೇತು', icon: '🔥', lon: siderealKetu(jd) }
+        { name: 'Sun', nameKn: 'ಸೂರ್ಯ', icon: '☀️', lon: siderealSun(jd), isPlanet: false },
+        { name: 'Moon', nameKn: 'ಚಂದ್ರ', icon: '🌙', lon: siderealMoon(jd), isPlanet: false },
+        { name: 'Mars', nameKn: 'ಮಂಗಳ', icon: '🔴', lon: siderealPlanet(jd, 'Mars'), isPlanet: true },
+        { name: 'Mercury', nameKn: 'ಬುಧ', icon: '🟢', lon: siderealPlanet(jd, 'Mercury'), isPlanet: true },
+        { name: 'Jupiter', nameKn: 'ಗುರು', icon: '🟡', lon: siderealPlanet(jd, 'Jupiter'), isPlanet: true },
+        { name: 'Venus', nameKn: 'ಶುಕ್ರ', icon: '⚪', lon: siderealPlanet(jd, 'Venus'), isPlanet: true },
+        { name: 'Saturn', nameKn: 'ಶನಿ', icon: '🔵', lon: siderealPlanet(jd, 'Saturn'), isPlanet: true },
+        { name: 'Rahu', nameKn: 'ರಾಹು', icon: '🐍', lon: siderealRahu(jd), isNode: true },
+        { name: 'Ketu', nameKn: 'ಕೇತು', icon: '🔥', lon: siderealKetu(jd), isNode: true }
     ];
     const sunLon = grahas[0].lon;
     grahas.forEach(g => {
@@ -1408,11 +1432,32 @@ function getAllGrahaPositions(jd) {
         g.rashi = RASHI_EN[g.rashiIdx];
         g.rashiKn = RASHI_KN[g.rashiIdx];
         g.deg = (g.lon % 30).toFixed(1);
-        
-        if (g.name === 'Jupiter' || g.name === 'Venus') {
+
+        // Speed & Retrograde (Vakri) calculation
+        if (g.isPlanet) {
+            const dt = 0.05;
+            const p1 = siderealPlanet(jd - dt, g.name);
+            const p2 = siderealPlanet(jd + dt, g.name);
+            const diff = ((p2 - p1 + 540) % 360) - 180;
+            g.speed = diff / (2 * dt); // deg / day
+            g.isVakri = g.speed < 0;
+        } else if (g.isNode) {
+            g.isVakri = true; // Rahu/Ketu always retrograde
+        } else {
+            g.isVakri = false;
+        }
+
+        // Combustion (Moudhya) calculation
+        if (g.isPlanet && COMBUST_LIMITS[g.name] !== undefined) {
             let dist = Math.abs(g.lon - sunLon);
             if (dist > 180) dist = 360 - dist;
-            g.combust = (g.name === 'Jupiter' && dist <= 11) || (g.name === 'Venus' && dist <= 10);
+            g.distFromSun = dist;
+            let limit = COMBUST_LIMITS[g.name];
+            if (g.isVakri && g.name === 'Mercury') limit = 12;
+            if (g.isVakri && g.name === 'Venus') limit = 8;
+            g.combust = dist <= limit;
+        } else {
+            g.combust = false;
         }
     });
     return grahas;
@@ -2041,13 +2086,30 @@ function renderPanchanga(p) {
     const sunRashiTomorrow = Math.floor(siderealSun(p.sunrise + 1) / 30);
     const sankrantiCard = document.getElementById('sankrantiCard');
     if (sunRashiToday !== sunRashiTomorrow) {
+        // High-precision bisection for exact solar ingress moment
+        let lo = p.sunrise, hi = p.sunrise + 1.0;
+        const targetDeg = sunRashiTomorrow * 30;
+        for (let b = 0; b < 25; b++) {
+            const mid = (lo + hi) / 2;
+            const diff = ((siderealSun(mid) - targetDeg + 540) % 360) - 180;
+            if (diff >= 0) hi = mid; else lo = mid;
+        }
+        const ingJD = (lo + hi) / 2;
+        const punyaSpan = (16 * 24) / 1440; // 16 ghatikas = 6.4 hours
+        const punyaStart = ingJD - punyaSpan / 2;
+        const punyaEnd = ingJD + punyaSpan / 2;
+
         sankrantiCard.style.display = 'block';
         document.getElementById('sankrantiInfo').innerHTML = `
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 0;">
-                <span style="font-size:1.5rem;">🌞</span>
-                <div>
-                    <div style="font-weight:600;">Sankranti (ಸಂಕ್ರಾಂತಿ)</div>
-                    <div style="font-size:0.85rem; color:var(--text-dim);">Sun moves from <b>${RASHI_EN[sunRashiToday]}</b> to <b>${RASHI_EN[sunRashiTomorrow]}</b></div>
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 0;">
+                <span style="font-size:1.8rem;">🌞</span>
+                <div style="flex:1;">
+                    <div style="font-weight:700; font-size:1rem; color:var(--gold);">${RASHI_EN[sunRashiTomorrow]} Sankranti <span style="font-family:var(--font-kn); font-size:0.9rem;">(${RASHI_KN[sunRashiTomorrow]} ಸಂಕ್ರಾಂತಿ)</span></div>
+                    <div style="font-size:0.85rem; color:var(--text); margin-top:2px;">Sun transitions from <b>${RASHI_EN[sunRashiToday]} (${RASHI_KN[sunRashiToday]})</b> to <b>${RASHI_EN[sunRashiTomorrow]} (${RASHI_KN[sunRashiTomorrow]})</b></div>
+                    <div style="display:flex; gap:15px; margin-top:6px; font-size:0.75rem; color:var(--text-dim); flex-wrap:wrap;">
+                        <div>⏱️ <b>Ingress Time:</b> ${fmt(ingJD)}</div>
+                        <div>✨ <b>Punyakala:</b> ${fmt(punyaStart)} – ${fmt(punyaEnd)}</div>
+                    </div>
                 </div>
             </div>`;
     } else {
@@ -2089,23 +2151,37 @@ function renderPanchanga(p) {
     // --- GRAHA STHITI (Planetary Positions) ---
     const grahas = getAllGrahaPositions(p.sunrise);
     const grahaGrid = document.getElementById('grahaGrid');
-    grahaGrid.innerHTML = grahas.map(g =>
-        `<div style="background:#1a2038;padding:8px;border-radius:6px;text-align:center;">
+    grahaGrid.innerHTML = grahas.map(g => {
+        const badges = [];
+        if (g.isVakri) badges.push(`<span style="background:rgba(245,158,11,0.22);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);padding:1px 5px;border-radius:4px;font-size:0.65rem;font-weight:700;" title="Vakri (Retrograde) / ವಕ್ರಿ">ವ R</span>`);
+        if (g.combust) badges.push(`<span style="background:rgba(239,68,68,0.22);color:#ef4444;border:1px solid rgba(239,68,68,0.4);padding:1px 5px;border-radius:4px;font-size:0.65rem;font-weight:700;" title="Moudhya (Combust) / ಮೌಢ್ಯ">ಮೌ C</span>`);
+        const badgeRow = badges.length > 0 ? `<div style="display:flex;gap:4px;justify-content:center;margin-top:4px;">${badges.join('')}</div>` : '';
+
+        return `<div style="background:#1a2038;padding:8px;border-radius:6px;text-align:center;">
             <div style="font-size:1.1rem;">${g.icon}</div>
-            <div style="font-size:0.75rem;color:var(--text-dim);">${g.name}${g.combust ? ' <span style="color:var(--red);" title="Combust (Moudhya)">⚠️</span>' : ''}</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);">${g.name}</div>
             <div style="font-weight:600;font-size:0.85rem;">${g.rashi}</div>
             <div style="font-family:var(--font-kn);font-size:0.75rem;color:var(--gold-light);">${g.rashiKn}</div>
             <div style="font-size:0.65rem;color:var(--text-dim);">${g.deg}°</div>
-        </div>`
-    ).join('');
-    
-    const moudhya = grahas.filter(g => g.combust).map(g => g.nameKn + ' (' + g.name + ')');
+            ${badgeRow}
+        </div>`;
+    }).join('');
+
+    const guruShukraCombust = grahas.filter(g => g.combust && (g.name === 'Jupiter' || g.name === 'Venus'));
+    const otherCombust = grahas.filter(g => g.combust && g.name !== 'Jupiter' && g.name !== 'Venus');
+    const vakriPlanets = grahas.filter(g => g.isVakri && g.isPlanet);
     const mWarning = document.getElementById('moudhyaWarning');
-    if (moudhya.length > 0) {
-        mWarning.textContent = '⚠️ Moudhya (Combust): ' + moudhya.join(', ') + ' — Marriages/Auspicious events prohibited.';
-    } else {
-        mWarning.textContent = '';
+    const warningNotes = [];
+    if (guruShukraCombust.length > 0) {
+        warningNotes.push(`⚠️ <span style="color:var(--red);font-weight:bold;">Guru/Shukra Moudhya:</span> ${guruShukraCombust.map(g => g.nameKn + ' (' + g.name + ')').join(', ')} — Marriages & Auspicious events prohibited (ಶುಭ ಕಾರ್ಯಗಳು ವರ್ಜ್ಯ).`);
     }
+    if (otherCombust.length > 0) {
+        warningNotes.push(`⚡ <span>Moudhya (Combust):</span> ${otherCombust.map(g => g.nameKn + ' (' + g.name + ')').join(', ')}.`);
+    }
+    if (vakriPlanets.length > 0) {
+        warningNotes.push(`🪐 <span style="color:#f59e0b;">Vakri (Retrograde):</span> ${vakriPlanets.map(g => g.nameKn + ' (' + g.name + ')').join(', ')}.`);
+    }
+    mWarning.innerHTML = warningNotes.join('<br style="margin:4px 0;">');
 
     // --- LAGNA TABLE (Daily Ascendants) ---
     const lagnaGrid = document.getElementById('lagnaList');
@@ -2440,12 +2516,65 @@ function matchFestivals(p, pYesterday) {
         }
     }
 
-    // Check Solar Festivals (Makara Sankranti) via exact solar ingress
-    if (p.month === 1 && p.day >= 13 && p.day <= 16) {
-        const ingJD = findMakaraIngress(p.year);
-        const ySet = pYesterday ? pYesterday.sunset : (p.sunset - 1.0);
-        if (ingJD > ySet && ingJD <= p.sunset) {
-            results.push({ id: "makara_sankranti", name: { en: "Makara Sankranti", kn: "ಮಕರ ಸಂಕ್ರಾಂತಿ" }, shopping_peak: true });
+    // Check Solar Festivals (All 12 Solar Sankrantis)
+    const ySet = pYesterday ? pYesterday.sunset : (p.sunset - 1.0);
+    const rashiYest = Math.floor(siderealSun(ySet) / 30);
+    const rashiToday = Math.floor(siderealSun(p.sunset) / 30);
+    if (rashiYest !== rashiToday) {
+        const SANKRANTI_NAMES = [
+            { id: "mesha_sankranti", en: "Mesha Sankranti (Vishu)", kn: "ಮೇಷ ಸಂಕ್ರಾಂತಿ (ವಿಷು)" },
+            { id: "vrishabha_sankranti", en: "Vrishabha Sankranti", kn: "ವೃಷಭ ಸಂಕ್ರಾಂತಿ" },
+            { id: "mithuna_sankranti", en: "Mithuna Sankranti", kn: "ಮಿಥುನ ಸಂಕ್ರಾಂತಿ" },
+            { id: "karka_sankranti", en: "Karka Sankranti (Dakshinayana)", kn: "ಕರ್ಕಾಟಕ ಸಂಕ್ರಾಂತಿ (ದಕ್ಷಿಣಾಯನ)" },
+            { id: "simha_sankranti", en: "Simha Sankranti", kn: "ಸಿಂಹ ಸಂಕ್ರಾಂತಿ" },
+            { id: "kanya_sankranti", en: "Kanya Sankranti", kn: "ಕನ್ಯಾ ಸಂಕ್ರಾಂತಿ" },
+            { id: "tula_sankranti", en: "Tula Sankranti", kn: "ತುಲಾ ಸಂಕ್ರಾಂತಿ" },
+            { id: "vrischika_sankranti", en: "Vrischika Sankranti", kn: "ವೃಶ್ಚಿಕ ಸಂಕ್ರಾಂತಿ" },
+            { id: "dhanu_sankranti", en: "Dhanu Sankranti", kn: "ಧನು ಸಂಕ್ರಾಂತಿ" },
+            { id: "makara_sankranti", en: "Makara Sankranti", kn: "ಮಕರ ಸಂಕ್ರಾಂತಿ" },
+            { id: "kumbha_sankranti", en: "Kumbha Sankranti", kn: "ಕುಂಭ ಸಂಕ್ರಾಂತಿ" },
+            { id: "meena_sankranti", en: "Meena Sankranti", kn: "ಮೀನ ಸಂಕ್ರಾಂತಿ" }
+        ];
+        const sInfo = SANKRANTI_NAMES[rashiToday];
+        results.push({
+            id: sInfo.id,
+            name: { en: sInfo.en, kn: sInfo.kn },
+            shopping_peak: (rashiToday === 9 || rashiToday === 0),
+            isSankranti: true,
+            rashiTo: rashiToday
+        });
+    }
+
+    // Check Solar & Lunar Eclipses on this day
+    if (tithiNum === 15 || tithiNum === 30) {
+        const obs = new Astronomy.Observer(p.lat || 12.9716, p.lon || 77.5946, 920);
+        const searchTime = new Astronomy.AstroTime(p.sunrise - 2451545.0);
+        if (tithiNum === 15) {
+            const le = Astronomy.SearchLunarEclipse(searchTime.AddDays(-0.5));
+            if (le) {
+                const pkJD = le.peak.ut + 2451545.0;
+                if (pkJD >= p.sunrise - 0.5 && pkJD < p.sunrise + 1.0) {
+                    results.push({
+                        id: "chandra_grahanam",
+                        name: { en: `Chandra Grahanam (${le.kind})`, kn: `ಚಂದ್ರ ಗ್ರಹಣ (${le.kind === 'total' ? 'ಖಗ್ರಾಸ' : (le.kind === 'partial' ? 'ಖಂಡಗ್ರಾಸ' : 'ಛಾಯಾ')})` },
+                        shopping_peak: false,
+                        isEclipse: true
+                    });
+                }
+            }
+        } else if (tithiNum === 30) {
+            const se = Astronomy.SearchGlobalSolarEclipse(searchTime.AddDays(-0.5));
+            if (se) {
+                const pkJD = se.peak.ut + 2451545.0;
+                if (pkJD >= p.sunrise - 0.5 && pkJD < p.sunrise + 1.0) {
+                    results.push({
+                        id: "surya_grahanam",
+                        name: { en: `Surya Grahanam (${se.kind})`, kn: `ಸೂರ್ಯ ಗ್ರಹಣ (${se.kind === 'total' ? 'ಖಗ್ರಾಸ' : (se.kind === 'annular' ? 'ಕಂಕಣ' : 'ಖಂಡಗ್ರಾಸ')})` },
+                        shopping_peak: false,
+                        isEclipse: true
+                    });
+                }
+            }
         }
     }
 
@@ -2998,6 +3127,298 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ============================================================
+//  ANTARDASHA ACCORDION HANDLER
+// ============================================================
+function toggleDashaAntar(idx) {
+    const el = document.getElementById('dasha-antar-' + idx);
+    const icon = document.getElementById('dasha-icon-' + idx);
+    if (!el) return;
+    const isHidden = (el.style.display === 'none');
+    el.style.display = isHidden ? 'block' : 'none';
+    if (icon) icon.textContent = isHidden ? '▼' : '▶';
+}
+
+// ============================================================
+//  KUJA DOSHA (MANGLIK) ANALYZER
+// ============================================================
+function checkKujaDosha(birthGrahas, lagnaRashiIdx) {
+    const mars = birthGrahas.find(g => g.name === 'Mars');
+    const moon = birthGrahas.find(g => g.name === 'Moon');
+    const venus = birthGrahas.find(g => g.name === 'Venus');
+    const jupiter = birthGrahas.find(g => g.name === 'Jupiter');
+
+    if (!mars || lagnaRashiIdx === undefined || lagnaRashiIdx === null) {
+        return { isDosha: false, severity: 'None', text: 'Insufficient data', statusText: 'Data Unavailable' };
+    }
+
+    const marsRashi = mars.rashiIdx;
+    const moonRashi = moon ? moon.rashiIdx : null;
+    const venusRashi = venus ? venus.rashiIdx : null;
+    const jupiterRashi = jupiter ? jupiter.rashiIdx : null;
+
+    const DOSHA_HOUSES = [1, 2, 4, 7, 8, 12];
+
+    const houseFromLagna = ((marsRashi - lagnaRashiIdx + 12) % 12) + 1;
+    const houseFromMoon = moonRashi !== null ? (((marsRashi - moonRashi + 12) % 12) + 1) : null;
+    const houseFromVenus = venusRashi !== null ? (((marsRashi - venusRashi + 12) % 12) + 1) : null;
+
+    const inLagnaHouses = DOSHA_HOUSES.includes(houseFromLagna);
+    const inMoonHouses = houseFromMoon !== null && DOSHA_HOUSES.includes(houseFromMoon);
+    const inVenusHouses = houseFromVenus !== null && DOSHA_HOUSES.includes(houseFromVenus);
+
+    const hasBaseDosha = inLagnaHouses || inMoonHouses || inVenusHouses;
+    const cancellations = [];
+
+    // 1. Swa-Kshetra (Aries or Scorpio)
+    if (marsRashi === 0 || marsRashi === 7) {
+        cancellations.push({
+            rule: "Swa-Kshetra (Own Sign / ಸ್ವಕ್ಷೇತ್ರ)",
+            desc: "Mars is placed in its own sign (Aries or Scorpio), neutralizing malefic effects.",
+            descKn: "ಕುಜನು ಸ್ವಕ್ಷೇತ್ರದಲ್ಲಿದ್ದಾನೆ (ಮೇಷ ಅಥವಾ ವೃಶ್ಚಿಕ), ದೋಷ ಶಮನವಾಗುತ್ತದೆ."
+        });
+    }
+
+    // 2. Uchcha (Capricorn)
+    if (marsRashi === 9) {
+        cancellations.push({
+            rule: "Uchcha (Exalted / ಉಚ್ಛ)",
+            desc: "Mars is exalted in Capricorn, transforming affliction into auspicious vigor.",
+            descKn: "ಕುಜನು ಮಕರದಲ್ಲಿ ಉಚ್ಛಸ್ಥಿತಿಯಲ್ಲಿದ್ದು, ದೋಷ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+        });
+    }
+
+    // 3. Neecha (Cancer)
+    if (marsRashi === 3) {
+        cancellations.push({
+            rule: "Neecha (Debilitated / ನೀಚ)",
+            desc: "Mars is debilitated in Cancer, drastically mitigating dosha severity.",
+            descKn: "ಕುಜನು ಕರ್ಕಾಟಕದಲ್ಲಿ ನೀಚನಾಗಿದ್ದು, ದೋಷ ತೀವ್ರತೆ ರದ್ದಾಗುತ್ತದೆ."
+        });
+    }
+
+    // 4. Jupiter signs (Sagittarius or Pisces)
+    if (marsRashi === 8 || marsRashi === 11) {
+        cancellations.push({
+            rule: "Guru Kshetra (Jupiter Sign / ಗುರು ಕ್ಷೇತ್ರ)",
+            desc: "Mars in Sagittarius or Pisces (ruled by benefic Jupiter) eliminates dosha.",
+            descKn: "ಗುರು ಕ್ಷೇತ್ರವಾದ ಧನು ಅಥವಾ ಮೀನದಲ್ಲಿ ಕುಜನಿದ್ದರೆ ದೋಷವಿರುವುದಿಲ್ಲ."
+        });
+    }
+
+    // 5. Jupiter Conjunction or Aspect (Guru-Mangala Yoga)
+    if (jupiterRashi !== null) {
+        if (marsRashi === jupiterRashi) {
+            cancellations.push({
+                rule: "Guru-Mangala Yoga (Conjunction with Jupiter / ಗುರು-ಮಂಗಳ ಯುತಿ)",
+                desc: "Benefic Jupiter is conjunct with Mars, fully neutralizing Kuja Dosha.",
+                descKn: "ಗುರು-ಮಂಗಳ ಯುತಿಯಿಂದಾಗಿ ಕುಜ ದೋಷ ಸಂಪೂರ್ಣ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+            });
+        }
+        const distFromJup = ((marsRashi - jupiterRashi + 12) % 12) + 1;
+        if (distFromJup === 5 || distFromJup === 7 || distFromJup === 9) {
+            cancellations.push({
+                rule: "Guru Drishti (Jupiter Aspect / ಗುರು ದೃಷ್ಟಿ)",
+                desc: "Benefic Jupiter aspects Mars (5th, 7th, or 9th drishti), pacifying Kuja Dosha.",
+                descKn: "ಗುರುವಿನ ದೃಷ್ಟಿ ಕುಜನ ಮೇಲಿರುವುದರಿಂದ ಕುಜ ದೋಷ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+            });
+        }
+    }
+
+    // 6. Moon Conjunction (Chandra-Mangala Yoga)
+    if (moonRashi !== null && marsRashi === moonRashi) {
+        cancellations.push({
+            rule: "Chandra-Mangala Yoga (ಚಂದ್ರ-ಮಂಗಳ ಯುತಿ)",
+            desc: "Moon is conjunct with Mars, creating auspicious Chandra-Mangala yoga.",
+            descKn: "ಚಂದ್ರ-ಮಂಗಳ ಯುತಿಯಿಂದಾಗಿ ದೋಷ ಭಂಗವಾಗುತ್ತದೆ."
+        });
+    }
+
+    // 7. House-specific sign rules
+    if (houseFromLagna === 2 && (marsRashi === 2 || marsRashi === 5)) {
+        cancellations.push({ rule: "2nd House in Gemini/Virgo", desc: "Mars in 2nd house in Gemini or Virgo causes no dosha.", descKn: "ಮಿಥುನ/ಕನ್ಯಾದ 2ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+    }
+    if (houseFromLagna === 4 && (marsRashi === 0 || marsRashi === 7)) {
+        cancellations.push({ rule: "4th House in Aries/Scorpio", desc: "Mars in 4th house in Aries or Scorpio causes no dosha.", descKn: "ಮೇಷ/ವೃಶ್ಚಿಕದ 4ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+    }
+    if (houseFromLagna === 7 && (marsRashi === 9 || marsRashi === 11)) {
+        cancellations.push({ rule: "7th House in Capricorn/Pisces", desc: "Mars in 7th house in Capricorn or Pisces causes no dosha.", descKn: "ಮಕರ/ಮೀನದ 7ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+    }
+    if (houseFromLagna === 8 && (marsRashi === 3 || marsRashi === 8)) {
+        cancellations.push({ rule: "8th House in Cancer/Sagittarius", desc: "Mars in 8th house in Cancer or Sagittarius causes no dosha.", descKn: "ಕರ್ಕಾಟಕ/ಧನುಸ್ಸಿನ 8ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+    }
+    if (houseFromLagna === 12 && (marsRashi === 1 || marsRashi === 6)) {
+        cancellations.push({ rule: "12th House in Taurus/Libra", desc: "Mars in 12th house in Taurus or Libra causes no dosha.", descKn: "ವೃಷಭ/ತುಲಾದ 12ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+    }
+
+    let status = 'none';
+    let statusText = 'No Kuja Dosha (ನಿರ್ದೋಷ)';
+    let statusColor = 'var(--green)';
+
+    if (hasBaseDosha) {
+        if (cancellations.length > 0) {
+            status = 'cancelled';
+            statusText = 'Kuja Dosha Cancelled (ದೋಷ ಪರಿಹಾರ / ಭಂಗ)';
+            statusColor = 'var(--orange)';
+        } else {
+            status = 'present';
+            statusText = 'Kuja Dosha Present (ಕುಜ ದೋಷವಿದೆ)';
+            statusColor = 'var(--red)';
+        }
+    }
+
+    return {
+        hasBaseDosha,
+        isCancelled: cancellations.length > 0,
+        status,
+        statusText,
+        statusColor,
+        houseFromLagna,
+        houseFromMoon,
+        houseFromVenus,
+        inLagnaHouses,
+        inMoonHouses,
+        inVenusHouses,
+        cancellations
+    };
+}
+
+// ============================================================
+//  SURYA & CHANDRA GRAHANAM (ECLIPSE FINDER)
+// ============================================================
+function findYearEclipses(year, lat = 12.9716, lon = 77.5946, tzOff = 5.5) {
+    const obs = new Astronomy.Observer(lat, lon, 920);
+    const yearStartTime = new Astronomy.AstroTime(new Date(Date.UTC(year, 0, 1)));
+    const yearEndTime = new Astronomy.AstroTime(new Date(Date.UTC(year + 1, 0, 1)));
+    const eclipses = [];
+
+    // 1. Lunar Eclipses
+    let curTime = yearStartTime;
+    while (true) {
+        const le = Astronomy.SearchLunarEclipse(curTime);
+        if (!le || le.peak.date >= yearEndTime.date) break;
+        if (le.peak.date >= yearStartTime.date) {
+            const peakDate = le.peak.date;
+            const sdMin = (le.sd_partial > 0) ? le.sd_partial : le.sd_penum;
+            const sparshaDate = new Date(peakDate.getTime() - sdMin * 60000);
+            const mokshaDate = new Date(peakDate.getTime() + sdMin * 60000);
+            const sutakaDate = new Date(sparshaDate.getTime() - 9 * 3600000); // 3 praharas (9 hrs) before
+
+            const moonEquator = Astronomy.Equator(Astronomy.Body.Moon, le.peak, obs, true, true);
+            const moonHor = Astronomy.Horizon(le.peak, obs, moonEquator.ra, moonEquator.dec, 'normal');
+            const isVisible = moonHor.altitude > 0;
+
+            const kindKnMap = { 'total': 'ಖಗ್ರಾಸ (Total)', 'partial': 'ಖಂಡಗ್ರಾಸ (Partial)', 'penumbral': 'ಛಾಯಾ (Penumbral)' };
+            eclipses.push({
+                type: 'lunar',
+                title: 'Chandra Grahanam',
+                titleKn: 'ಚಂದ್ರ ಗ್ರಹಣ',
+                kind: le.kind,
+                kindText: kindKnMap[le.kind] || le.kind,
+                peakUTC: peakDate,
+                sparshaUTC: sparshaDate,
+                mokshaUTC: mokshaDate,
+                sutakaUTC: sutakaDate,
+                obscuration: (le.obscuration * 100).toFixed(0) + '%',
+                isVisible,
+                icon: '🌕'
+            });
+        }
+        curTime = le.peak.AddDays(15);
+    }
+
+    // 2. Solar Eclipses
+    curTime = yearStartTime;
+    while (true) {
+        const se = Astronomy.SearchGlobalSolarEclipse(curTime);
+        if (!se || se.peak.date >= yearEndTime.date) break;
+        if (se.peak.date >= yearStartTime.date) {
+            const peakDate = se.peak.date;
+            const localSearchTime = se.peak.AddDays(-1);
+            const lse = Astronomy.SearchLocalSolarEclipse(localSearchTime, obs);
+            const isLocal = lse && Math.abs(lse.peak.time.date.getTime() - peakDate.getTime()) < 24 * 3600000 && lse.peak.altitude > 0;
+
+            let sparshaDate, mokshaDate;
+            if (isLocal && lse.partial_begin && lse.partial_end) {
+                sparshaDate = lse.partial_begin.time.date;
+                mokshaDate = lse.partial_end.time.date;
+            } else {
+                sparshaDate = new Date(peakDate.getTime() - 2 * 3600000);
+                mokshaDate = new Date(peakDate.getTime() + 2 * 3600000);
+            }
+            const sutakaDate = new Date(sparshaDate.getTime() - 12 * 3600000); // 4 praharas (12 hrs) before
+
+            const kindKnMap = { 'total': 'ಖಗ್ರಾಸ (Total)', 'annular': 'ಕಂಕಣ (Annular)', 'partial': 'ಖಂಡಗ್ರಾಸ (Partial)' };
+            eclipses.push({
+                type: 'solar',
+                title: 'Surya Grahanam',
+                titleKn: 'ಸೂರ್ಯ ಗ್ರಹಣ',
+                kind: se.kind,
+                kindText: kindKnMap[se.kind] || se.kind,
+                peakUTC: peakDate,
+                sparshaUTC: sparshaDate,
+                mokshaUTC: mokshaDate,
+                sutakaUTC: sutakaDate,
+                obscuration: (se.obscuration * 100).toFixed(0) + '%',
+                isVisible: !!isLocal,
+                localObscuration: isLocal ? (lse.obscuration * 100).toFixed(0) + '%' : '0%',
+                icon: '☀️'
+            });
+        }
+        curTime = se.peak.AddDays(15);
+    }
+
+    eclipses.sort((a, b) => a.peakUTC - b.peakUTC);
+    return eclipses;
+}
+
+function toggleYearEclipses() {
+    const listEl = document.getElementById('eclipseList');
+    const btn = document.getElementById('btnToggleEclipses');
+    if (!listEl) return;
+    if (listEl.style.display === 'none') {
+        const loc = getLocation();
+        const eYear = (typeof calYear !== 'undefined' && calYear) ? calYear : new Date().getFullYear();
+        const eclipses = findYearEclipses(eYear, loc.lat, loc.lon, loc.tz);
+
+        if (eclipses.length === 0) {
+            listEl.innerHTML = `<div style="padding:10px;color:var(--text-dim);text-align:center;">No eclipses found for ${eYear}.</div>`;
+        } else {
+            listEl.innerHTML = eclipses.map(e => {
+                const peakLocal = e.peakUTC.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+                const peakTime = e.peakUTC.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                const sparshaTime = e.sparshaUTC.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                const mokshaTime = e.mokshaUTC.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                const sutakaTime = e.sutakaUTC.toLocaleTimeString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                return `<div style="background:#1a2038;border-radius:6px;padding:10px;border-left:4px solid ${e.isVisible ? 'var(--gold)' : '#64748b'};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <div style="font-weight:700;font-size:0.95rem;">${e.icon} ${e.title} <span style="font-family:var(--font-kn);color:var(--gold-light);font-size:0.85rem;">(${e.titleKn})</span></div>
+                        <div style="font-size:0.75rem;padding:2px 8px;border-radius:12px;font-weight:600;background:${e.isVisible ? 'rgba(34,197,94,0.2);color:var(--green);border:1px solid var(--green);' : 'rgba(148,163,184,0.15);color:#94a3b8;'}">
+                            ${e.isVisible ? '👁️ Visible in India (ಗೋಚರ)' : '🌐 Not Visible Locally (ಅಗೋಚರ)'}
+                        </div>
+                    </div>
+                    <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;">${e.kindText} &bull; Obscuration: <b>${e.obscuration}</b></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.75rem;background:rgba(0,0,0,0.25);padding:6px;border-radius:4px;">
+                        <div><b>Date:</b> ${peakLocal}</div>
+                        <div><b>Madhya (Peak):</b> ${peakTime}</div>
+                        <div><b>Sparsha (Begin):</b> ${sparshaTime}</div>
+                        <div><b>Moksha (End):</b> ${mokshaTime}</div>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--gold-light);margin-top:6px;">
+                        ⏱️ <b>Sutaka Kala starts:</b> ${sutakaTime} ${e.isVisible ? '(Rituals & Fasting Apply / ಆಚರಣೆ ಅಗತ್ಯ)' : '(Not visible locally — Sutaka rules do not apply)'}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        listEl.style.display = 'flex';
+        if (btn) btn.textContent = 'Hide Year Eclipses';
+    } else {
+        listEl.style.display = 'none';
+        if (btn) btn.textContent = 'View Year Eclipses';
+    }
+}
+
 function generateJathaka() {
     const name = document.getElementById('jName').value || 'Unknown';
     const dobStrRaw = document.getElementById('jDob').value;
@@ -3100,44 +3521,95 @@ function generateJathaka() {
 
             document.getElementById('jDashaBalance').textContent = dashaBalanceStr;
 
-            // --- Full Dasha Timeline ---
+            // --- Full Dasha Timeline with Antardasha Drill-Down ---
             const DASHA_PLANET_NAMES = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+            const DASHA_PLANET_KN = ['ಕೇತು','ಶುಕ್ರ','ಸೂರ್ಯ','ಚಂದ್ರ','ಮಂಗಳ','ರಾಹು','ಗುರು','ಶನಿ','ಬುಧ'];
             const DASHA_COLORS = ['#9333ea','#f472b6','#f59e0b','#94a3b8','#ef4444','#6366f1','#eab308','#3b82f6','#22c55e'];
-            let dashaTimelineHtml = '';
+            let dashaTimelineHtml = '<div style="font-size:0.75rem; color:#666; margin-bottom:6px; text-align:center;">💡 Click any Mahadasha row to view 9 Antardasha (Bhukti) sub-periods / ಅಂತರ್ದಶಾ ವಿವರಗಳಿಗೆ ಕ್ಲಿಕ್ ಮಾಡಿ</div>';
             let curDate = new Date(d.getTime()); // birth date
             // Add balance of first dasha
             const balanceDays = balanceYearsDecimal * 365.2425;
-            curDate = new Date(curDate.getTime() + balanceDays * 86400000);
-            
+            const balEndDate = new Date(curDate.getTime() + balanceDays * 86400000);
+
+            // Helper to generate Antardasha sub-table
+            function getAntardashasHtml(mdIdx, fullStart, fullEnd, birthDate, isFirst, rowIdx) {
+                const mdYears = DASHA_YEARS[mdIdx];
+                let curStart = new Date(fullStart.getTime());
+                let adHtml = '';
+                const now = new Date();
+                for (let j = 0; j < 9; j++) {
+                    const adIdx = (mdIdx + j) % 9;
+                    const adYears = DASHA_YEARS[adIdx];
+                    const adDays = (mdYears * adYears * 365.2425) / 120;
+                    const curEnd = new Date(curStart.getTime() + adDays * 86400000);
+
+                    if (!isFirst || curEnd > birthDate) {
+                        const effStart = (isFirst && curStart < birthDate) ? new Date(birthDate.getTime()) : new Date(curStart.getTime());
+                        const isAdCurrent = (now >= effStart && now < curEnd);
+                        const sStr = effStart.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                        const eStr = curEnd.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                        const spanDays = (curEnd - effStart) / 86400000;
+                        const spanYrs = (spanDays / 365.2425).toFixed(1);
+
+                        adHtml += `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;margin-bottom:2px;border-radius:4px;font-size:0.75rem;${isAdCurrent ? 'background:#e0f2fe;font-weight:600;border-left:3px solid #0284c7;' : 'background:#f8fafc;'}">
+                            <div style="min-width:140px;">
+                                <span>${DASHA_PLANET_NAMES[mdIdx]}-${DASHA_PLANET_NAMES[adIdx]}</span>
+                                <span style="font-family:var(--font-kn);color:var(--gold-dark);font-size:0.7rem;">(${DASHA_PLANET_KN[mdIdx]}-${DASHA_PLANET_KN[adIdx]})</span>
+                                ${isAdCurrent ? '<span style="background:#0284c7;color:#fff;font-size:0.6rem;padding:1px 5px;border-radius:10px;margin-left:4px;">Active / ಪ್ರಸ್ತುತ</span>' : ''}
+                            </div>
+                            <div style="color:#64748b;">${sStr} → ${eStr}</div>
+                            <div style="color:#94a3b8;font-size:0.7rem;">${spanYrs}y</div>
+                        </div>`;
+                    }
+                    curStart = curEnd;
+                }
+                return adHtml;
+            }
+
             // The first dasha lord
             const firstDashaIdx = nakLordIdx;
-            // Show balance dasha first
-            const balEndStr = curDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
+            const balEndStr = balEndDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
             const birthDateStr = d.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
-            dashaTimelineHtml += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:#f8f0e0;border-radius:4px;border-left:4px solid ${DASHA_COLORS[firstDashaIdx]};">
-                <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[firstDashaIdx]}</div>
+            const now = new Date();
+            const isFirstCurrent = (now >= d && now < balEndDate);
+            const firstVirtualStart = new Date(balEndDate.getTime() - DASHA_YEARS[firstDashaIdx] * 365.2425 * 86400000);
+            const firstAdHtml = getAntardashasHtml(firstDashaIdx, firstVirtualStart, balEndDate, d, true, 0);
+
+            dashaTimelineHtml += `
+            <div onclick="toggleDashaAntar(0)" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:6px 8px;background:#f8f0e0;border-radius:4px;border-left:4px solid ${DASHA_COLORS[firstDashaIdx]};margin-bottom:2px;">
+                <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[firstDashaIdx]}${isFirstCurrent ? ' ◀' : ''}</div>
                 <div style="flex:1;font-size:0.8rem;color:#555;">${birthDateStr} → ${balEndStr}</div>
                 <div style="font-size:0.7rem;color:#888;">${bYears}y ${bMonths}m ${bDays}d</div>
+                <div id="dasha-icon-0" style="font-size:0.7rem;color:#888;">${isFirstCurrent ? '▼' : '▶'}</div>
+            </div>
+            <div id="dasha-antar-0" style="display:${isFirstCurrent ? 'block' : 'none'};padding:6px;background:#f1f5f9;border-radius:4px;margin-bottom:6px;">
+                ${firstAdHtml}
             </div>`;
             
+            curDate = balEndDate;
             let totalElapsedDays = balanceDays;
             // Now show remaining 8 dashas in sequence
             for (let i = 1; i <= 8; i++) {
                 const idx = (firstDashaIdx + i) % 9;
                 const yrs = DASHA_YEARS[idx];
-                                const startDate = new Date(curDate.getTime());
+                const startDate = new Date(curDate.getTime());
                 const startStr = startDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
                 const endDate = new Date(d.getTime() + (totalElapsedDays + yrs * 365.2425) * 86400000);
                 curDate = endDate;
                 totalElapsedDays += yrs * 365.2425;
                 const endStr = endDate.toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'});
-                const now = new Date();
-                // FIXED: Direct timestamp comparison prevents locale string parsing NaN bugs on WebViews
                 const isCurrent = (now >= startDate && now < endDate);
-                dashaTimelineHtml += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;${isCurrent ? 'background:#e8f5e9;' : 'background:#fafafa;'}border-radius:4px;border-left:4px solid ${DASHA_COLORS[idx]};">
+                const adHtml = getAntardashasHtml(idx, startDate, endDate, d, false, i);
+
+                dashaTimelineHtml += `
+                <div onclick="toggleDashaAntar(${i})" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:6px 8px;${isCurrent ? 'background:#e8f5e9;' : 'background:#fafafa;'}border-radius:4px;border-left:4px solid ${DASHA_COLORS[idx]};margin-bottom:2px;">
                     <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[idx]}${isCurrent ? ' ◀' : ''}</div>
                     <div style="flex:1;font-size:0.8rem;color:#555;">${startStr} → ${endStr}</div>
                     <div style="font-size:0.7rem;color:#888;">${yrs} yrs</div>
+                    <div id="dasha-icon-${i}" style="font-size:0.7rem;color:#888;">${isCurrent ? '▼' : '▶'}</div>
+                </div>
+                <div id="dasha-antar-${i}" style="display:${isCurrent ? 'block' : 'none'};padding:6px;background:#f1f5f9;border-radius:4px;margin-bottom:6px;">
+                    ${adHtml}
                 </div>`;
             }
             document.getElementById('jDashaTimeline').innerHTML = dashaTimelineHtml;
@@ -3207,6 +3679,55 @@ function generateJathaka() {
                 birthGrahas
             };
             renderActiveKundali();
+
+            // --- Kuja Dosha (Manglik) Analysis ---
+            const kuja = checkKujaDosha(birthGrahas, lagnaRashiIdx);
+            const kujaContentEl = document.getElementById('jKujaDoshaContent');
+            if (kujaContentEl) {
+                const badgeBg = kuja.status === 'none' ? 'rgba(34,197,94,0.15)' : (kuja.status === 'cancelled' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)');
+                const badgeBorder = kuja.status === 'none' ? 'var(--green)' : (kuja.status === 'cancelled' ? 'var(--orange)' : 'var(--red)');
+                const badgeColor = kuja.status === 'none' ? 'var(--green)' : (kuja.status === 'cancelled' ? '#d97706' : 'var(--red)');
+
+                let cancelListHtml = '';
+                if (kuja.cancellations && kuja.cancellations.length > 0) {
+                    cancelListHtml = `
+                    <div style="margin-top:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+                        <div style="font-weight:700; font-size:0.8rem; color:#334155; margin-bottom:6px;">✨ Cancellation Factors (ದೋಷ ಭಂಗ / ಪರಿಹಾರ ನಿಯಮಗಳು):</div>
+                        ${kuja.cancellations.map(c => `
+                            <div style="font-size:0.75rem; margin-bottom:4px; color:#475569;">
+                                <b>• ${c.rule}:</b> ${c.desc} <span style="font-family:var(--font-kn); color:var(--gold-dark);">(${c.descKn})</span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+
+                kujaContentEl.innerHTML = `
+                    <div style="padding:10px 14px; border-radius:8px; background:${badgeBg}; border:1px solid ${badgeBorder}; display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                        <div>
+                            <div style="font-weight:800; font-size:1rem; color:${badgeColor};">${kuja.statusText}</div>
+                            <div style="font-size:0.75rem; color:#475569; margin-top:2px;">
+                                ${kuja.status === 'none' ? 'Mars is placed in auspicious houses causing no affliction.' : (kuja.status === 'cancelled' ? 'Mars causes affliction, but classical exceptions completely neutralize the dosha.' : 'Mars is placed in an afflicted house without complete cancellation.')}
+                            </div>
+                        </div>
+                        <div style="font-size:1.8rem;">${kuja.status === 'none' ? '✅' : (kuja.status === 'cancelled' ? '🛡️' : '⚠️')}</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:0.8rem; text-align:center;">
+                        <div style="padding:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;">
+                            <div style="font-size:0.7rem; color:#64748b;">From Lagna (ಲಗ್ನದಿಂದ)</div>
+                            <div style="font-weight:700; margin-top:2px; color:${kuja.inLagnaHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromLagna} ${kuja.inLagnaHouses ? '(Dosha)' : '(Shubha)'}</div>
+                        </div>
+                        <div style="padding:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;">
+                            <div style="font-size:0.7rem; color:#64748b;">From Moon (ಚಂದ್ರನಿಂದ)</div>
+                            <div style="font-weight:700; margin-top:2px; color:${kuja.inMoonHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromMoon || '—'} ${kuja.inMoonHouses ? '(Dosha)' : '(Shubha)'}</div>
+                        </div>
+                        <div style="padding:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;">
+                            <div style="font-size:0.7rem; color:#64748b;">From Venus (ಶುಕ್ರನಿಂದ)</div>
+                            <div style="font-weight:700; margin-top:2px; color:${kuja.inVenusHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromVenus || '—'} ${kuja.inVenusHouses ? '(Dosha)' : '(Shubha)'}</div>
+                        </div>
+                    </div>
+                    ${cancelListHtml}
+                `;
+            }
 
             currentJathakaData = {
                 name, dobStr: dobLocaleStr, nakName, pada, moonRashi: moonRashiStr, sunRashi: sunRashiStr, tithi: tithiStr, dashaBalance: dashaBalanceStr
@@ -4166,14 +4687,16 @@ function filterCalFests(type) {
     items.forEach(item => {
         if (type === 'all') { item.style.display = ''; return; }
         const text = (item.textContent || '').toLowerCase();
+        const isEclipse = text.includes('grahanam') || text.includes('eclipse') || text.includes('ಗ್ರಹಣ');
         const isEkadashi = text.includes('ekadashi') || text.includes('ಏಕಾದಶಿ');
-        const isVrata = text.includes('vrata') || text.includes('pradosh') || text.includes('chaturthi') || text.includes('purnima') || text.includes('amavasya') || isEkadashi;
-        const isSankranti = text.includes('sankranti') || text.includes('sankrant');
-        const isFestival = !isVrata && !isSankranti;
+        const isSankranti = text.includes('sankranti') || text.includes('sankrant') || text.includes('ಸಂಕ್ರಾಂತಿ');
+        const isVrata = (text.includes('vrata') || text.includes('pradosh') || text.includes('chaturthi') || text.includes('purnima') || text.includes('amavasya') || isEkadashi) && !isEclipse;
+        const isFestival = !isVrata && !isSankranti && !isEclipse;
 
         if (type === 'ekadashi') item.style.display = isEkadashi ? '' : 'none';
         else if (type === 'vrata') item.style.display = isVrata ? '' : 'none';
         else if (type === 'sankranti') item.style.display = isSankranti ? '' : 'none';
+        else if (type === 'eclipse') item.style.display = isEclipse ? '' : 'none';
         else if (type === 'festival') item.style.display = isFestival ? '' : 'none';
     });
 }
@@ -4378,6 +4901,15 @@ function scoreDayForMuhurtham(p, purpose, evalNakIdx) {
     if (fests.some(f => f.shopping_peak)) score += 5;
     // Wire in specialized purpose scoring (FIXED: was disconnected)
     if (typeof scoreForNewPurpose === 'function') score += scoreForNewPurpose(p, purpose, nakIdx);
+
+    // Moudhya Penalty: Guru (Jupiter) or Shukra (Venus) combustion prohibits Vivaha, Upanayana, Grihapravesha
+    if (purpose === 'marriage' || purpose === 'upanayana' || purpose === 'grihapravesha') {
+        const dayGrahas = getAllGrahaPositions(p.sunrise);
+        const guruCombust = dayGrahas.find(g => g.name === 'Jupiter')?.combust;
+        const shukraCombust = dayGrahas.find(g => g.name === 'Venus')?.combust;
+        if (guruCombust || shukraCombust) score -= 40;
+    }
+
     return Math.max(0, Math.min(100, score));
 }
 
@@ -4740,6 +5272,21 @@ function doMarriageMatch() {
         </div>`;
     });
     document.getElementById('matchTable').innerHTML = html;
+
+    // Kuja Dosha guidance note in matchmaking
+    let kujaNote = document.getElementById('matchKujaNote');
+    if (!kujaNote) {
+        kujaNote = document.createElement('div');
+        kujaNote.id = 'matchKujaNote';
+        document.getElementById('matchTable').parentNode.appendChild(kujaNote);
+    }
+    kujaNote.innerHTML = `
+        <div style="margin-top:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.3); border-radius:6px; padding:10px;">
+            <div style="font-weight:700; font-size:0.85rem; color:var(--gold); margin-bottom:4px;">🛡️ Kuja Dosha (Manglik) Verification Reminder / ಕುಜ ದೋಷ ಪರಿಶೀಲನೆ:</div>
+            <div style="font-size:0.75rem; color:var(--text-dim); line-height:1.4;">
+                Ashtakoota tests Nakshatra compatibility (36 Gunas). In traditional Vedic matchmaking, Kuja Dosha (Mars in 1st, 2nd, 4th, 7th, 8th, or 12th house) must also be verified using the Janma Kundali. If both bride and groom have Kuja Dosha, the dosha is mutually cancelled (ದೋಷ ಪರಿಹಾರ). You can generate the individual Janma Jathaka in the <b>Kundali tab</b> to check full Kuja Dosha status with Parashara cancellation rules.
+            </div>
+        </div>`;
 }
 
 // ============================================================
