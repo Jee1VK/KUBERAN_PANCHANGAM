@@ -1295,7 +1295,7 @@ function lahiriAyanamsa(jd) {
     // True Ayanamsa = Mean Ayanamsa + Nutation in longitude
     // This cancels the nutation already present in apparent (true) tropical longitudes
     const t = new Astronomy.AstroTime(jd - 2451545.0);
-    const nutation = Astronomy.e_tilt(t).dpsi; // nutation in longitude (degrees)
+    const nutation = Astronomy.e_tilt(t).dpsi / 3600.0; // nutation in longitude (degrees, converted from arcseconds)
     return 23.857092 + psiArcsec / 3600.0 + nutation;
 }
 
@@ -3957,12 +3957,15 @@ function checkSuvarnaMuhurtha(p, dayOfWeek, horaData) {
 
     if (results.length > 0) {
         card.style.display = 'block';
-        card.querySelector('#suvarnaContent').innerHTML = results.map(r =>
-            '<div style="padding:8px 10px; margin-bottom:6px; border-radius:6px; border-left:3px solid ' +
-            (r.type === 'best' ? 'var(--gold)' : r.type === 'good' ? 'var(--green)' : '#6366f1') +
-            '; background:' + (r.type === 'best' ? 'rgba(212,175,55,0.1)' : r.type === 'good' ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.1)') +
-            '; font-size:0.85rem;">' + r.text + '</div>'
-        ).join('');
+        const contentEl = card.querySelector('#suvarnaContent') || document.getElementById('suvarnaContent');
+        if (contentEl) {
+            contentEl.innerHTML = results.map(r =>
+                '<div style="padding:8px 10px; margin-bottom:6px; border-radius:6px; border-left:3px solid ' +
+                (r.type === 'best' ? 'var(--gold)' : r.type === 'good' ? 'var(--green)' : '#6366f1') +
+                '; background:' + (r.type === 'best' ? 'rgba(212,175,55,0.1)' : r.type === 'good' ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.1)') +
+                '; font-size:0.85rem;">' + r.text + '</div>'
+            ).join('');
+        }
     } else {
         card.style.display = 'none';
     }
