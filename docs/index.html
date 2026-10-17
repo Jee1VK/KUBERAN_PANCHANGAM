@@ -26,7 +26,7 @@
             --red: #ef4444;
             --orange: #f59e0b;
             --text: #e8e8f0;
-            --text-dim: #8890a8;
+            --text-dim: #9ca3af;
             --font-kn: 'Noto Sans Kannada', sans-serif;
             --font-en: 'Inter', 'Segoe UI', sans-serif;
         }
@@ -257,6 +257,82 @@
             #matchTable > div { color: #000 !important; }
             #matchTable > div > div { color: #000 !important; }
         }
+
+        /* LUXURY KUBERAN ROYAL SILK AESTHETIC POLISH */
+        :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+        button, .btn-calc, .btn-add, .btn-today, .chip-btn, .tab-nav, .btn-stepper {
+            transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+        button:active, .btn-calc:active, .btn-add:active, .btn-today:active, .chip-btn:active, .tab-nav:active, .btn-stepper:active {
+            transform: scale(0.96);
+        }
+        .card {
+            background: linear-gradient(145deg, #161b2e 0%, #1e172a 100%);
+            border: 1px solid rgba(212, 160, 23, 0.22);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        }
+        .card h2 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .btn-stepper {
+            background: var(--card); border: 1px solid var(--card-border); color: var(--gold);
+            width: 36px; height: 36px; border-radius: 8px; font-size: 1.2rem; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+        .btn-stepper:hover { border-color: var(--gold); background: rgba(212,160,23,0.1); }
+        .chip-btn {
+            background: var(--card); border: 1px solid var(--card-border); color: var(--text-dim);
+            padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        }
+        .chip-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 700; }
+        .chip-btn:hover:not(.active) { border-color: rgba(212,160,23,0.5); color: var(--text); }
+        .btn-share-wa {
+            background: linear-gradient(135deg, #25D366, #128C7E) !important;
+            color: #fff !important; border: none !important; font-weight: 700 !important;
+            display: inline-flex; align-items: center; gap: 5px;
+            box-shadow: 0 2px 10px rgba(37,211,102,0.3);
+        }
+        .btn-share-wa:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        /* LIVE MUHURTHA BANNER */
+        .live-pill {
+            padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 600;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            flex-wrap: wrap; margin-bottom: 14px; animation: pulseGlow 3s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 0 14px rgba(212,160,23,0.25); }
+        }
+        .live-pill.good { background: rgba(34,197,94,0.15); border: 1px solid var(--green); color: #86efac; }
+        .live-pill.bad { background: rgba(239,68,68,0.15); border: 1px solid var(--red); color: #fca5a5; }
+        .live-pill.caution { background: rgba(245,158,11,0.15); border: 1px solid var(--orange); color: #fde047; }
+        .live-pill.neutral { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: var(--text); }
+
+        /* VIEW SWITCHER */
+        .seg-btn {
+            background: transparent; border: none; color: var(--text-dim); padding: 6px 14px;
+            border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .seg-btn.active { background: var(--gold); color: #000; font-weight: 700; }
+        .seg-btn:hover:not(.active) { color: #fff; }
+
+        /* WINDOW ROW ACCENTS */
+        .window-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 9px 12px; margin-bottom: 6px; border-radius: 6px; background: rgba(255,255,255,0.02);
+            transition: background 0.15s ease;
+        }
+        .window-row:hover { background: rgba(255,255,255,0.04); }
+        .window-row.good-row { border-left: 3px solid var(--green); background: rgba(34,197,94,0.06); }
+        .window-row.bad-row { border-left: 3px solid var(--red); background: rgba(239,68,68,0.06); }
+        .window-row.neutral-row { border-left: 3px solid var(--orange); background: rgba(245,158,11,0.06); }
+
     </style>
 </head>
 <body>
@@ -345,13 +421,33 @@
 <div class="tab-content active" id="tab-daily">
 <div class="container">
 
-    <!-- CONTROLS -->
-    <div class="controls">
-        <div>
-            <label>Date</label>
-            <input type="date" id="dateInput">
+    <!-- CONTROLS & DATE STEPPER -->
+    <div class="controls" style="margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; width:100%; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:6px;">
+                <button type="button" class="btn-stepper" onclick="stepDate(-1)" title="Previous Day (ಹಿಂದಿನ ದಿನ)">‹</button>
+                <input type="date" id="dateInput" style="min-width:140px; cursor:pointer;" onchange="onDateInputChange(this.value)">
+                <button type="button" class="btn-stepper" onclick="stepDate(1)" title="Next Day (ಮುಂದಿನ ದಿನ)">›</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="chip-btn active" id="chipToday" onclick="goToday()">Today (ಇಂದು)</button>
+                <button type="button" class="chip-btn" id="chipTomorrow" onclick="goTomorrow()">Tomorrow (ನಾಳೆ)</button>
+                <button type="button" class="chip-btn btn-share-wa" onclick="shareTodayPanchanga()" title="Share Panchangam on WhatsApp">
+                    <span>📲 Share</span>
+                </button>
+            </div>
         </div>
-        <button class="btn-today" onclick="goToday()">Today</button>
+    </div>
+
+    <!-- LIVE REAL-TIME MUHURTHA STATUS BANNER -->
+    <div id="liveMuhurthaBanner" class="live-pill neutral" style="display:none;"></div>
+
+    <!-- ESSENTIAL VS DETAILED VIEW SWITCHER -->
+    <div class="view-switch-container" style="display:flex; justify-content:center; margin-bottom:14px;">
+        <div style="display:inline-flex; background:rgba(255,255,255,0.05); border:1px solid var(--card-border); border-radius:30px; padding:3px; gap:4px;">
+            <button type="button" class="seg-btn active" id="btnViewQuick" onclick="switchDailyView('quick')">⚡ Essential (ಮುಖ್ಯ)</button>
+            <button type="button" class="seg-btn" id="btnViewDetailed" onclick="switchDailyView('detailed')">📜 Detailed (ಸಂಪೂರ್ಣ)</button>
+        </div>
     </div>
 
     <!-- LOCATION CONTROLS -->
@@ -392,7 +488,16 @@
 
     <!-- TODAY AT A GLANCE -->
     <div class="card" id="glanceCard" style="background:linear-gradient(135deg, #1a1f38, #0f1320); border:1px solid var(--gold); border-left:4px solid var(--gold);">
-        <h2 style="margin-bottom:12px;">🕉️ Today at a Glance</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(212,160,23,0.25); padding-bottom:8px;">
+            <h2 style="margin:0; border:none; padding:0; font-size:0.95rem;">🕉️ Today at a Glance</h2>
+            <div id="glanceMoonPhase" style="display:flex; align-items:center; gap:8px;">
+                <div id="moonPhaseSvgContainer"></div>
+                <div style="text-align:right;">
+                    <div id="moonPhaseName" style="font-size:0.75rem; font-weight:700; color:var(--gold-light);">—</div>
+                    <div id="moonPhaseIllum" style="font-size:0.68rem; color:var(--text-dim);">—</div>
+                </div>
+            </div>
+        </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" id="glanceGrid">
             <div><span style="color:var(--text-dim);font-size:0.7rem;">TITHI</span><div style="font-weight:600;" id="glTithi">—</div></div>
             <div><span style="color:var(--text-dim);font-size:0.7rem;">NAKSHATRA</span><div style="font-weight:600;" id="glNak">—</div></div>
@@ -423,13 +528,13 @@
     </div>
 
     <!-- SANKRANTI INDICATOR -->
-    <div class="card" id="sankrantiCard" style="display:none;">
+    <div class="card detailed-only" id="sankrantiCard" style="display:none;">
         <h2>🌞 Sankranti</h2>
         <div id="sankrantiInfo"></div>
     </div>
 
     <!-- UPCOMING FESTIVALS -->
-    <div class="card">
+    <div class="card detailed-only">
         <h2>📆 Upcoming Festivals</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Next 5 festivals from today.</p>
         <div id="upcomingFests"></div>
@@ -1647,6 +1752,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
         ritu: rituName,
         lagnas: computeDailyLagnas(riseJD, lat, lon),
         shraddhaTithi: shraddha,
+        elongation: elongation(riseJD),
         wd, year, month, day
     };
 }
@@ -1750,7 +1856,7 @@ function renderPanchanga(p) {
     labels.innerHTML = `<span>${fmt(p.sunrise)}</span><span>Noon</span><span>${fmt(p.sunset)}</span>`;
 
     const wl = document.getElementById('windowsList');
-    const row = (dot, name, s, e) => `<div class="window-row"><div class="window-dot ${dot}"></div><div class="window-name">${name}</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
+    const row = (dot, name, s, e) => `<div class="window-row ${dot === 'good' ? 'good-row' : (dot === 'bad' ? 'bad-row' : 'neutral-row')}"><div class="window-dot ${dot}"></div><div class="window-name">${name}</div><div class="window-time">${fmt(s)} – ${fmt(e)}</div></div>`;
     
     let amritRows = '';
     if (p.amritKalam && p.amritKalam.length > 0) {
@@ -2058,6 +2164,14 @@ function renderPanchanga(p) {
     const rashiToUse = (storedRashi !== null && !isNaN(parseInt(storedRashi, 10))) ? parseInt(storedRashi, 10) : 0;
     generateRashifal(rashiToUse, grahas, p);
 
+    // --- MOON PHASE & LIVE STATUS ---
+    updateMoonPhaseDisplay(p);
+    updateLiveMuhurthaBanner();
+
+    // --- RESTORE SAVED VIEW ---
+    const savedDailyView = localStorage.getItem('kuberan_daily_view') || 'quick';
+    switchDailyView(savedDailyView);
+
     // --- START REAL-TIME COUNTDOWN TIMER ---
     startLiveNowTimer();
 }
@@ -2312,7 +2426,9 @@ function toggleLang() {
 
 function goToday() {
     const now = new Date();
-    document.getElementById('dateInput').value = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    const str = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    document.getElementById('dateInput').value = str;
+    if (typeof updateDateChips === 'function') updateDateChips(str);
     recalculate();
 }
 
@@ -3091,9 +3207,281 @@ function updateLiveNowIndicators() {
     }
 }
 
+
+// ============================================================
+//  UI/UX PRO MAX SUITE: LIVE MUHURTHA, MOON PHASE, STEPPER, SHARE
+// ============================================================
+
+function renderMoonPhaseSVG(deg, size = 44) {
+    const R = size / 2 - 2;
+    const cx = size / 2;
+    const cy = size / 2;
+    const rad = deg * Math.PI / 180;
+    const isWaxing = deg < 180;
+    const rx = Math.max(0.1, Math.abs(R * Math.cos(rad)));
+    let pathD = '';
+    if (deg >= 358 || deg <= 2) {
+        pathD = ''; // New Moon (Amavasya)
+    } else if (deg >= 178 && deg <= 182) {
+        pathD = `M ${cx} ${cy - R} A ${R} ${R} 0 1 1 ${cx} ${cy + R} A ${R} ${R} 0 1 1 ${cx} ${cy - R} Z`;
+    } else if (isWaxing) {
+        const termSweep = deg < 90 ? 0 : 1;
+        pathD = `M ${cx} ${cy - R} A ${R} ${R} 0 0 1 ${cx} ${cy + R} A ${rx} ${R} 0 0 ${termSweep} ${cx} ${cy - R} Z`;
+    } else {
+        const termSweep = deg < 270 ? 1 : 0;
+        pathD = `M ${cx} ${cy - R} A ${R} ${R} 0 0 0 ${cx} ${cy + R} A ${rx} ${R} 0 0 ${termSweep} ${cx} ${cy - R} Z`;
+    }
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter: drop-shadow(0 0 6px rgba(245,200,66,0.35)); vertical-align:middle;">
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="#161b2e" stroke="rgba(212,160,23,0.4)" stroke-width="1.5" />
+        ${pathD ? `<path d="${pathD}" fill="#fdf0cd" />` : ''}
+    </svg>`;
+}
+
+function updateMoonPhaseDisplay(p) {
+    const deg = (p && p.elongation !== undefined) ? p.elongation : 0;
+    const rad = deg * Math.PI / 180;
+    const illum = ((1 - Math.cos(rad)) / 2 * 100).toFixed(0);
+    const isWaxing = deg < 180;
+    
+    const svgEl = document.getElementById('moonPhaseSvgContainer');
+    const nameEl = document.getElementById('moonPhaseName');
+    const illumEl = document.getElementById('moonPhaseIllum');
+    
+    if (svgEl) svgEl.innerHTML = renderMoonPhaseSVG(deg, 42);
+    
+    let phaseNameEn = '';
+    let phaseNameKn = '';
+    if (p.tithi && p.tithi.no === 15) {
+        phaseNameEn = 'Pournami';
+        phaseNameKn = 'ಹುಣ್ಣಿಮೆ';
+    } else if (p.tithi && p.tithi.no === 30) {
+        phaseNameEn = 'Amavasya';
+        phaseNameKn = 'ಅಮಾವಾಸ್ಯೆ';
+    } else if (isWaxing) {
+        phaseNameEn = 'Shukla Paksha';
+        phaseNameKn = 'ಶುಕ್ಲ ಪಕ್ಷ';
+    } else {
+        phaseNameEn = 'Krishna Paksha';
+        phaseNameKn = 'ಕೃಷ್ಣ ಪಕ್ಷ';
+    }
+    
+    if (nameEl) nameEl.textContent = `${phaseNameEn} (${phaseNameKn})`;
+    if (illumEl) illumEl.textContent = `🌖 ${illum}% Illumination`;
+}
+
+function getTodayStr() {
+    const now = new Date();
+    return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+}
+
+function formatDateYMD(dt) {
+    return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`;
+}
+
+function stepDate(delta) {
+    const dInput = document.getElementById('dateInput');
+    const val = dInput.value || getTodayStr();
+    const [y, m, d] = val.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    dt.setDate(dt.getDate() + delta);
+    const nextStr = formatDateYMD(dt);
+    dInput.value = nextStr;
+    updateDateChips(nextStr);
+    recalculate();
+}
+
+function goTomorrow() {
+    const tm = new Date();
+    tm.setDate(tm.getDate() + 1);
+    const str = formatDateYMD(tm);
+    document.getElementById('dateInput').value = str;
+    updateDateChips(str);
+    recalculate();
+}
+
+function onDateInputChange(val) {
+    updateDateChips(val);
+    recalculate();
+}
+
+function updateDateChips(selectedStr) {
+    const todayStr = getTodayStr();
+    const tm = new Date(); tm.setDate(tm.getDate() + 1);
+    const tmStr = formatDateYMD(tm);
+    const chipTod = document.getElementById('chipToday');
+    const chipTom = document.getElementById('chipTomorrow');
+    if (chipTod) chipTod.classList.toggle('active', selectedStr === todayStr);
+    if (chipTom) chipTom.classList.toggle('active', selectedStr === tmStr);
+}
+
+function switchDailyView(mode) {
+    try { localStorage.setItem('kuberan_daily_view', mode); } catch(e){}
+    const isDetailed = mode === 'detailed';
+    const bQuick = document.getElementById('btnViewQuick');
+    const bDet = document.getElementById('btnViewDetailed');
+    if (bQuick) bQuick.classList.toggle('active', !isDetailed);
+    if (bDet) bDet.classList.toggle('active', isDetailed);
+    document.querySelectorAll('.detailed-only').forEach(el => {
+        el.style.display = isDetailed ? 'block' : 'none';
+    });
+}
+
+function updateLiveMuhurthaBanner() {
+    const banner = document.getElementById('liveMuhurthaBanner');
+    if (!banner || !lastPanchanga) return;
+    
+    const p = lastPanchanga;
+    const fmt = (jd) => jdToLocalTimeStr(jd, p.tzOff);
+    const todayStr = getTodayStr();
+    const curVal = document.getElementById('dateInput')?.value;
+    
+    if (curVal && curVal !== todayStr) {
+        banner.style.display = 'flex';
+        banner.className = 'live-pill neutral';
+        banner.innerHTML = `<div>📅 <strong>Viewing:</strong> ${curVal}</div>
+            <a href="javascript:void(0)" onclick="goToday()" style="color:var(--gold);text-decoration:underline;font-size:0.8rem;">Switch to Today for Live Status ➔</a>`;
+        return;
+    }
+    
+    const nowJD = (Date.now() / 86400000) + 2440587.5;
+    banner.style.display = 'flex';
+    
+    // Check Active Windows
+    // 1. Rahu Kalam
+    if (nowJD >= p.rahu.start && nowJD < p.rahu.end) {
+        const mins = Math.max(1, Math.round((p.rahu.end - nowJD) * 1440));
+        banner.className = 'live-pill bad';
+        banner.innerHTML = `<div>🔴 <strong>Rahu Kalam Active Now (ರಾಹುಕಾಲ)!</strong> Until ${fmt(p.rahu.end)} (${mins}m left)</div>
+            <div style="font-size:0.75rem;opacity:0.9;">Avoid new deeds</div>`;
+        return;
+    }
+    
+    // 2. Varjyam
+    if (p.varjyam && p.varjyam.length > 0) {
+        for (const v of p.varjyam) {
+            if (nowJD >= v.start && nowJD < v.end) {
+                const mins = Math.max(1, Math.round((v.end - nowJD) * 1440));
+                banner.className = 'live-pill bad';
+                banner.innerHTML = `<div>⚠️ <strong>Varjyam Active Now (ವರ್ಜ್ಯ ಕಾಲ)!</strong> Until ${fmt(v.end)} (${mins}m left)</div>
+                    <div style="font-size:0.75rem;opacity:0.9;">Avoid beginnings</div>`;
+                return;
+            }
+        }
+    }
+    
+    // 3. Yamaganda
+    if (nowJD >= p.yama.start && nowJD < p.yama.end) {
+        const mins = Math.max(1, Math.round((p.yama.end - nowJD) * 1440));
+        banner.className = 'live-pill caution';
+        banner.innerHTML = `<div>🟠 <strong>Yamaganda Active (ಯಮಗಂಡ)!</strong> Until ${fmt(p.yama.end)} (${mins}m left)</div>
+            <div style="font-size:0.75rem;opacity:0.9;">Caution window</div>`;
+        return;
+    }
+    
+    // 4. Amrit Kalam
+    if (p.amritKalam && p.amritKalam.length > 0) {
+        for (const a of p.amritKalam) {
+            if (nowJD >= a.start && nowJD < a.end) {
+                const mins = Math.max(1, Math.round((a.end - nowJD) * 1440));
+                banner.className = 'live-pill good';
+                banner.innerHTML = `<div>✨ <strong>Amrit Kalam Active Now (ಅಮೃತ ಕಾಲ)!</strong> Until ${fmt(a.end)} (${mins}m left)</div>
+                    <div style="font-size:0.75rem;color:#fff;">🌟 Highly Auspicious</div>`;
+                return;
+            }
+        }
+    }
+    
+    // 5. Abhijit Muhurtha
+    if (nowJD >= p.abhijit.start && nowJD < p.abhijit.end && p.wd !== 3) {
+        const mins = Math.max(1, Math.round((p.abhijit.end - nowJD) * 1440));
+        banner.className = 'live-pill good';
+        banner.innerHTML = `<div>✨ <strong>Abhijit Muhurtha Active (ಅಭಿಜಿತ್ ಮುಹೂರ್ತ)!</strong> Until ${fmt(p.abhijit.end)} (${mins}m left)</div>
+            <div style="font-size:0.75rem;color:#fff;">🌟 Auspicious Victory</div>`;
+        return;
+    }
+    
+    // None active: find next window today
+    let nextEvent = null;
+    let nextEventName = '';
+    let nextEventGood = true;
+    
+    const candidates = [
+        { jd: p.rahu.start, name: 'Rahu Kalam (ರಾಹುಕಾಲ)', good: false },
+        { jd: p.yama.start, name: 'Yamaganda (ಯಮಗಂಡ)', good: false },
+        { jd: p.abhijit.start, name: 'Abhijit Muhurtha (ಅಭಿಜಿತ್)', good: true }
+    ];
+    if (p.amritKalam) {
+        p.amritKalam.forEach(a => candidates.push({ jd: a.start, name: 'Amrit Kalam (ಅಮೃತ ಕಾಲ)', good: true }));
+    }
+    
+    candidates.sort((a,b) => a.jd - b.jd);
+    for (const c of candidates) {
+        if (c.jd > nowJD) {
+            nextEvent = c.jd;
+            nextEventName = c.name;
+            nextEventGood = c.good;
+            break;
+        }
+    }
+    
+    banner.className = 'live-pill neutral';
+    if (nextEvent) {
+        const mins = Math.max(1, Math.round((nextEvent - nowJD) * 1440));
+        banner.innerHTML = `<div>🟢 <strong>Shubha Samaya (ಸಾಮಾನ್ಯ ಶುಭ ಕಾಲ)</strong> · Next: <b>${nextEventName}</b> at ${fmt(nextEvent)}</div>
+            <div style="font-size:0.75rem;color:var(--gold);">In ${mins} min</div>`;
+    } else {
+        banner.innerHTML = `<div>🌙 <strong>Shanti Sandhya (ಸಂಜೆ ಶಾಂತಿ ಕಾಲ)</strong></div>
+            <div style="font-size:0.75rem;color:var(--text-dim);">All daytime muhurthas concluded</div>`;
+    }
+}
+
+function shareTodayPanchanga() {
+    if (!lastPanchanga) return;
+    const p = lastPanchanga;
+    const fmt = (jd) => jdToLocalTimeStr(jd, p.tzOff);
+    const dateObj = new Date(p.year, p.month - 1, p.day);
+    const dateStr = dateObj.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    const text = `🕉️ *KUBERAN PANCHANGAM* 🕉️\n` +
+        `📅 *${dateStr}*` +
+        `\n🏛️ *${p.samvatsara.name} ನಾಮ ಸಂವತ್ಸರ* · ${p.ayana.en} · ${p.masa.en} (${p.masa.kn})\n\n` +
+        `✨ *Five Limbs of the Day (ಪಂಚಾಂಗ):*\n` +
+        `• *Tithi:* ${p.tithi.paksha} ${p.tithi.name} (${p.tithi.nameKn}) till ${fmt(p.tithi.endJD)}\n` +
+        `• *Nakshatra:* ${p.nakshatra.name} (${p.nakshatra.nameKn}) Pada ${p.nakshatra.pada}\n` +
+        `• *Yoga:* ${p.yoga.name}\n` +
+        `• *Karana:* ${p.karana.name}\n\n` +
+        `⏱️ *Auspicious Windows (ಶುಭ ಮುಹೂರ್ತ):*\n` +
+        `• *Abhijit Muhurtha:* ${fmt(p.abhijit.start)} – ${fmt(p.abhijit.end)}\n` +
+        (p.amritKalam && p.amritKalam[0] ? `• *Amrit Kalam:* ${fmt(p.amritKalam[0].start)} – ${fmt(p.amritKalam[0].end)}\n` : '') +
+        `\n⚠️ *Inauspicious Windows (ವರ್ಜ್ಯ ಕಾಲ):*\n` +
+        `• *Rahu Kalam:* ${fmt(p.rahu.start)} – ${fmt(p.rahu.end)}\n` +
+        `• *Yamaganda:* ${fmt(p.yama.start)} – ${fmt(p.yama.end)}\n` +
+        (p.varjyam && p.varjyam[0] ? `• *Varjyam:* ${fmt(p.varjyam[0].start)} – ${fmt(p.varjyam[0].end)}\n` : '') +
+        `\n✨ *Kuberan Silks — Chickpet, Bengaluru*\nhttps://kuberansilks.com/`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: `Kuberan Panchangam - ${dateStr}`,
+            text: text
+        }).catch(() => {});
+    } else {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Panchanga copied to clipboard! Opening WhatsApp to share...');
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            }).catch(() => {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            });
+        } else {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        }
+    }
+}
+
 function startLiveNowTimer() {
     if (liveNowInterval) clearInterval(liveNowInterval);
     updateLiveNowIndicators();
+    updateLiveMuhurthaBanner();
     liveNowInterval = setInterval(updateLiveNowIndicators, 30000); // every 30s
 }
 
