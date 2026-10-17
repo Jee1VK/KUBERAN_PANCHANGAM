@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kuberan-panchangam-v43';
+const CACHE_NAME = 'kuberan-panchangam-v44';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -1586,7 +1586,9 @@ function getAmantaMasaIdx(baseJD) {
         // Check previous NM for adhika
         const prevNmJD = findNM(nmJD - 29.53);
         const prevRashi = sunRashiAt(prevNmJD);
-        return { idx: rashiIdx, isAdhika: prevRashi === rashiIdx };
+        const isAdhika = (prevRashi === rashiIdx);
+        const finalIdx = isAdhika ? ((rashiIdx + 1) % 12) : rashiIdx;
+        return { idx: finalIdx, isAdhika };
     }
 
     // Step 1: Find approximate days to next New Moon
@@ -1606,52 +1608,66 @@ function getAmantaMasaIdx(baseJD) {
     // Step 4: Check for Adhika Masa — find previous NM and compare Sun rashis
     const prevNmJD = findNM(nmJD - 29.53);
     const prevRashi = sunRashiAt(prevNmJD);
-    // If two consecutive NMs have Sun in the same rashi, the first month is Adhika
-    // We're between prevNM and nmJD. prevRashi tells us what masa started at prevNM.
-    // If prevRashi === rashiIdx, the current month (between these two NMs) is Adhika.
+    // If two consecutive NMs have Sun in the same rashi, the first month is Adhika.
+    // In classical Amanta, Adhika takes the name of the upcoming month: (rashiIdx + 1) % 12.
     const isAdhika = (prevRashi === rashiIdx);
+    const finalIdx = isAdhika ? ((rashiIdx + 1) % 12) : rashiIdx;
 
-    return { idx: rashiIdx, isAdhika };
+    return { idx: finalIdx, isAdhika };
 }
 
 // ============================================================
 //  FIND UGADI — Chaitra Shukla Prathama (New Year start)
-//  Finds the JD when Chaitra Shukla Prathama begins in a given year.
+//  Finds the JD when Nija Chaitra Shukla Prathama begins.
 // ============================================================
+const _ugadiCache = {};
 function findUgadiJD(year) {
-    // Ugadi falls on Chaitra Shukla Prathama.
+    if (_ugadiCache[year]) return _ugadiCache[year];
+    // Ugadi falls on Chaitra Shukla Prathama of NIJA Chaitra (not Adhika Chaitra).
     // In Amanta system, Chaitra begins after the NM when Sun is in Meena (rashi 11).
-    // That NM typically falls in March-April.
-    // Search from Feb 20 to Apr 30 for the NM where Sun is in Meena (rashi 11).
+    // If that month is Adhika Chaitra, Ugadi is celebrated on Nija Chaitra.
     const searchStartJD = julianDay(year, 2, 20, 12);
     const relSpd = 12.19;
     
-    // Find first NM after search start
     let baseJD = searchStartJD;
     const elong0 = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
     let daysToNM = (360 - elong0) / relSpd;
     if (daysToNM < 0.5) daysToNM += 29.53;
     
-    // Try up to 3 consecutive NMs
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < 4; attempt++) {
         let nmJD = baseJD + daysToNM;
         for (let i = 0; i < 5; i++) {
             const e2 = ((moonLongitude(nmJD) - sunLongitude(nmJD)) % 360 + 360) % 360;
             const err = e2 > 180 ? e2 - 360 : e2;
             nmJD -= err / relSpd;
         }
-        const sunRashi = Math.floor(((sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360) / 30);
-        if (sunRashi === 11) {
-            // This NM starts Chaitra. The next day with Shukla Prathama at sunrise is Ugadi.
-            // Shukla Prathama starts right after this NM.
-            // Return the JD of the NM + ~1 day (next sunrise after NM)
-            return nmJD + 1;
+        const m = getAmantaMasaIdx(nmJD + 1);
+        if (m.idx === 0 && !m.isAdhika) {
+            const dt = jdToDate(nmJD);
+            const sr0 = computeSunrise(dt.year, dt.month, dt.day, 12.9716, 77.5946, 5.5);
+            const rise0 = julianDay(dt.year, dt.month, dt.day, sr0.rise);
+            const el0 = ((moonLongitude(rise0) - sunLongitude(rise0)) % 360 + 360) % 360;
+            const t0 = Math.floor(el0 / 12) + 1;
+            if (t0 === 1) {
+                _ugadiCache[year] = rise0;
+                return rise0;
+            }
+            const tEnd0 = nextBoundary(rise0, elongation, 12);
+            const sr1 = computeSunrise(dt.year, dt.month, dt.day + 1, 12.9716, 77.5946, 5.5);
+            const rise1 = julianDay(dt.year, dt.month, dt.day + 1, sr1.rise);
+            const nextTithiEnd = nextBoundary(tEnd0 + 0.005, elongation, 12);
+            if (nextTithiEnd < rise1) {
+                _ugadiCache[year] = rise0;
+                return rise0;
+            }
+            _ugadiCache[year] = rise1;
+            return rise1;
         }
-        // Try next NM
         daysToNM += 29.53;
     }
-    // Fallback: approximate as March 22
-    return julianDay(year, 3, 22, 12);
+    const fallback = julianDay(year, 3, 22, 6);
+    _ugadiCache[year] = fallback;
+    return fallback;
 }
 
 
@@ -2239,7 +2255,7 @@ const FESTIVAL_RULES = [
     {"id":"kara_hunnime","name":{"en":"Kara Hunnime","kn":"ಕಾರ ಹುಣ್ಣಿಮೆ"},"masa":"Jyeshtha","paksha":"Shukla","tithi":15,"shopping_peak":false},
     {"id":"prathama_ekadashi","name":{"en":"Prathama / Ashadhi Ekadashi","kn":"ಪ್ರಥಮ ಏಕಾದಶಿ"},"masa":"Ashadha","paksha":"Shukla","tithi":11,"shopping_peak":false},
     {"id":"hanuman_jayanti","name":{"en":"Hanuman Jayanti","kn":"ಹನುಮಾನ್ ಜಯಂತಿ"},"masa":"Margashira","paksha":"Shukla","tithi":13,"shopping_peak":false},
-    {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"kaala":"madhyahna","masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
     {"id":"rama_navami","name":{"en":"Rama Navami","kn":"ರಾಮ ನವಮಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":9,"shopping_peak":false},
     {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"ಅಕ್ಷಯ ತೃತೀಯ"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
     {"id":"guru_purnima","name":{"en":"Guru Purnima","kn":"ಗುರು ಪೂರ್ಣಿಮೆ"},"masa":"Ashadha","paksha":"Shukla","tithi":15,"shopping_peak":false},
@@ -2274,94 +2290,179 @@ const VRATA_RULES = [
     {"id":"shivaratri","name":{"en":"Masa Shivaratri","kn":"ಮಾಸ ಶಿವರಾತ್ರಿ"},"tithi":14,"paksha":"Krishna","shopping_peak":false}
 ];
 
-function matchFestivals(p) {
+// Solar Ingress Solver for Makara Sankranti
+const _makaraCache = {};
+function findMakaraIngress(year) {
+    if (_makaraCache[year]) return _makaraCache[year];
+    let lo = julianDay(year, 1, 13, 0);
+    let hi = julianDay(year, 1, 16, 23);
+    for (let i = 0; i < 30; i++) {
+        const mid = (lo + hi) / 2;
+        const lng = (sunLongitude(mid) - lahiriAyanamsa(mid) + 360) % 360;
+        const diff = ((lng - 270 + 540) % 360) - 180;
+        if (diff >= 0) hi = mid; else lo = mid;
+    }
+    _makaraCache[year] = hi;
+    return hi;
+}
+
+function matchFestivals(p, pYesterday) {
     const results = [];
     const tithiNum = p.tithi.no; // 1-based (1-30) from computePanchanga
     const pakshaStr = p.tithi.paksha;
-    const masaStr = p.masa.en;
+    const masaName = p.masa.en.replace(/^Adhika\s+/, '');
+    const isAdhikaToday = p.masa.isAdhika;
 
-        // Match major festivals
-    for (const f of FESTIVAL_RULES) {
-        let t = tithiNum;
-        let pks = pakshaStr;
-        let ms = masaStr;
-        
-        // If festival requires a specific time of day (Kaala)
-        if (f.kaala) {
-            let offset = 0;
-            if (f.kaala === 'pradosha') offset = 12; // ~Sunset
-            else if (f.kaala === 'midnight') offset = 18; // ~Midnight
-            else if (f.kaala === 'madhyahna') offset = 6; // ~Midday
-            else if (f.kaala === 'arunodaya') offset = -1.5; // ~Arunodaya
-            
-            if (offset !== 0) {
-                const jdKaala = p.sunrise + offset / 24;
-                const s = sunLongitude(jdKaala);
-                const m = moonLongitude(jdKaala);
-                const elong = ((m - s) % 360 + 360) % 360;
-                t = Math.floor(elong / 12) + 1;
-                pks = t <= 15 ? 'Shukla' : 'Krishna';
-                
-                // If it's a Krishna paksha festival checking late night, masa might wrap.
-                // We keep it simple and trust the day's masa string for most cases, 
-                // but Amavasya (30) always pairs with Krishna.
-                if (t === 30) pks = 'Krishna';
-                const kMasa = getAmantaMasaIdx(jdKaala);
-                const kMasaIdx = typeof kMasa === 'object' ? kMasa.idx : kMasa;
-                ms = MASA_EN[kMasaIdx];
-            }
-        }
+    // Detect if the NEXT tithi is a Kshaya tithi starting today
+    const nextTithiNum = (tithiNum % 30) + 1;
+    const nextTithiPaksha = nextTithiNum <= 15 ? 'Shukla' : 'Krishna';
+    let nextTithiIsKshaya = false;
+    let nextTithiMasaName = masaName;
 
-        if (f.tithi === t && f.paksha === pks && f.masa === ms) {
-            results.push(f);
+    let tomorrowSunrise = p.sunrise + 1.0;
+
+    if (p.tithi.endJD && p.tithi.endJD < p.sunset + 0.5) {
+        const srTom = computeSunrise(p.year, p.month, p.day + 1, 12.9716, 77.5946, p.tzOff || 5.5);
+        if (srTom) tomorrowSunrise = julianDay(p.year, p.month, p.day + 1, srTom.rise);
+        const nextTithiEndJD = nextBoundary(p.tithi.endJD + 0.005, elongation, 12);
+        if (nextTithiEndJD < tomorrowSunrise) {
+            nextTithiIsKshaya = true;
+            const nm = getAmantaMasaIdx(p.tithi.endJD + 0.1);
+            if (!nm.isAdhika) nextTithiMasaName = MASA_EN[nm.idx];
         }
     }
 
-    // Match recurring vratas
+    // Yesterday's context for Vriddhi suppression
+    let yMasaName = null;
+    let yIsAdhika = false;
+    let yTithiNum = null;
+    let yPaksha = null;
+    if (pYesterday) {
+        yMasaName = pYesterday.masa.en.replace(/^Adhika\s+/, '');
+        yIsAdhika = pYesterday.masa.isAdhika;
+        yTithiNum = pYesterday.tithi.no;
+        yPaksha = pYesterday.tithi.paksha;
+    } else {
+        const yRise = p.sunrise - 1.0;
+        const ym = getAmantaMasaIdx(yRise);
+        yMasaName = MASA_EN[ym.idx];
+        yIsAdhika = ym.isAdhika;
+        const sY = sunLongitude(yRise);
+        const mY = moonLongitude(yRise);
+        const elY = ((mY - sY) % 360 + 360) % 360;
+        yTithiNum = Math.floor(elY / 12) + 1;
+        yPaksha = yTithiNum <= 15 ? 'Shukla' : 'Krishna';
+    }
+
+    // Match major festivals
+    for (const f of FESTIVAL_RULES) {
+        let matched = false;
+
+        if (f.kaala) {
+            let offsetHours = 0;
+            if (f.kaala === 'pradosha') offsetHours = 12;
+            else if (f.kaala === 'midnight') offsetHours = 18;
+            else if (f.kaala === 'madhyahna') offsetHours = 6;
+            else if (f.kaala === 'arunodaya') offsetHours = -1.5;
+
+            const jdToday = p.sunrise + offsetHours / 24;
+            const sToday = sunLongitude(jdToday);
+            const mToday = moonLongitude(jdToday);
+            const elToday = ((mToday - sToday) % 360 + 360) % 360;
+            const tNoToday = Math.floor(elToday / 12) + 1;
+            const pksToday = tNoToday <= 15 ? 'Shukla' : 'Krishna';
+            const isHitToday = (!isAdhikaToday && tNoToday === f.tithi && pksToday === f.paksha && masaName === f.masa);
+
+            const jdYest = (pYesterday ? pYesterday.sunrise : (p.sunrise - 1.0)) + offsetHours / 24;
+            const sYest = sunLongitude(jdYest);
+            const mYest = moonLongitude(jdYest);
+            const elYest = ((mYest - sYest) % 360 + 360) % 360;
+            const tNoYest = Math.floor(elYest / 12) + 1;
+            const pksYest = tNoYest <= 15 ? 'Shukla' : 'Krishna';
+            const isHitYesterday = (!yIsAdhika && tNoYest === f.tithi && pksYest === f.paksha && yMasaName === f.masa);
+
+            if (isHitToday && !isHitYesterday) {
+                matched = true;
+            } else if (!isHitToday && !isHitYesterday) {
+                const jdTomorrow = tomorrowSunrise + offsetHours / 24;
+                const sTom = sunLongitude(jdTomorrow);
+                const mTom = moonLongitude(jdTomorrow);
+                const elTom = ((mTom - sTom) % 360 + 360) % 360;
+                const tNoTom = Math.floor(elTom / 12) + 1;
+                const pksTom = tNoTom <= 15 ? 'Shukla' : 'Krishna';
+                const willHitTomorrow = (!isAdhikaToday && tNoTom === f.tithi && pksTom === f.paksha && masaName === f.masa);
+
+                if (!willHitTomorrow) {
+                    if (nextTithiIsKshaya && f.tithi === nextTithiNum && f.paksha === nextTithiPaksha && f.masa === nextTithiMasaName) {
+                        matched = true;
+                    } else if (!isAdhikaToday && tithiNum === f.tithi && pakshaStr === f.paksha && masaName === f.masa) {
+                        matched = true;
+                    }
+                }
+            }
+        } else {
+            // Udaya Tithi (sunrise) festival
+            const isHitToday = (!isAdhikaToday && f.tithi === tithiNum && f.paksha === pakshaStr && f.masa === masaName);
+            const isHitYesterday = (!yIsAdhika && f.tithi === yTithiNum && f.paksha === yPaksha && f.masa === yMasaName);
+
+            if (isHitToday && !isHitYesterday) {
+                matched = true;
+            } else if (!isHitToday && !isHitYesterday && nextTithiIsKshaya) {
+                if (f.tithi === nextTithiNum && f.paksha === nextTithiPaksha && f.masa === nextTithiMasaName) {
+                    matched = true;
+                }
+            }
+        }
+
+        if (matched) results.push(f);
+    }
+
+    // Match recurring vratas (with Vriddhi Day-2 suppression)
     const tithiInPaksha = tithiNum <= 15 ? tithiNum : tithiNum - 15; // 1-15 within each paksha
+    const yTithiInPaksha = yTithiNum <= 15 ? yTithiNum : yTithiNum - 15;
     for (const v of VRATA_RULES) {
         if (v.tithi < 15) {
-            // Tithi within paksha (e.g. Ekadashi = 11th of each paksha)
             if (tithiInPaksha === v.tithi) {
                 if (!v.paksha || v.paksha === pakshaStr) {
-                    // Don't duplicate if already matched as a named festival
-                    if (!results.find(r => r.id === v.id)) {
+                    const hitYest = (yTithiInPaksha === v.tithi && (!v.paksha || v.paksha === yPaksha));
+                    if (!hitYest && !results.find(r => r.id === v.id)) {
                         results.push(v);
                     }
                 }
             }
         } else {
-            // Absolute tithi (Amavasya = 30, Purnima = 15)
             if (tithiNum === v.tithi) {
-                if (!results.find(r => r.id === v.id)) {
+                const hitYest = (yTithiNum === v.tithi);
+                if (!hitYest && !results.find(r => r.id === v.id)) {
                     results.push(v);
                 }
             }
         }
     }
 
-    // Check Solar Festivals (Makara Sankranti)
-    // Sun enters Makara at any time during the day (sunrise to sunset)
-    const sunRashiSunset = Math.floor(((sunLongitude(p.sunset) - lahiriAyanamsa(p.sunset) + 360) % 360) / 30);
-    if (p.sunRashiIdx === 9 || sunRashiSunset === 9) {
-        // Check yesterday's sunrise AND sunset rashi to prevent double-detection
-        const yRashiSunrise = Math.floor(((sunLongitude(p.sunrise - 1) - lahiriAyanamsa(p.sunrise - 1) + 360) % 360) / 30);
-        const yRashiSunset = Math.floor(((sunLongitude(p.sunset - 1) - lahiriAyanamsa(p.sunset - 1) + 360) % 360) / 30);
-        // Only trigger if Sun was NOT in Makara at all yesterday (neither sunrise nor sunset)
-        if (yRashiSunrise !== 9 && yRashiSunset !== 9) {
-            results.push({id: "makara_sankranti", name: {en: "Makara Sankranti", kn: "ಮಕರ ಸಂಕ್ರಾಂತಿ"}, shopping_peak: true});
-        }
-    }
-    
-        // Varamahalakshmi Vrata: the Friday closest to (and before/on) Shravana Purnima
-    // Only trigger if tithi is in the range where the next Purnima is within 7 days
-    if (p.vara.en === "Friday" && masaStr === "Shravana" && pakshaStr === "Shukla") {
-        // FIXED: Allows Shukla Navami (tithi 9) and Ashtami (tithi 8) when Purnima falls midweek (e.g. Wednesday)
-        if (tithiNum >= 8 && tithiNum <= 15 && (tithiNum + 7.2 > 15)) {
-            results.push({id: "varamahalakshmi", name: {en: "Varamahalakshmi Vrata", kn: "ವರಮಹಾಲಕ್ಷ್ಮಿ ವ್ರತ"}, shopping_peak: true});
+    // Check Solar Festivals (Makara Sankranti) via exact solar ingress
+    if (p.month === 1 && p.day >= 13 && p.day <= 16) {
+        const ingJD = findMakaraIngress(p.year);
+        const ySet = pYesterday ? pYesterday.sunset : (p.sunset - 1.0);
+        if (ingJD > ySet && ingJD <= p.sunset) {
+            results.push({ id: "makara_sankranti", name: { en: "Makara Sankranti", kn: "ಮಕರ ಸಂಕ್ರಾಂತಿ" }, shopping_peak: true });
         }
     }
 
+    // Varamahalakshmi Vrata: exactly the Friday preceding Shravana Purnima
+    if (p.vara.en === "Friday" && masaName === "Shravana" && !isAdhikaToday && pakshaStr === "Shukla" && tithiNum < 15) {
+        const nextFriJD = p.sunrise + 7;
+        const sNext = sunLongitude(nextFriJD);
+        const mNext = moonLongitude(nextFriJD);
+        const elNext = ((mNext - sNext) % 360 + 360) % 360;
+        const nextFriTithiNo = Math.floor(elNext / 12) + 1;
+        const nextFriMasa = getAmantaMasaIdx(nextFriJD);
+        const nextFriMasaName = MASA_EN[nextFriMasa.idx];
+        const nextIsAfterPurnima = (nextFriTithiNo >= 15 || nextFriTithiNo > 15 || nextFriMasaName !== "Shravana");
+        if (nextIsAfterPurnima) {
+            results.push({ id: "varamahalakshmi", name: { en: "Varamahalakshmi Vrata", kn: "ವರಮಹಾಲಕ್ಷ್ಮಿ ವ್ರತ" }, shopping_peak: true });
+        }
+    }
 
     return results;
 }
