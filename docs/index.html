@@ -1444,10 +1444,10 @@ function computeSunrise(year, month, day, lat, lon, tzOff) {
 //  Classical 27 Nakshatra offsets in Ghatikas (out of 60)
 // ============================================================
 const AMRITA_GHATIKAS = [
-    42, 48, 54, 52, 38, 35, 54, 44, 56, 54, 44, 42, 45, 44, 38, 38, 28, 38, 44, 48, 44, 34, 34, 42, 40, 48, 54
+    42, 48, 54, 52, 38, 35, 54, 44, 56, 54, 44, 42, 45, 44, 38, 38, 34, 38, 44, 48, 44, 34, 34, 42, 40, 48, 54
 ];
 const VARJYAM_GHATIKAS = [
-    50, 24, 30, 40, 14, 21, 30, 20, 32, 30, 20, 18, 21, 20, 14, 14, 10, 14, 56, 24, 20, 10, 10, 18, 16, 24, 30
+    50, 24, 30, 40, 14, 21, 30, 20, 32, 30, 20, 18, 21, 20, 14, 14, 10, 14, 20, 24, 20, 10, 10, 18, 16, 24, 30
 ];
 
 function prevBoundary(jd, angleFn, unit) {
@@ -1560,45 +1560,98 @@ function getTzOffset(tzName, targetYear, targetMonth, targetDay) {
 //  South Indian (Karnataka) Panchangams.
 // ============================================================
 function getAmantaMasaIdx(baseJD) {
-        // Edge case: On Amavasya day (elongation near 0/360), this NM ends
-    // the CURRENT masa. The festival rules use the ending masa name.
-    // e.g., Deepavali = "Ashvina Krishna Amavasya" means the NM ending Ashvina.
-    const curElong = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
-    if (curElong > 348) {
-        // Only on the Krishna side approaching Amavasya (not after NM)
-        // We are at or very near New Moon. Find exact conjunction time.
-        let nmJD = baseJD;
-        const relSpd = 12.19; // avg Moon-Sun relative speed deg/day
+    // Helper: find exact NM near a given JD (within ±20 days)
+    function findNM(approxJD) {
+        let nmJD = approxJD;
+        const relSpd = 12.19;
         for (let i = 0; i < 5; i++) {
             const e2 = ((moonLongitude(nmJD) - sunLongitude(nmJD)) % 360 + 360) % 360;
             const err = e2 > 180 ? e2 - 360 : e2;
             nmJD -= err / relSpd;
         }
-        // Sun's rashi at THIS NM -> that rashi index IS the ending masa
-        const nmSun = (sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360;
-        return Math.floor(nmSun / 30);
+        return nmJD;
+    }
+    // Helper: Sun's sidereal rashi at a given JD
+    function sunRashiAt(jd) {
+        return Math.floor(((sunLongitude(jd) - lahiriAyanamsa(jd) + 360) % 360) / 30);
+    }
+
+    // Edge case: On Amavasya day (elongation near 0/360), this NM ends
+    // the CURRENT masa. The festival rules use the ending masa name.
+    // e.g., Deepavali = "Ashvina Krishna Amavasya" means the NM ending Ashvina.
+    const curElong = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
+    if (curElong > 348) {
+        const nmJD = findNM(baseJD);
+        const rashiIdx = sunRashiAt(nmJD);
+        // Check previous NM for adhika
+        const prevNmJD = findNM(nmJD - 29.53);
+        const prevRashi = sunRashiAt(prevNmJD);
+        return { idx: rashiIdx, isAdhika: prevRashi === rashiIdx };
     }
 
     // Step 1: Find approximate days to next New Moon
     const elong = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
-    const moonSpeed = 13.176; // deg/day average
-    const sunSpeed = 0.9856;  // deg/day average
-    const relSpeed = moonSpeed - sunSpeed; // ~12.19 deg/day
+    const moonSpeed = 13.176;
+    const sunSpeed = 0.9856;
+    const relSpeed = moonSpeed - sunSpeed;
     let daysToNM = (360 - elong) / relSpeed;
     if (daysToNM < 0.5) daysToNM += 29.53;
     
-    // Step 2: Iterative refinement (3 iterations for sub-minute precision)
-    let nmJD = baseJD + daysToNM;
-    for (let i = 0; i < 5; i++) {
-        const e2 = ((moonLongitude(nmJD) - sunLongitude(nmJD)) % 360 + 360) % 360;
-        // How far from conjunction (0 deg)?
-        const err = e2 > 180 ? e2 - 360 : e2;
-        nmJD -= err / relSpeed;
-    }
+    // Step 2: Iterative refinement (5 iterations for sub-minute precision)
+    const nmJD = findNM(baseJD + daysToNM);
     
     // Step 3: Sun's sidereal rashi at the exact New Moon moment
-    const finalSun = (sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360;
-    return Math.floor(finalSun / 30);
+    const rashiIdx = sunRashiAt(nmJD);
+
+    // Step 4: Check for Adhika Masa — find previous NM and compare Sun rashis
+    const prevNmJD = findNM(nmJD - 29.53);
+    const prevRashi = sunRashiAt(prevNmJD);
+    // If two consecutive NMs have Sun in the same rashi, the first month is Adhika
+    // We're between prevNM and nmJD. prevRashi tells us what masa started at prevNM.
+    // If prevRashi === rashiIdx, the current month (between these two NMs) is Adhika.
+    const isAdhika = (prevRashi === rashiIdx);
+
+    return { idx: rashiIdx, isAdhika };
+}
+
+// ============================================================
+//  FIND UGADI — Chaitra Shukla Prathama (New Year start)
+//  Finds the JD when Chaitra Shukla Prathama begins in a given year.
+// ============================================================
+function findUgadiJD(year) {
+    // Ugadi falls on Chaitra Shukla Prathama.
+    // In Amanta system, Chaitra begins after the NM when Sun is in Meena (rashi 11).
+    // That NM typically falls in March-April.
+    // Search from Feb 20 to Apr 30 for the NM where Sun is in Meena (rashi 11).
+    const searchStartJD = julianDay(year, 2, 20, 12);
+    const relSpd = 12.19;
+    
+    // Find first NM after search start
+    let baseJD = searchStartJD;
+    const elong0 = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
+    let daysToNM = (360 - elong0) / relSpd;
+    if (daysToNM < 0.5) daysToNM += 29.53;
+    
+    // Try up to 3 consecutive NMs
+    for (let attempt = 0; attempt < 3; attempt++) {
+        let nmJD = baseJD + daysToNM;
+        for (let i = 0; i < 5; i++) {
+            const e2 = ((moonLongitude(nmJD) - sunLongitude(nmJD)) % 360 + 360) % 360;
+            const err = e2 > 180 ? e2 - 360 : e2;
+            nmJD -= err / relSpd;
+        }
+        const sunRashi = Math.floor(((sunLongitude(nmJD) - lahiriAyanamsa(nmJD) + 360) % 360) / 30);
+        if (sunRashi === 11) {
+            // This NM starts Chaitra. The next day with Shukla Prathama at sunrise is Ugadi.
+            // Shukla Prathama starts right after this NM.
+            // Return the JD of the NM + ~1 day (next sunrise after NM)
+            return nmJD + 1;
+        }
+        // Try next NM
+        daysToNM += 29.53;
+    }
+    // Fallback: approximate as March 22
+    return julianDay(year, 3, 22, 12);
 }
 
 
@@ -1703,12 +1756,14 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
 
     // Masa (approximate from Sun's sidereal sign at previous new moon)
     // Masa: Amanta lunar month from true New Moon conjunction
-    const masaIdx = getAmantaMasaIdx(riseJD);
+    const masaResult = getAmantaMasaIdx(riseJD);
+    const masaIdx = masaResult.idx;
+    const isAdhikaMasa = masaResult.isAdhika;
 
-    // Samvatsara
-    // Shaka year & Samvatsara: Exact astronomical transition on Chaitra Shukla Prathama (Ugadi)
-    // (FIXED: replaces arbitrary March 22 approximation with true Amanta lunar month boundary)
-    const isPastUgadi = (month > 4) || ((month === 3 || month === 4) && ((masaIdx === 0 && paksha === "Shukla") || (masaIdx > 0 && masaIdx < 6)));
+    // Samvatsara: compute actual Ugadi date for stable year determination
+    const ugadiJD = findUgadiJD(year);
+    const currentJD = julianDay(year, month, day, 12);
+    const isPastUgadi = currentJD >= ugadiJD;
     const shakaYear = isPastUgadi ? year - 78 : year - 79;
     const samvatsaraIdx = ((shakaYear + 12) % 60) || 60;
     const samvatsaraName = SAMVATSARA[samvatsaraIdx - 1];
@@ -1746,7 +1801,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
         amritKalam: amritWindows,
         varjyam: varjyamWindows,
         amrit: amritWindows[0] || { start: aStart1, end: aEnd1 },
-        masa: { en: MASA_EN[masaIdx], kn: MASA_KN[masaIdx] },
+        masa: { en: (isAdhikaMasa ? "Adhika " : "") + MASA_EN[masaIdx], kn: (isAdhikaMasa ? "ಅಧಿಕ " : "") + MASA_KN[masaIdx], isAdhika: isAdhikaMasa },
         samvatsara: { name: samvatsaraName, idx: samvatsaraIdx, shaka: shakaYear },
         ayana: { en: ayana, kn: ayanaKn },
         ritu: rituName,
@@ -2184,19 +2239,19 @@ const FESTIVAL_RULES = [
     {"id":"kara_hunnime","name":{"en":"Kara Hunnime","kn":"ಕಾರ ಹುಣ್ಣಿಮೆ"},"masa":"Jyeshtha","paksha":"Shukla","tithi":15,"shopping_peak":false},
     {"id":"prathama_ekadashi","name":{"en":"Prathama / Ashadhi Ekadashi","kn":"ಪ್ರಥಮ ಏಕಾದಶಿ"},"masa":"Ashadha","paksha":"Shukla","tithi":11,"shopping_peak":false},
     {"id":"hanuman_jayanti","name":{"en":"Hanuman Jayanti","kn":"ಹನುಮಾನ್ ಜಯಂತಿ"},"masa":"Margashira","paksha":"Shukla","tithi":13,"shopping_peak":false},
-    {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
+    {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"kaala":"madhyahna","masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
     {"id":"rama_navami","name":{"en":"Rama Navami","kn":"ರಾಮ ನವಮಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":9,"shopping_peak":false},
     {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"ಅಕ್ಷಯ ತೃತೀಯ"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
     {"id":"guru_purnima","name":{"en":"Guru Purnima","kn":"ಗುರು ಪೂರ್ಣಿಮೆ"},"masa":"Ashadha","paksha":"Shukla","tithi":15,"shopping_peak":false},
     {"id":"nagara_panchami","name":{"en":"Nagara Panchami","kn":"ನಾಗರ ಪಂಚಮಿ"},"masa":"Shravana","paksha":"Shukla","tithi":5,"shopping_peak":false},
     {"id":"krishna_janmashtami","name":{"en":"Krishna Janmashtami","kn":"ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ"},"kaala":"midnight","masa":"Shravana","paksha":"Krishna","tithi":23,"shopping_peak":false},
-    {"id":"gowri_habba","name":{"en":"Gowri Habba","kn":"ಗೌರಿ ಹಬ್ಬ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":3,"shopping_peak":true},
+    {"id":"gowri_habba","name":{"en":"Gowri Habba","kn":"ಗೌರಿ ಹಬ್ಬ"},"kaala":"madhyahna","masa":"Bhadrapada","paksha":"Shukla","tithi":3,"shopping_peak":true},
     {"id":"ganesha_chaturthi","name":{"en":"Ganesha Chaturthi","kn":"ಗಣೇಶ ಚತುರ್ಥಿ"},"kaala":"madhyahna","masa":"Bhadrapada","paksha":"Shukla","tithi":4,"shopping_peak":true},
     {"id":"ananta_chaturdashi","name":{"en":"Ananta Chaturdashi","kn":"ಅನಂತ ಚತುರ್ದಶಿ"},"masa":"Bhadrapada","paksha":"Shukla","tithi":14,"shopping_peak":false},
     {"id":"mahalaya_amavasya","name":{"en":"Mahalaya Amavasya","kn":"ಮಹಾಲಯ ಅಮಾವಾಸ್ಯೆ"},"masa":"Bhadrapada","paksha":"Krishna","tithi":30,"shopping_peak":false},
     {"id":"navaratri","name":{"en":"Sharad Navaratri / Mysuru Dasara Begins","kn":"ಶರನ್ನವರಾತ್ರಿ / ಮೈಸೂರು ದಸರಾ ಪ್ರಾರಂಭ"},"masa":"Ashvina","paksha":"Shukla","tithi":1,"shopping_peak":true},
     {"id":"ayudha_puja","name":{"en":"Maha Navami / Ayudha Puja","kn":"ಮಹಾ ನವಮಿ / ಆಯುಧ ಪೂಜೆ"},"masa":"Ashvina","paksha":"Shukla","tithi":9,"shopping_peak":true},
-    {"id":"vijayadashami","name":{"en":"Vijayadashami","kn":"ವಿಜಯದಶಮಿ"},"masa":"Ashvina","paksha":"Shukla","tithi":10,"shopping_peak":true},
+    {"id":"vijayadashami","name":{"en":"Vijayadashami","kn":"ವಿಜಯದಶಮಿ"},"kaala":"madhyahna","masa":"Ashvina","paksha":"Shukla","tithi":10,"shopping_peak":true},
     {"id":"dhana_trayodashi","name":{"en":"Dhana Trayodashi","kn":"ಧನ ತ್ರಯೋದಶಿ"},"masa":"Ashvina","paksha":"Krishna","tithi":28,"shopping_peak":true},
     {"id":"naraka_chaturdashi","name":{"en":"Naraka Chaturdashi","kn":"ನರಕ ಚತುರ್ದಶಿ"},"kaala":"arunodaya","masa":"Ashvina","paksha":"Krishna","tithi":29,"shopping_peak":true},
     {"id":"deepavali","name":{"en":"Deepavali (Lakshmi Puja)","kn":"ದೀಪಾವಳಿ (ಲಕ್ಷ್ಮೀ ಪೂಜೆ)"},"kaala":"pradosha","masa":"Ashvina","paksha":"Krishna","tithi":30,"shopping_peak":true},
@@ -2251,6 +2306,9 @@ function matchFestivals(p) {
                 // We keep it simple and trust the day's masa string for most cases, 
                 // but Amavasya (30) always pairs with Krishna.
                 if (t === 30) pks = 'Krishna';
+                const kMasa = getAmantaMasaIdx(jdKaala);
+                const kMasaIdx = typeof kMasa === 'object' ? kMasa.idx : kMasa;
+                ms = MASA_EN[kMasaIdx];
             }
         }
 
@@ -2283,10 +2341,14 @@ function matchFestivals(p) {
     }
 
     // Check Solar Festivals (Makara Sankranti)
-    if (p.sunRashiIdx === 9) {
-        // Did Sun enter Makara today? (Compare with yesterday's sunrise)
-        const yRashi = Math.floor(((sunLongitude(p.sunrise - 1) - lahiriAyanamsa(p.sunrise - 1) + 360) % 360) / 30);
-        if (yRashi !== 9) {
+    // Sun enters Makara at any time during the day (sunrise to sunset)
+    const sunRashiSunset = Math.floor(((sunLongitude(p.sunset) - lahiriAyanamsa(p.sunset) + 360) % 360) / 30);
+    if (p.sunRashiIdx === 9 || sunRashiSunset === 9) {
+        // Check yesterday's sunrise AND sunset rashi to prevent double-detection
+        const yRashiSunrise = Math.floor(((sunLongitude(p.sunrise - 1) - lahiriAyanamsa(p.sunrise - 1) + 360) % 360) / 30);
+        const yRashiSunset = Math.floor(((sunLongitude(p.sunset - 1) - lahiriAyanamsa(p.sunset - 1) + 360) % 360) / 30);
+        // Only trigger if Sun was NOT in Makara at all yesterday (neither sunrise nor sunset)
+        if (yRashiSunrise !== 9 && yRashiSunset !== 9) {
             results.push({id: "makara_sankranti", name: {en: "Makara Sankranti", kn: "ಮಕರ ಸಂಕ್ರಾಂತಿ"}, shopping_peak: true});
         }
     }
@@ -2299,6 +2361,7 @@ function matchFestivals(p) {
             results.push({id: "varamahalakshmi", name: {en: "Varamahalakshmi Vrata", kn: "ವರಮಹಾಲಕ್ಷ್ಮಿ ವ್ರತ"}, shopping_peak: true});
         }
     }
+
 
     return results;
 }
@@ -2577,11 +2640,16 @@ function calcCompat() {
             if (dobVal) {
                 const dobDate = new Date(dobVal);
                 if (!isNaN(dobDate.getTime())) {
-                    const bp = computePanchanga(dobDate.getFullYear(), dobDate.getMonth() + 1, dobDate.getDate(), loc.lat, loc.lon, loc.tz);
-                    if (bp && bp.nakshatra) {
-                        birthNak = bp.nakshatra.idx;
-                        birthNakName = `${NAK_EN[birthNak]} (${NAK_KN[birthNak]})`;
-                    }
+                    const bY = dobDate.getFullYear();
+                    const bM = dobDate.getMonth() + 1;
+                    const bD = dobDate.getDate();
+                    const bHrs = dobDate.getHours() + dobDate.getMinutes() / 60;
+                    const bTzOff = getTzOffset(loc.tz, bY, bM, bD);
+                    const bHrsUTC = bHrs - bTzOff;
+                    const bJD = julianDay(bY, bM, bD, bHrsUTC);
+                    const bMoonLng = (moonLongitude(bJD) - lahiriAyanamsa(bJD) + 360) % 360;
+                    birthNak = Math.floor(bMoonLng / (360 / 27));
+                    birthNakName = `${NAK_EN[birthNak]} (${NAK_KN[birthNak]})`;
                 }
             }
         }
@@ -2863,7 +2931,7 @@ function generateJathaka() {
 
             // Get exact Moon longitude at birth time
             // Convert local birth time to UTC using the specified timezone
-            const tzOffHrs = getTzOffset(tz);
+            const tzOffHrs = getTzOffset(tz, y, m, day);
             const hoursUTC = hours - tzOffHrs;
             const jdBirthUTC = julianDay(y, m, day, hoursUTC);
             
@@ -2937,7 +3005,7 @@ function generateJathaka() {
             let dashaTimelineHtml = '';
             let curDate = new Date(d.getTime()); // birth date
             // Add balance of first dasha
-            const balanceDays = balanceYearsDecimal * 365.25;
+            const balanceDays = balanceYearsDecimal * 365.2425;
             curDate = new Date(curDate.getTime() + balanceDays * 86400000);
             
             // The first dasha lord
