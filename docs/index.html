@@ -134,20 +134,22 @@
         .result-bad { background: rgba(239,68,68,0.15); border: 1px solid var(--red); }
 
         /* JATHAKA REPORT */
-        .jathaka-report { padding: 20px; background: #fff; color: #000; border-radius: 8px; margin-top: 20px; display: none; }
-        .jathaka-header { text-align: center; border-bottom: 2px solid var(--maroon); padding-bottom: 10px; margin-bottom: 15px; }
-        .jathaka-header h2 { color: var(--maroon); font-size: 1.5rem; margin-bottom: 5px; }
-        .jathaka-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .j-box { border: 1px solid #ccc; padding: 10px; border-radius: 6px; }
-        .j-box .l { font-size: 0.75rem; color: #666; text-transform: uppercase; }
-        .j-box .v { font-size: 1.1rem; font-weight: bold; color: #000; }
+        .jathaka-report { padding: 20px; background: var(--card); color: var(--text); border-radius: 12px; margin-top: 20px; border: 1px solid var(--card-border); display: none; }
+        .jathaka-header { text-align: center; border-bottom: 2px solid rgba(212, 160, 23, 0.35); padding-bottom: 12px; margin-bottom: 18px; }
+        .jathaka-header h2 { color: var(--gold); font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .jathaka-header p { color: var(--text-dim); font-size: 0.9rem; }
+        .jathaka-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .j-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(212, 160, 23, 0.25); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 8px; transition: border-color 0.2s, background 0.2s; }
+        .j-box:hover { border-color: var(--gold); background: rgba(255, 255, 255, 0.05); }
+        .j-box .l { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 2px; }
+        .j-box .v { font-size: 1.1rem; font-weight: 700; color: var(--gold-light); }
         
-        .si-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1px; background: var(--maroon); border: 2px solid var(--maroon); aspect-ratio: 1; margin: 20px auto; max-width: 320px; }
-        .si-cell { background: #fff; padding: 4px; font-size: 0.75rem; display: flex; flex-direction: column; text-align: center; justify-content: center; position: relative; }
-        .si-cell-title { position: absolute; top: 2px; left: 2px; font-size: 0.5rem; color: #999; }
-        .si-center { grid-column: 2 / 4; grid-row: 2 / 4; background: #fffdf8; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--maroon); font-size: 1.2rem; flex-direction: column; }
+        .si-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 2px; background: rgba(212, 160, 23, 0.35); border: 2px solid var(--gold); aspect-ratio: 1; margin: 20px auto; max-width: 320px; border-radius: 8px; overflow: hidden; }
+        .si-cell { background: #1a2038; color: var(--text); padding: 4px; font-size: 0.75rem; display: flex; flex-direction: column; text-align: center; justify-content: center; position: relative; }
+        .si-cell-title { position: absolute; top: 2px; left: 3px; font-size: 0.55rem; color: var(--gold); font-weight: 600; }
+        .si-center { grid-column: 2 / 4; grid-row: 2 / 4; background: linear-gradient(135deg, rgba(123, 30, 45, 0.9), rgba(61, 14, 24, 0.95)); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold-light); font-size: 1.15rem; flex-direction: column; text-shadow: 0 1px 3px rgba(0,0,0,0.6); border: 1px solid rgba(212, 160, 23, 0.3); }
         
-        .btn-print { background: var(--maroon); color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem; margin-top: 15px; }
+        .btn-print { background: var(--gold); color: #000; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem; margin-top: 15px; }
 
         /* BOTTOM NAV */
         .bottom-nav { display: none; }
@@ -228,19 +230,20 @@
             .print-footer { display: block !important; text-align: center; font-size: 0.7rem; color: #999; padding-top: 15px; border-top: 1px solid #ddd; margin-top: 25px; }
 
             /* JATHAKA REPORT */
-            .jathaka-report { display: block !important; box-shadow: none !important; border: none !important; padding: 15px !important; margin: 0 !important; background: #fff !important; }
+            .jathaka-report { display: block !important; box-shadow: none !important; border: none !important; padding: 15px !important; margin: 0 !important; background: #fff !important; color: #000 !important; }
             .jathaka-header { text-align: center; border-bottom: 2px solid #8b1a2b; padding-bottom: 10px; margin-bottom: 15px; }
-            .jathaka-header h2 { color: #8b1a2b !important; font-size: 1.5rem; }
+            .jathaka-header h2 { color: #8b1a2b !important; font-size: 1.5rem; text-shadow: none !important; }
+            .jathaka-header p { color: #555 !important; }
             .jathaka-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-            .j-box { border: 1px solid #333 !important; padding: 8px !important; border-radius: 4px !important; break-inside: avoid; }
+            .j-box { border: 1px solid #333 !important; border-left: 3px solid #8b1a2b !important; background: #fff !important; padding: 8px !important; border-radius: 4px !important; break-inside: avoid; }
             .j-box .l { color: #666 !important; font-size: 0.7rem !important; }
             .j-box .v { color: #000 !important; font-size: 1rem !important; }
 
             /* Rasi Chart */
-            .si-chart { border: 2px solid #8b1a2b !important; max-width: 280px !important; margin: 15px auto !important; break-inside: avoid; }
-            .si-cell { background: #fff !important; border: 1px solid #8b1a2b !important; }
+            .si-chart { border: 2px solid #8b1a2b !important; background: #8b1a2b !important; max-width: 280px !important; margin: 15px auto !important; break-inside: avoid; }
+            .si-cell { background: #fff !important; border: 1px solid #8b1a2b !important; color: #000 !important; }
             .si-cell-title { color: #666 !important; }
-            .si-center { background: #fffdf8 !important; color: #8b1a2b !important; }
+            .si-center { background: #fffdf8 !important; color: #8b1a2b !important; text-shadow: none !important; border: none !important; }
 
             /* Dasha Timeline */
             #jDashaTimeline { break-inside: avoid; }
@@ -958,7 +961,7 @@
     <div class="jathaka-report card" id="jathakaPrintArea">
         <div class="jathaka-header">
             <h2 id="jReportName">Name</h2>
-            <p style="font-size:0.9rem; color:#555;" id="jReportDobLoc">DOB | Location</p>
+            <p style="font-size:0.9rem; color:var(--text-dim);" id="jReportDobLoc">DOB | Location</p>
         </div>
         
         <div class="jathaka-grid">
@@ -973,27 +976,27 @@
             <div class="j-box"><div class="l">Yoga & Karana</div><div class="v" id="jYogaKarana">...</div></div>
         </div>
 
-        <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px; text-align:center;">
-            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:5px;">Vimshottari Dasha Balance at Birth</div>
-            <div style="font-size:1.2rem; font-weight:bold; color:var(--maroon);" id="jDashaBalance">...</div>
+        <div style="margin-top:20px; border-top:1px dashed rgba(212,160,23,0.3); padding-top:15px; text-align:center;">
+            <div style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px;">Vimshottari Dasha Balance at Birth</div>
+            <div style="font-size:1.25rem; font-weight:bold; color:var(--gold-light); text-shadow:0 1px 3px rgba(0,0,0,0.5);" id="jDashaBalance">...</div>
         </div>
 
         <!-- Full Dasha Timeline -->
-        <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
-            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:10px; text-align:center;">Complete Vimshottari Maha Dasha Timeline (120 Years)</div>
+        <div style="margin-top:20px; border-top:1px dashed rgba(212,160,23,0.3); padding-top:15px;">
+            <div style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; text-align:center;">Complete Vimshottari Maha Dasha Timeline (120 Years)</div>
             <div id="jDashaTimeline" style="display:flex; flex-direction:column; gap:4px;"></div>
         </div>
 
         <!-- Graha Positions at Birth -->
-        <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
+        <div style="margin-top:20px; border-top:1px dashed rgba(212,160,23,0.3); padding-top:15px;">
             <div style="display:flex; flex-direction:column; gap:8px; align-items:center; margin-bottom:12px;">
                 <div style="display:flex; gap:8px;">
-                    <button id="btnRasiChart" onclick="setChartType('rasi')" style="padding:5px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:var(--maroon); color:#fff; border:none;">Rasi (D1)</button>
-                    <button id="btnNavamshaChart" onclick="setChartType('navamsha')" style="padding:5px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:#eee; color:#333; border:1px solid #ccc;">Navamsha (D9)</button>
+                    <button id="btnRasiChart" onclick="setChartType('rasi')" style="padding:6px 16px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:var(--maroon); color:#fff; border:1px solid var(--gold);">Rasi (D1)</button>
+                    <button id="btnNavamshaChart" onclick="setChartType('navamsha')" style="padding:6px 16px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:rgba(255,255,255,0.06); color:var(--text); border:1px solid var(--card-border);">Navamsha (D9)</button>
                 </div>
                 <div style="display:flex; gap:8px;">
-                    <button id="btnSouthChart" onclick="setChartStyle('south')" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; background:var(--gold); color:#000; border:none;">South Indian Style</button>
-                    <button id="btnNorthChart" onclick="setChartStyle('north')" style="padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:600; cursor:pointer; background:#eee; color:#333; border:1px solid #ccc;">North Indian Style</button>
+                    <button id="btnSouthChart" onclick="setChartStyle('south')" style="padding:5px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:var(--gold); color:#000; border:none;">South Indian Style</button>
+                    <button id="btnNorthChart" onclick="setChartStyle('north')" style="padding:5px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; cursor:pointer; background:rgba(255,255,255,0.06); color:var(--text); border:1px solid var(--card-border);">North Indian Style</button>
                 </div>
             </div>
             <!-- North Indian Chart Container -->
@@ -1043,19 +1046,19 @@
         </div>
 
         <!-- KUJA DOSHA (MANGLIK) ANALYSIS -->
-        <div id="jKujaDoshaCard" style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
-            <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:8px; text-align:center;">Kuja Dosha (Manglik) Analysis / ಕುಜ ದೋಷ ವಿಶ್ಲೇಷಣೆ</div>
+        <div id="jKujaDoshaCard" style="margin-top:20px; border-top:1px dashed rgba(212,160,23,0.3); padding-top:15px;">
+            <div style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; text-align:center;">Kuja Dosha (Manglik) Analysis / ಕುಜ ದೋಷ ವಿಶ್ಲೇಷಣೆ</div>
             <div id="jKujaDoshaContent"></div>
         </div>
 
-        <div style="margin-top:30px; text-align:center; font-size:0.75rem; color:#999;">
+        <div style="margin-top:30px; text-align:center; font-size:0.75rem; color:var(--text-dim);">
             Generated by Kuberan Panchangam Engine
         </div>
     </div>
 
     <div style="display:flex; gap:10px; margin-top:15px;">
-        <button class="btn-print" id="btnPrintJathaka" style="display:none; flex:1; padding:10px; border:none; background:var(--gold); color:var(--dark); border-radius:8px; font-weight:700; cursor:pointer;" onclick="window.print()">🖨️ Download / Print PDF</button>
-        <button class="btn-print" id="btnShareJathaka" style="display:none; flex:1; background:var(--gold); color:#000;" onclick="shareJathaka()">Share</button>
+        <button class="btn-print" id="btnPrintJathaka" style="display:none; flex:1; padding:12px; border:none; background:var(--gold); color:#000; border-radius:8px; font-weight:700; cursor:pointer;" onclick="window.print()">🖨️ Download / Print PDF</button>
+        <button class="btn-print" id="btnShareJathaka" style="display:none; flex:1; padding:12px; border:none; background:var(--gold); color:#000; border-radius:8px; font-weight:700; cursor:pointer;" onclick="shareJathaka()">Share</button>
     </div>
 
     <!-- History Section -->
@@ -3616,7 +3619,7 @@ function generateJathaka() {
             const DASHA_PLANET_NAMES = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
             const DASHA_PLANET_KN = ['ಕೇತು','ಶುಕ್ರ','ಸೂರ್ಯ','ಚಂದ್ರ','ಮಂಗಳ','ರಾಹು','ಗುರು','ಶನಿ','ಬುಧ'];
             const DASHA_COLORS = ['#9333ea','#f472b6','#f59e0b','#94a3b8','#ef4444','#6366f1','#eab308','#3b82f6','#22c55e'];
-            let dashaTimelineHtml = '<div style="font-size:0.75rem; color:#666; margin-bottom:6px; text-align:center;">💡 Click any Mahadasha row to view 9 Antardasha (Bhukti) sub-periods / ಅಂತರ್ದಶಾ ವಿವರಗಳಿಗೆ ಕ್ಲಿಕ್ ಮಾಡಿ</div>';
+            let dashaTimelineHtml = '<div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:8px; text-align:center;">💡 Click any Mahadasha row to view 9 Antardasha (Bhukti) sub-periods / ಅಂತರ್ದಶಾ ವಿವರಗಳಿಗೆ ಕ್ಲಿಕ್ ಮಾಡಿ</div>';
             let curDate = new Date(d.getTime()); // birth date
             // Add balance of first dasha
             const balanceDays = balanceYearsDecimal * 365.2425;
@@ -3642,14 +3645,14 @@ function generateJathaka() {
                         const spanDays = (curEnd - effStart) / 86400000;
                         const spanYrs = (spanDays / 365.2425).toFixed(1);
 
-                        adHtml += `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;margin-bottom:2px;border-radius:4px;font-size:0.75rem;${isAdCurrent ? 'background:#e0f2fe;font-weight:600;border-left:3px solid #0284c7;' : 'background:#f8fafc;'}">
-                            <div style="min-width:140px;">
+                        adHtml += `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;margin-bottom:3px;border-radius:4px;font-size:0.75rem;${isAdCurrent ? 'background:rgba(2,132,199,0.25);font-weight:600;border-left:3px solid #38bdf8;' : 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);'}">
+                            <div style="min-width:140px;color:var(--text);">
                                 <span>${DASHA_PLANET_NAMES[mdIdx]}-${DASHA_PLANET_NAMES[adIdx]}</span>
-                                <span style="font-family:var(--font-kn);color:var(--gold-dark);font-size:0.7rem;">(${DASHA_PLANET_KN[mdIdx]}-${DASHA_PLANET_KN[adIdx]})</span>
-                                ${isAdCurrent ? '<span style="background:#0284c7;color:#fff;font-size:0.6rem;padding:1px 5px;border-radius:10px;margin-left:4px;">Active / ಪ್ರಸ್ತುತ</span>' : ''}
+                                <span style="font-family:var(--font-kn);color:var(--gold);font-size:0.7rem;">(${DASHA_PLANET_KN[mdIdx]}-${DASHA_PLANET_KN[adIdx]})</span>
+                                ${isAdCurrent ? '<span style="background:#0284c7;color:#fff;font-size:0.6rem;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700;">Active / ಪ್ರಸ್ತುತ</span>' : ''}
                             </div>
-                            <div style="color:#64748b;">${sStr} → ${eStr}</div>
-                            <div style="color:#94a3b8;font-size:0.7rem;">${spanYrs}y</div>
+                            <div style="color:var(--text-dim);">${sStr} → ${eStr}</div>
+                            <div style="color:var(--gold-light);font-size:0.7rem;font-weight:600;">${spanYrs}y</div>
                         </div>`;
                     }
                     curStart = curEnd;
@@ -3667,13 +3670,13 @@ function generateJathaka() {
             const firstAdHtml = getAntardashasHtml(firstDashaIdx, firstVirtualStart, balEndDate, d, true, 0);
 
             dashaTimelineHtml += `
-            <div onclick="toggleDashaAntar(0)" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:6px 8px;background:#f8f0e0;border-radius:4px;border-left:4px solid ${DASHA_COLORS[firstDashaIdx]};margin-bottom:2px;">
-                <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[firstDashaIdx]}${isFirstCurrent ? ' ◀' : ''}</div>
-                <div style="flex:1;font-size:0.8rem;color:#555;">${birthDateStr} → ${balEndStr}</div>
-                <div style="font-size:0.7rem;color:#888;">${bYears}y ${bMonths}m ${bDays}d</div>
-                <div id="dasha-icon-0" style="font-size:0.7rem;color:#888;">${isFirstCurrent ? '▼' : '▶'}</div>
+            <div onclick="toggleDashaAntar(0)" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.25);border-radius:6px;border-left:4px solid ${DASHA_COLORS[firstDashaIdx]};margin-bottom:3px;">
+                <div style="font-weight:700;min-width:70px;color:var(--gold-light);">${DASHA_PLANET_NAMES[firstDashaIdx]}${isFirstCurrent ? ' ◀' : ''}</div>
+                <div style="flex:1;font-size:0.8rem;color:var(--text);">${birthDateStr} → ${balEndStr}</div>
+                <div style="font-size:0.75rem;color:var(--text-dim);">${bYears}y ${bMonths}m ${bDays}d</div>
+                <div id="dasha-icon-0" style="font-size:0.7rem;color:var(--gold);">${isFirstCurrent ? '▼' : '▶'}</div>
             </div>
-            <div id="dasha-antar-0" style="display:${isFirstCurrent ? 'block' : 'none'};padding:6px;background:#f1f5f9;border-radius:4px;margin-bottom:6px;">
+            <div id="dasha-antar-0" style="display:${isFirstCurrent ? 'block' : 'none'};padding:8px;background:rgba(0,0,0,0.3);border:1px solid var(--card-border);border-radius:6px;margin-bottom:6px;">
                 ${firstAdHtml}
             </div>`;
             
@@ -3693,13 +3696,13 @@ function generateJathaka() {
                 const adHtml = getAntardashasHtml(idx, startDate, endDate, d, false, i);
 
                 dashaTimelineHtml += `
-                <div onclick="toggleDashaAntar(${i})" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:6px 8px;${isCurrent ? 'background:#e8f5e9;' : 'background:#fafafa;'}border-radius:4px;border-left:4px solid ${DASHA_COLORS[idx]};margin-bottom:2px;">
-                    <div style="font-weight:700;min-width:65px;color:#333;">${DASHA_PLANET_NAMES[idx]}${isCurrent ? ' ◀' : ''}</div>
-                    <div style="flex:1;font-size:0.8rem;color:#555;">${startStr} → ${endStr}</div>
-                    <div style="font-size:0.7rem;color:#888;">${yrs} yrs</div>
-                    <div id="dasha-icon-${i}" style="font-size:0.7rem;color:#888;">${isCurrent ? '▼' : '▶'}</div>
+                <div onclick="toggleDashaAntar(${i})" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;${isCurrent ? 'background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);'}border-radius:6px;border-left:4px solid ${DASHA_COLORS[idx]};margin-bottom:3px;">
+                    <div style="font-weight:700;min-width:70px;color:${isCurrent ? 'var(--green)' : 'var(--gold-light)'};">${DASHA_PLANET_NAMES[idx]}${isCurrent ? ' ◀' : ''}</div>
+                    <div style="flex:1;font-size:0.8rem;color:var(--text);">${startStr} → ${endStr}</div>
+                    <div style="font-size:0.75rem;color:var(--text-dim);">${yrs} yrs</div>
+                    <div id="dasha-icon-${i}" style="font-size:0.7rem;color:var(--gold);">${isCurrent ? '▼' : '▶'}</div>
                 </div>
-                <div id="dasha-antar-${i}" style="display:${isCurrent ? 'block' : 'none'};padding:6px;background:#f1f5f9;border-radius:4px;margin-bottom:6px;">
+                <div id="dasha-antar-${i}" style="display:${isCurrent ? 'block' : 'none'};padding:8px;background:rgba(0,0,0,0.3);border:1px solid var(--card-border);border-radius:6px;margin-bottom:6px;">
                     ${adHtml}
                 </div>`;
             }
@@ -3726,11 +3729,11 @@ function generateJathaka() {
             
             // Detailed textual list
             document.getElementById('jGrahaAtBirth').innerHTML = birthGrahas.map(g =>
-                `<div style="text-align:center;padding:6px;border:1px solid #ddd;border-radius:4px;">
-                    <div style="font-size:0.9rem;">${g.icon}</div>
-                    <div style="font-size:0.7rem;color:#666;">${g.name}</div>
-                    <div style="font-weight:600;font-size:0.8rem;">${g.rashi}</div>
-                    <div style="font-size:0.65rem;color:#999;">${g.deg}°</div>
+                `<div style="text-align:center;padding:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,160,23,0.2);border-radius:6px;">
+                    <div style="font-size:1.1rem;margin-bottom:2px;">${g.icon}</div>
+                    <div style="font-size:0.75rem;color:var(--text-dim);font-weight:600;">${g.name}</div>
+                    <div style="font-weight:700;font-size:0.85rem;color:var(--gold-light);margin-top:2px;">${g.rashi}</div>
+                    <div style="font-size:0.7rem;color:var(--text-dim);">${g.deg}°</div>
                 </div>`
             ).join('');
 
@@ -3752,11 +3755,11 @@ function generateJathaka() {
             });
             document.getElementById('jGrahaNavamsha').innerHTML = birthGrahas.map(g => {
                 const navRashi = getNavamshaRashi(g.lon);
-                return '<div style="text-align:center;padding:6px;border:1px solid #ddd;border-radius:4px;">' +
-                    '<div style="font-size:0.9rem;">' + g.icon + '</div>' +
-                    '<div style="font-size:0.7rem;color:#666;">' + g.name + '</div>' +
-                    '<div style="font-weight:600;font-size:0.8rem;">' + RASHI_EN[navRashi] + '</div>' +
-                    '<div style="font-size:0.65rem;color:#999;">D9</div></div>';
+                return '<div style="text-align:center;padding:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,160,23,0.2);border-radius:6px;">' +
+                    '<div style="font-size:1.1rem;margin-bottom:2px;">' + g.icon + '</div>' +
+                    '<div style="font-size:0.75rem;color:var(--text-dim);font-weight:600;">' + g.name + '</div>' +
+                    '<div style="font-weight:700;font-size:0.85rem;color:var(--gold-light);margin-top:2px;">' + RASHI_EN[navRashi] + '</div>' +
+                    '<div style="font-size:0.7rem;color:var(--gold);font-weight:600;">D9</div></div>';
             }).join('');
 
             // Store current for sharing
@@ -3782,11 +3785,11 @@ function generateJathaka() {
                 let cancelListHtml = '';
                 if (kuja.cancellations && kuja.cancellations.length > 0) {
                     cancelListHtml = `
-                    <div style="margin-top:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
-                        <div style="font-weight:700; font-size:0.8rem; color:#334155; margin-bottom:6px;">✨ Cancellation Factors (ದೋಷ ಭಂಗ / ಪರಿಹಾರ ನಿಯಮಗಳು):</div>
+                    <div style="margin-top:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(212,160,23,0.25); border-radius:6px; padding:10px;">
+                        <div style="font-weight:700; font-size:0.8rem; color:var(--gold); margin-bottom:6px;">✨ Cancellation Factors (ದೋಷ ಭಂಗ / ಪರಿಹಾರ ನಿಯಮಗಳು):</div>
                         ${kuja.cancellations.map(c => `
-                            <div style="font-size:0.75rem; margin-bottom:4px; color:#475569;">
-                                <b>• ${c.rule}:</b> ${c.desc} <span style="font-family:var(--font-kn); color:var(--gold-dark);">(${c.descKn})</span>
+                            <div style="font-size:0.75rem; margin-bottom:4px; color:var(--text);">
+                                <b>• ${c.rule}:</b> ${c.desc} <span style="font-family:var(--font-kn); color:var(--gold-light);">(${c.descKn})</span>
                             </div>
                         `).join('')}
                     </div>`;
@@ -3796,24 +3799,24 @@ function generateJathaka() {
                     <div style="padding:10px 14px; border-radius:8px; background:${badgeBg}; border:1px solid ${badgeBorder}; display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
                         <div>
                             <div style="font-weight:800; font-size:1rem; color:${badgeColor};">${kuja.statusText}</div>
-                            <div style="font-size:0.75rem; color:#475569; margin-top:2px;">
+                            <div style="font-size:0.75rem; color:var(--text); margin-top:2px;">
                                 ${kuja.status === 'none' ? 'Mars is placed in auspicious houses causing no affliction.' : (kuja.status === 'cancelled' ? 'Mars causes affliction, but classical exceptions completely neutralize the dosha.' : 'Mars is placed in an afflicted house without complete cancellation.')}
                             </div>
                         </div>
                         <div style="font-size:1.8rem;">${kuja.status === 'none' ? '✅' : (kuja.status === 'cancelled' ? '🛡️' : '⚠️')}</div>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:0.8rem; text-align:center;">
-                        <div style="padding:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;">
-                            <div style="font-size:0.7rem; color:#64748b;">From Lagna (ಲಗ್ನದಿಂದ)</div>
-                            <div style="font-weight:700; margin-top:2px; color:${kuja.inLagnaHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromLagna} ${kuja.inLagnaHouses ? '(Dosha)' : '(Shubha)'}</div>
+                        <div style="padding:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:6px;">
+                            <div style="font-size:0.7rem; color:var(--text-dim);">From Lagna (ಲಗ್ನದಿಂದ)</div>
+                            <div style="font-weight:700; margin-top:3px; color:${kuja.inLagnaHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromLagna} ${kuja.inLagnaHouses ? '(Dosha)' : '(Shubha)'}</div>
                         </div>
-                        <div style="padding:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;">
-                            <div style="font-size:0.7rem; color:#64748b;">From Moon (ಚಂದ್ರನಿಂದ)</div>
-                            <div style="font-weight:700; margin-top:2px; color:${kuja.inMoonHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromMoon || '—'} ${kuja.inMoonHouses ? '(Dosha)' : '(Shubha)'}</div>
+                        <div style="padding:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:6px;">
+                            <div style="font-size:0.7rem; color:var(--text-dim);">From Moon (ಚಂದ್ರನಿಂದ)</div>
+                            <div style="font-weight:700; margin-top:3px; color:${kuja.inMoonHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromMoon || '—'} ${kuja.inMoonHouses ? '(Dosha)' : '(Shubha)'}</div>
                         </div>
-                        <div style="padding:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;">
-                            <div style="font-size:0.7rem; color:#64748b;">From Venus (ಶುಕ್ರನಿಂದ)</div>
-                            <div style="font-weight:700; margin-top:2px; color:${kuja.inVenusHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromVenus || '—'} ${kuja.inVenusHouses ? '(Dosha)' : '(Shubha)'}</div>
+                        <div style="padding:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:6px;">
+                            <div style="font-size:0.7rem; color:var(--text-dim);">From Venus (ಶುಕ್ರನಿಂದ)</div>
+                            <div style="font-weight:700; margin-top:3px; color:${kuja.inVenusHouses ? 'var(--red)' : 'var(--green)'};">House ${kuja.houseFromVenus || '—'} ${kuja.inVenusHouses ? '(Dosha)' : '(Shubha)'}</div>
                         </div>
                     </div>
                     ${cancelListHtml}
@@ -4823,11 +4826,11 @@ function setChartType(type) {
     const btnRasi = document.getElementById('btnRasiChart');
     const btnNav = document.getElementById('btnNavamshaChart');
     if (type === 'rasi') {
-        if (btnRasi) { btnRasi.style.background = 'var(--maroon)'; btnRasi.style.color = '#fff'; btnRasi.style.border = 'none'; }
-        if (btnNav) { btnNav.style.background = '#eee'; btnNav.style.color = '#333'; btnNav.style.border = '1px solid #ccc'; }
+        if (btnRasi) { btnRasi.style.background = 'var(--maroon)'; btnRasi.style.color = '#fff'; btnRasi.style.border = '1px solid var(--gold)'; }
+        if (btnNav) { btnNav.style.background = 'rgba(255,255,255,0.06)'; btnNav.style.color = 'var(--text)'; btnNav.style.border = '1px solid var(--card-border)'; }
     } else {
-        if (btnRasi) { btnRasi.style.background = '#eee'; btnRasi.style.color = '#333'; btnRasi.style.border = '1px solid #ccc'; }
-        if (btnNav) { btnNav.style.background = 'var(--maroon)'; btnNav.style.color = '#fff'; btnNav.style.border = 'none'; }
+        if (btnRasi) { btnRasi.style.background = 'rgba(255,255,255,0.06)'; btnRasi.style.color = 'var(--text)'; btnRasi.style.border = '1px solid var(--card-border)'; }
+        if (btnNav) { btnNav.style.background = 'var(--maroon)'; btnNav.style.color = '#fff'; btnNav.style.border = '1px solid var(--gold)'; }
     }
     renderActiveKundali();
 }
@@ -4838,9 +4841,9 @@ function setChartStyle(style) {
     const btnNorth = document.getElementById('btnNorthChart');
     if (style === 'south') {
         if (btnSouth) { btnSouth.style.background = 'var(--gold)'; btnSouth.style.color = '#000'; btnSouth.style.border = 'none'; }
-        if (btnNorth) { btnNorth.style.background = '#eee'; btnNorth.style.color = '#333'; btnNorth.style.border = '1px solid #ccc'; }
+        if (btnNorth) { btnNorth.style.background = 'rgba(255,255,255,0.06)'; btnNorth.style.color = 'var(--text)'; btnNorth.style.border = '1px solid var(--card-border)'; }
     } else {
-        if (btnSouth) { btnSouth.style.background = '#eee'; btnSouth.style.color = '#333'; btnSouth.style.border = '1px solid #ccc'; }
+        if (btnSouth) { btnSouth.style.background = 'rgba(255,255,255,0.06)'; btnSouth.style.color = 'var(--text)'; btnSouth.style.border = '1px solid var(--card-border)'; }
         if (btnNorth) { btnNorth.style.background = 'var(--gold)'; btnNorth.style.color = '#000'; btnNorth.style.border = 'none'; }
     }
     renderActiveKundali();
@@ -4906,11 +4909,11 @@ function generateNorthIndianChartSVG(lagnaRashiIdx, grahas) {
     });
     signPlanets[lagnaRashiIdx].unshift('📍 As');
 
-    let svg = `<svg viewBox="0 0 300 300" style="width:100%; max-width:320px; aspect-ratio:1; display:block; margin:auto; background:#fff; font-family:'Segoe UI',sans-serif; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-        <rect x="2" y="2" width="296" height="296" fill="#fffdf8" stroke="#8b1a2b" stroke-width="2.5"/>
-        <line x1="2" y1="2" x2="298" y2="298" stroke="#8b1a2b" stroke-width="1.5"/>
-        <line x1="2" y1="298" x2="298" y2="2" stroke="#8b1a2b" stroke-width="1.5"/>
-        <polygon points="150,2 298,150 150,298 2,150" fill="none" stroke="#8b1a2b" stroke-width="1.5"/>`;
+    let svg = `<svg viewBox="0 0 300 300" style="width:100%; max-width:320px; aspect-ratio:1; display:block; margin:auto; background:#1a2038; font-family:'Segoe UI',sans-serif; border-radius:8px; border:2px solid var(--gold); box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+        <rect x="2" y="2" width="296" height="296" fill="#161b2e" stroke="#d4a017" stroke-width="2"/>
+        <line x1="2" y1="2" x2="298" y2="298" stroke="#d4a017" stroke-width="1.5"/>
+        <line x1="2" y1="298" x2="298" y2="2" stroke="#d4a017" stroke-width="1.5"/>
+        <polygon points="150,2 298,150 150,298 2,150" fill="none" stroke="#d4a017" stroke-width="1.5"/>`;
 
     for (let h = 1; h <= 12; h++) {
         const signIdx = (lagnaRashiIdx + h - 1) % 12;
@@ -4919,12 +4922,12 @@ function generateNorthIndianChartSVG(lagnaRashiIdx, grahas) {
         const sc = signCoords[h];
         const hc = houseCenters[h];
 
-        svg += `\n        <text x="${sc.x}" y="${sc.y}" font-size="9" font-weight="bold" fill="#888" text-anchor="middle">${signNum}</text>`;
+        svg += `\n        <text x="${sc.x}" y="${sc.y}" font-size="9" font-weight="bold" fill="#f5c842" text-anchor="middle">${signNum}</text>`;
 
         if (planets.length > 0) {
             planets.forEach((p, pIdx) => {
                 const yOff = hc.y + (pIdx - (planets.length - 1) / 2) * 11;
-                svg += `\n        <text x="${hc.x}" y="${yOff}" font-size="9.5" font-weight="600" fill="#8b1a2b" text-anchor="middle">${p}</text>`;
+                svg += `\n        <text x="${hc.x}" y="${yOff}" font-size="9.5" font-weight="600" fill="#ffffff" text-anchor="middle">${p}</text>`;
             });
         }
     }
