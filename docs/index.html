@@ -528,8 +528,8 @@
     </div>
 
     <!-- SANKRANTI INDICATOR -->
-    <div class="card detailed-only" id="sankrantiCard" style="display:none;">
-        <h2>🌞 Sankranti</h2>
+    <div class="card" id="sankrantiCard">
+        <h2>🌞 Sankranti <span style="font-family:var(--font-kn); font-size:1rem; font-weight:normal;">(ಸಂಕ್ರಾಂತಿ)</span></h2>
         <div id="sankrantiInfo"></div>
     </div>
 
@@ -1028,6 +1028,8 @@
                 </div>
                 <div id="jGrahaNavamsha" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px;"></div>
             </div>
+        </div>
+
         <!-- KUJA DOSHA (MANGLIK) ANALYSIS -->
         <div id="jKujaDoshaCard" style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
             <div style="font-size:0.8rem; color:#666; text-transform:uppercase; margin-bottom:8px; text-align:center;">Kuja Dosha (Manglik) Analysis / ಕುಜ ದೋಷ ವಿಶ್ಲೇಷಣೆ</div>
@@ -2088,35 +2090,85 @@ function renderPanchanga(p) {
     const sunRashiPrev = Math.floor(siderealSun(ySetSank) / 30);
     const sunRashiCurr = Math.floor(siderealSun(p.sunset) / 30);
     const sankrantiCard = document.getElementById('sankrantiCard');
-    if (sunRashiPrev !== sunRashiCurr) {
-        // High-precision bisection for exact solar ingress moment
-        let lo = ySetSank, hi = p.sunset;
-        const targetDeg = sunRashiCurr * 30;
-        for (let b = 0; b < 25; b++) {
-            const mid = (lo + hi) / 2;
-            const diff = ((siderealSun(mid) - targetDeg + 540) % 360) - 180;
-            if (diff >= 0) hi = mid; else lo = mid;
-        }
-        const ingJD = (lo + hi) / 2;
-        const punyaSpan = (16 * 24) / 1440; // 16 ghatikas = 6.4 hours
-        const punyaStart = ingJD - punyaSpan / 2;
-        const punyaEnd = ingJD + punyaSpan / 2;
-
+    if (sankrantiCard) {
         sankrantiCard.style.display = 'block';
-        document.getElementById('sankrantiInfo').innerHTML = `
-            <div style="display:flex; align-items:center; gap:12px; padding:10px 0;">
-                <span style="font-size:1.8rem;">🌞</span>
-                <div style="flex:1;">
-                    <div style="font-weight:700; font-size:1rem; color:var(--gold);">${RASHI_EN[sunRashiCurr]} Sankranti <span style="font-family:var(--font-kn); font-size:0.9rem;">(${RASHI_KN[sunRashiCurr]} ಸಂಕ್ರಾಂತಿ)</span></div>
-                    <div style="font-size:0.85rem; color:var(--text); margin-top:2px;">Sun transitions from <b>${RASHI_EN[sunRashiPrev]} (${RASHI_KN[sunRashiPrev]})</b> to <b>${RASHI_EN[sunRashiCurr]} (${RASHI_KN[sunRashiCurr]})</b></div>
-                    <div style="display:flex; gap:15px; margin-top:6px; font-size:0.75rem; color:var(--text-dim); flex-wrap:wrap;">
-                        <div>⏱️ <b>Ingress Time:</b> ${fmt(ingJD)}</div>
-                        <div>✨ <b>Punyakala:</b> ${fmt(punyaStart)} – ${fmt(punyaEnd)}</div>
+        if (sunRashiPrev !== sunRashiCurr) {
+            // High-precision bisection for exact solar ingress moment
+            let lo = ySetSank, hi = p.sunset;
+            const targetDeg = sunRashiCurr * 30;
+            for (let b = 0; b < 25; b++) {
+                const mid = (lo + hi) / 2;
+                const diff = ((siderealSun(mid) - targetDeg + 540) % 360) - 180;
+                if (diff >= 0) hi = mid; else lo = mid;
+            }
+            const ingJD = (lo + hi) / 2;
+            const punyaSpan = (16 * 24) / 1440; // 16 ghatikas = 6.4 hours
+            const punyaStart = ingJD - punyaSpan / 2;
+            const punyaEnd = ingJD + punyaSpan / 2;
+
+            document.getElementById('sankrantiInfo').innerHTML = `
+                <div style="background:linear-gradient(135deg, rgba(212,175,55,0.18), rgba(128,0,32,0.18)); border:1px solid var(--gold); border-radius:10px; padding:12px; margin-top:4px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:2rem;">🌞</span>
+                        <div style="flex:1;">
+                            <div style="display:inline-block; background:var(--gold); color:#1a0505; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; text-transform:uppercase; margin-bottom:4px;">TODAY / ಇಂದು</div>
+                            <div style="font-weight:700; font-size:1.1rem; color:var(--gold);">${RASHI_EN[sunRashiCurr]} Sankranti <span style="font-family:var(--font-kn); font-size:0.95rem;">(${RASHI_KN[sunRashiCurr]} ಸಂಕ್ರಾಂತಿ)</span></div>
+                            <div style="font-size:0.85rem; color:var(--text); margin-top:2px;">Sun transitions from <b>${RASHI_EN[sunRashiPrev]} (${RASHI_KN[sunRashiPrev]})</b> to <b>${RASHI_EN[sunRashiCurr]} (${RASHI_KN[sunRashiCurr]})</b></div>
+                            <div style="display:flex; gap:15px; margin-top:8px; font-size:0.8rem; color:var(--text); flex-wrap:wrap;">
+                                <div>⏱️ <b>Ingress Time / ಸಂಕ್ರಮಣ ಕಾಲ:</b> <span style="color:var(--gold-light); font-weight:600;">${fmt(ingJD)}</span></div>
+                                <div>✨ <b>Punyakala / ಪುಣ್ಯಕಾಲ:</b> <span style="color:var(--gold-light); font-weight:600;">${fmt(punyaStart)} – ${fmt(punyaEnd)}</span></div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>`;
-    } else {
-        sankrantiCard.style.display = 'none';
+                </div>`;
+        } else {
+            // Non-ingress day: Show current Sauramasa and calculate next upcoming Sankranti
+            const curSunDeg = siderealSun(p.sunset);
+            const degInRashi = curSunDeg % 30;
+            const nextRashiIdx = (sunRashiCurr + 1) % 12;
+            const degToNext = (30 - degInRashi + 360) % 30;
+            const approxDays = degToNext / 0.9856;
+            
+            let lo = p.sunset + approxDays - 2.0;
+            let hi = p.sunset + approxDays + 2.0;
+            const targetDeg = nextRashiIdx * 30;
+            for (let b = 0; b < 25; b++) {
+                const mid = (lo + hi) / 2;
+                const diff = ((siderealSun(mid) - targetDeg + 540) % 360) - 180;
+                if (diff >= 0) hi = mid; else lo = mid;
+            }
+            const nextIngJD = (lo + hi) / 2;
+            const daysLeft = Math.max(1, Math.round(nextIngJD - p.sunset));
+            const punyaSpan = (16 * 24) / 1440;
+            const punyaStart = nextIngJD - punyaSpan / 2;
+            const punyaEnd = nextIngJD + punyaSpan / 2;
+            
+            const nextDateObj = new Date((nextIngJD - 2440587.5 + (p.tzOff / 24)) * 86400000);
+            const nextDateStr = nextDateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+            document.getElementById('sankrantiInfo').innerHTML = `
+                <div style="padding:4px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                        <div>
+                            <span style="font-size:0.85rem; color:var(--text-dim);">Current Solar Month / ಸೌರ ಮಾಸ:</span>
+                            <div style="font-weight:700; color:var(--gold); font-size:1rem;">${RASHI_EN[sunRashiCurr]} (${RASHI_KN[sunRashiCurr]}) &bull; ${degInRashi.toFixed(1)}°</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="font-size:0.75rem; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); border-radius:12px; padding:3px 10px; color:var(--gold);">Next in ${daysLeft} days / ಇನ್ನೂ ${daysLeft} ದಿನ</span>
+                        </div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px 12px; font-size:0.82rem;">
+                        <div style="font-weight:600; color:var(--text); margin-bottom:4px;">
+                            📅 Upcoming: <span style="color:var(--gold);">${RASHI_EN[nextRashiIdx]} Sankranti (${RASHI_KN[nextRashiIdx]} ಸಂಕ್ರಾಂತಿ)</span>
+                        </div>
+                        <div style="display:flex; gap:15px; color:var(--text-dim); font-size:0.78rem; flex-wrap:wrap; margin-top:4px;">
+                            <div>🗓️ <b>Date:</b> ${nextDateStr}</div>
+                            <div>⏱️ <b>Ingress Time:</b> ${fmt(nextIngJD)}</div>
+                            <div>✨ <b>Punyakala:</b> ${fmt(punyaStart)} – ${fmt(punyaEnd)}</div>
+                        </div>
+                    </div>
+                </div>`;
+        }
     }
 
     // --- UPCOMING FESTIVALS ---
