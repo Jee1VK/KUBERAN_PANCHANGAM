@@ -571,7 +571,7 @@
                 <div class="value" id="valVara">—</div>
                 <div class="value-kn" id="valVaraKn">—</div>
             </div>
-            <div class="limb-item full-width" style="border-left-color:var(--orange);">
+            <div class="limb-item full-width detailed-only" style="border-left-color:var(--orange);">
                 <div class="label">Shraddha Tithi (For Ancestral Rites) · ಶ್ರಾದ್ಧ ತಿಥಿ</div>
                 <div class="value" id="valShraddhaTithi">—</div>
                 <div class="value-kn" id="valShraddhaTithiKn">—</div>
@@ -589,7 +589,7 @@
     </div>
 
     <!-- AMRIT KALAM & AUSPICIOUS MUHURTHA GUIDE -->
-    <div class="card" id="amritKalamCard">
+    <div class="card detailed-only" id="amritKalamCard">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h2 style="margin:0;">🍯 Amrit Kalam (ಅಮೃತ ಕಾಲ)</h2>
             <span id="amritStatusBadge" style="font-size:0.75rem; font-weight:700; padding:3px 10px; border-radius:12px; background:rgba(34,197,94,0.15); color:var(--green); border:1px solid var(--green);">✨ Nectar Window</span>
@@ -645,7 +645,7 @@
     </div>
 
     <!-- CHOGHADIYA -->
-    <div class="card">
+    <div class="card detailed-only" id="choghadiyaCard">
         <h2>🕐 Choghadiya (ಚೌಘಡಿಯಾ)</h2>
         <div id="chogLiveNow" style="display:none; padding:10px 14px; margin-bottom:12px; border-radius:8px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid var(--gold); text-align:center;">
             <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;">🟢 Right Now</div>
@@ -657,7 +657,7 @@
     </div>
 
     <!-- GRAHA STHITI (Planetary Positions) -->
-    <div class="card">
+    <div class="card detailed-only" id="grahaCard">
         <h2>🪐 Graha Sthiti (ಗ್ರಹ ಸ್ಥಿತಿ)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Sidereal (Lahiri) positions of the Navagraha at sunrise.</p>
         <div id="grahaGrid" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;"></div>
@@ -665,14 +665,14 @@
     </div>
 
     <!-- LAGNA TABLE (Daily Ascendants) -->
-    <div class="card">
+    <div class="card detailed-only" id="lagnaCard">
         <h2>⏱️ Daily Lagna (ಲಗ್ನ ಪಟ್ಟಿ)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Exact entry and exit times of all 12 ascendants calculated for your location from sunrise to next sunrise.</p>
         <div id="lagnaList" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
     </div>
 
     <!-- GOCHARA (Transit Analysis) -->
-    <div class="card" id="gocharaCard" style="display:none;">
+    <div class="card detailed-only" id="gocharaCard" style="display:none;">
         <h2>🔮 Gochara (ಗೋಚಾರ)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Transit results based on your birth Moon sign. <span id="gocharaBirthInfo" style="color:var(--gold);"></span></p>
         <div id="gocharaList"></div>
@@ -680,7 +680,7 @@
 
     
     <!-- DAILY RASHIFAL (Moon Sign Horoscope) -->
-    <div class="card" id="rashifalCard">
+    <div class="card detailed-only" id="rashifalCard">
         <h2>🔮 Daily Rashifal (ರಾಶಿಫಲ)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Real-time Gochara transit analysis for all 12 Rashis.</p>
         <div style="margin-bottom:12px;">
@@ -704,7 +704,7 @@
     </div>
 
     <!-- HORA (Planetary Hours) -->
-    <div class="card">
+    <div class="card detailed-only" id="horaCard">
         <h2>⏰ Hora (ಹೋರಾ)</h2>
         <div id="horaLiveNow" style="display:none; padding:10px 14px; margin-bottom:12px; border-radius:8px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid var(--gold); text-align:center;">
             <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;">🟢 Right Now</div>
@@ -716,7 +716,7 @@
     </div>
 
     <!-- GOWRI PANCHANGAM -->
-    <div class="card">
+    <div class="card detailed-only" id="gowriCard">
         <h2>🌺 Gowri Panchangam (ಗೌರಿ ಪಂಚಾಂಗ)</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">8 daily time slots with quality ratings. Very popular in Karnataka & South India.</p>
         <div id="gowriList"></div>
@@ -728,6 +728,18 @@
         <h2>🪙 Suvarna & Pattu Muhurtha</h2>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Auspicious timings for buying Gold, Jewellery & Silk today.</p>
         <div id="suvarnaContent"></div>
+    </div>
+
+    <!-- ESSENTIAL VIEW EXPAND BANNER -->
+    <div class="card essential-only" style="text-align:center; padding:18px 16px; margin-bottom:14px; background:linear-gradient(135deg, rgba(212,175,55,0.08), rgba(0,0,0,0.3)); border:1px dashed var(--gold); border-radius:10px;">
+        <div style="font-size:1.1rem; margin-bottom:4px;">📜</div>
+        <div style="font-weight:700; color:var(--gold); font-size:0.95rem;">Looking for Detailed Astrological Charts?</div>
+        <div style="font-size:0.8rem; color:var(--text-dim); margin:6px 0 12px 0;">
+            Choghadiya, Gowri Panchangam, Hora, Graha Sthiti, Daily Lagna, and Rashifal are available in Detailed View.
+        </div>
+        <button type="button" onclick="switchDailyView('detailed')" style="background:var(--gold); color:#000; border:none; padding:8px 22px; border-radius:20px; font-weight:700; font-size:0.85rem; cursor:pointer; box-shadow:0 2px 8px rgba(212,175,55,0.3);">
+            Switch to Detailed View (ಸಂಪೂರ್ಣ) ➔
+        </button>
     </div>
 
     <!-- SHARE DAILY -->
@@ -4085,13 +4097,25 @@ function updateDateChips(selectedStr) {
 
 function switchDailyView(mode) {
     try { localStorage.setItem('kuberan_daily_view', mode); } catch(e){}
-    const isDetailed = mode === 'detailed';
+    const isDetailed = (mode === 'detailed');
     const bQuick = document.getElementById('btnViewQuick');
     const bDet = document.getElementById('btnViewDetailed');
     if (bQuick) bQuick.classList.toggle('active', !isDetailed);
     if (bDet) bDet.classList.toggle('active', isDetailed);
+
+    // Toggle all detailed-only elements
     document.querySelectorAll('.detailed-only').forEach(el => {
-        el.style.display = isDetailed ? 'block' : 'none';
+        if (el.id === 'gocharaCard') {
+            const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+            el.style.display = (isDetailed && history.length > 0) ? 'block' : 'none';
+        } else {
+            el.style.display = isDetailed ? '' : 'none';
+        }
+    });
+
+    // Toggle all essential-only elements
+    document.querySelectorAll('.essential-only').forEach(el => {
+        el.style.display = isDetailed ? 'none' : '';
     });
 }
 
