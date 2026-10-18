@@ -1720,7 +1720,8 @@ function findUgadiJD(year) {
 }
 
 
-function computePanchanga(year, month, day, lat, lon, tzName) {
+function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
+    const isFast = !!(options && options.fast);
     const tzOff = getTzOffset(tzName, year, month, day);
     const sr = computeSunrise(year, month, day, lat, lon, tzOff);
     if (!sr) return null;
@@ -1751,11 +1752,11 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
 
     // Yoga
     const yogaIdx = Math.floor(ya / (360 / 27));
-    const yogaEnd = nextBoundary(riseJD, yogaAngle, 360 / 27);
+    const yogaEnd = isFast ? null : nextBoundary(riseJD, yogaAngle, 360 / 27);
 
     // Karana
     const kNo = Math.floor(e / 6) + 1;
-    const karanaEnd = nextBoundary(riseJD, elongation, 6);
+    const karanaEnd = isFast ? null : nextBoundary(riseJD, elongation, 6);
 
     // Rashi
     const sunRashiIdx = Math.floor(s / 30);
@@ -1778,44 +1779,47 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     const brahmaStart = riseJD - 96 / 1440;
     const brahmaEnd = riseJD - 48 / 1440;
 
-    // Amrit Kalam & Varjyam (Scaled to true Nakshatra duration in Ghatikas)
-    const nakStart1 = prevBoundary(riseJD, siderealMoon, 360 / 27);
-    const dur1 = nakEnd - nakStart1;
-    const nextDaySr = computeSunrise(year, month, day + 1, lat, lon, tzOff);
-    const nextRiseJD = nextDaySr ? julianDay(year, month, day + 1, nextDaySr.rise) : (riseJD + 1.0);
-
     const amritWindows = [];
     const varjyamWindows = [];
+    let aStart1 = riseJD, aEnd1 = riseJD;
 
-    // Window 1: Sunrise Nakshatra
-    const aStart1 = nakStart1 + (dur1 * (AMRITA_GHATIKAS[nakIdx] / 60));
-    const aEnd1 = aStart1 + (dur1 * (4 / 60));
-    if (aEnd1 >= riseJD && aStart1 < nextRiseJD) {
-        amritWindows.push({ start: aStart1, end: aEnd1, nakIdx, nakName: NAK_EN[nakIdx], nakNameKn: NAK_KN[nakIdx] });
-    }
+    if (!isFast) {
+        // Amrit Kalam & Varjyam (Scaled to true Nakshatra duration in Ghatikas)
+        const nakStart1 = prevBoundary(riseJD, siderealMoon, 360 / 27);
+        const dur1 = nakEnd - nakStart1;
+        const nextDaySr = computeSunrise(year, month, day + 1, lat, lon, tzOff);
+        const nextRiseJD = nextDaySr ? julianDay(year, month, day + 1, nextDaySr.rise) : (riseJD + 1.0);
 
-    const vStart1 = nakStart1 + (dur1 * (VARJYAM_GHATIKAS[nakIdx] / 60));
-    const vEnd1 = vStart1 + (dur1 * (4 / 60));
-    if (vEnd1 >= riseJD && vStart1 < nextRiseJD) {
-        varjyamWindows.push({ start: vStart1, end: vEnd1, nakIdx, nakName: NAK_EN[nakIdx], nakNameKn: NAK_KN[nakIdx] });
-    }
-
-    // Window 2: Next Nakshatra if it enters during this Panchang day
-    if (nakEnd < nextRiseJD) {
-        const nextNakIdx = (nakIdx + 1) % 27;
-        const nextNakEnd = nextBoundary(nakEnd + 0.01, siderealMoon, 360 / 27);
-        const dur2 = nextNakEnd - nakEnd;
-
-        const aStart2 = nakEnd + (dur2 * (AMRITA_GHATIKAS[nextNakIdx] / 60));
-        const aEnd2 = aStart2 + (dur2 * (4 / 60));
-        if (aStart2 < nextRiseJD && aEnd2 >= riseJD) {
-            amritWindows.push({ start: aStart2, end: aEnd2, nakIdx: nextNakIdx, nakName: NAK_EN[nextNakIdx], nakNameKn: NAK_KN[nextNakIdx] });
+        // Window 1: Sunrise Nakshatra
+        aStart1 = nakStart1 + (dur1 * (AMRITA_GHATIKAS[nakIdx] / 60));
+        aEnd1 = aStart1 + (dur1 * (4 / 60));
+        if (aEnd1 >= riseJD && aStart1 < nextRiseJD) {
+            amritWindows.push({ start: aStart1, end: aEnd1, nakIdx, nakName: NAK_EN[nakIdx], nakNameKn: NAK_KN[nakIdx] });
         }
 
-        const vStart2 = nakEnd + (dur2 * (VARJYAM_GHATIKAS[nextNakIdx] / 60));
-        const vEnd2 = vStart2 + (dur2 * (4 / 60));
-        if (vStart2 < nextRiseJD && vEnd2 >= riseJD) {
-            varjyamWindows.push({ start: vStart2, end: vEnd2, nakIdx: nextNakIdx, nakName: NAK_EN[nextNakIdx], nakNameKn: NAK_KN[nextNakIdx] });
+        const vStart1 = nakStart1 + (dur1 * (VARJYAM_GHATIKAS[nakIdx] / 60));
+        const vEnd1 = vStart1 + (dur1 * (4 / 60));
+        if (vEnd1 >= riseJD && vStart1 < nextRiseJD) {
+            varjyamWindows.push({ start: vStart1, end: vEnd1, nakIdx, nakName: NAK_EN[nakIdx], nakNameKn: NAK_KN[nakIdx] });
+        }
+
+        // Window 2: Next Nakshatra if it enters during this Panchang day
+        if (nakEnd < nextRiseJD) {
+            const nextNakIdx = (nakIdx + 1) % 27;
+            const nextNakEnd = nextBoundary(nakEnd + 0.01, siderealMoon, 360 / 27);
+            const dur2 = nextNakEnd - nakEnd;
+
+            const aStart2 = nakEnd + (dur2 * (AMRITA_GHATIKAS[nextNakIdx] / 60));
+            const aEnd2 = aStart2 + (dur2 * (4 / 60));
+            if (aStart2 < nextRiseJD && aEnd2 >= riseJD) {
+                amritWindows.push({ start: aStart2, end: aEnd2, nakIdx: nextNakIdx, nakName: NAK_EN[nextNakIdx], nakNameKn: NAK_KN[nextNakIdx] });
+            }
+
+            const vStart2 = nakEnd + (dur2 * (VARJYAM_GHATIKAS[nextNakIdx] / 60));
+            const vEnd2 = vStart2 + (dur2 * (4 / 60));
+            if (vStart2 < nextRiseJD && vEnd2 >= riseJD) {
+                varjyamWindows.push({ start: vStart2, end: vEnd2, nakIdx: nextNakIdx, nakName: NAK_EN[nextNakIdx], nakNameKn: NAK_KN[nextNakIdx] });
+            }
         }
     }
 
@@ -1840,15 +1844,18 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
     // Ritu
     const rituName = RITU[masaIdx];
 
-    // Shraddha Tithi (Aparahna Kala)
-    const aparahnaMidJD = riseJD + (dayLen * 0.7); // Midpoint of Aparahna (3/5 to 4/5 of day)
-    const sElong = elongation(aparahnaMidJD);
-    const sTithiNo = Math.floor(sElong / 12) + 1;
-    let sTithiName, sTithiNameKn;
-    if (sTithiNo === 15) { sTithiName = "Purnima"; sTithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
-    else if (sTithiNo === 30) { sTithiName = "Amavasya"; sTithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
-    else { const idx = (sTithiNo - 1) % 15; sTithiName = TITHI_EN[idx]; sTithiNameKn = TITHI_KN[idx]; }
-    const shraddha = { no: sTithiNo, name: sTithiName, nameKn: sTithiNameKn, paksha: sTithiNo <= 15 ? 'Shukla' : 'Krishna', pakshaKn: sTithiNo <= 15 ? 'ಶುಕ್ಲ' : 'ಕೃಷ್ಣ' };
+    let shraddha = null;
+    if (!isFast) {
+        // Shraddha Tithi (Aparahna Kala)
+        const aparahnaMidJD = riseJD + (dayLen * 0.7); // Midpoint of Aparahna (3/5 to 4/5 of day)
+        const sElong = elongation(aparahnaMidJD);
+        const sTithiNo = Math.floor(sElong / 12) + 1;
+        let sTithiName, sTithiNameKn;
+        if (sTithiNo === 15) { sTithiName = "Purnima"; sTithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
+        else if (sTithiNo === 30) { sTithiName = "Amavasya"; sTithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
+        else { const idx = (sTithiNo - 1) % 15; sTithiName = TITHI_EN[idx]; sTithiNameKn = TITHI_KN[idx]; }
+        shraddha = { no: sTithiNo, name: sTithiName, nameKn: sTithiNameKn, paksha: sTithiNo <= 15 ? 'Shukla' : 'Krishna', pakshaKn: sTithiNo <= 15 ? 'ಶುಕ್ಲ' : 'ಕೃಷ್ಣ' };
+    }
 
     return {
         sunrise: riseJD, sunset: setJD, tzOff,
@@ -1870,7 +1877,7 @@ function computePanchanga(year, month, day, lat, lon, tzName) {
         samvatsara: { name: samvatsaraName, idx: samvatsaraIdx, shaka: shakaYear },
         ayana: { en: ayana, kn: ayanaKn },
         ritu: rituName,
-        lagnas: computeDailyLagnas(riseJD, lat, lon),
+        lagnas: isFast ? [] : computeDailyLagnas(riseJD, lat, lon),
         shraddhaTithi: shraddha,
         elongation: elongation(riseJD),
         wd, year, month, day
@@ -2797,7 +2804,22 @@ document.querySelectorAll('.tab-nav').forEach(btn => {
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
         if (btn.dataset.tab === 'muhurtha') updateMuhurthaPersonalized();
         if (btn.dataset.tab === 'jathaka') loadJathakaHistory();
-        if (btn.dataset.tab === 'calendar') initCalendar();
+        if (btn.dataset.tab === 'calendar') {
+            const loc = getLocation();
+            const now = new Date();
+            const targetY = (calYear !== undefined) ? calYear : now.getFullYear();
+            const targetM = (calMonth !== undefined) ? calMonth : now.getMonth();
+            const key = `${targetY}-${targetM}-${loc.lat.toFixed(2)}-${loc.lon.toFixed(2)}`;
+            if (currentRenderedCalKey === key && document.getElementById('calGrid')?.children.length > 0) {
+                // Already displayed, instant
+            } else if (calMonthCache.has(key)) {
+                renderCalendar();
+            } else {
+                const gridEl = document.getElementById('calGrid');
+                if (gridEl) gridEl.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding:24px; color:var(--gold); font-size:0.95rem;">⏳ Loading Calendar...</div>';
+                setTimeout(initCalendar, 0);
+            }
+        }
     });
 });
 
@@ -4940,7 +4962,7 @@ function scoreForNewPurpose(p, purpose, evalNakIdx) {
 // ============================================================
 
 
-function scoreDayForMuhurtham(p, purpose, evalNakIdx) {
+function scoreDayForMuhurtham(p, purpose, evalNakIdx, precomputedFests) {
     let score = 50;
     const tithiNum = p.tithi.no;
     const nakIdx = (evalNakIdx !== undefined && evalNakIdx !== null) ? evalNakIdx : p.nakshatra.idx;
@@ -4957,7 +4979,7 @@ function scoreDayForMuhurtham(p, purpose, evalNakIdx) {
     if ((purpose === 'marriage' || purpose === 'vivaha') && [3,4,11,12,16,20,21,25,26].includes(nakIdx)) score += 10; // FIXED: removed Pushya(7), added Mrigashira(4)/Anuradha(16)/U.Ashadha(20)/U.Bhadrapada(25)
     if ((purpose === 'business' || purpose === 'vehicle') && p.wd === 4) score += 10;
     if (purpose === 'travel' && [6,12,21,25,26].includes(nakIdx)) score += 10; // FIXED: removed Krittika(2), added U.Bhadrapada(25)
-    const fests = matchFestivals(p);
+    const fests = precomputedFests || matchFestivals(p);
     if (fests.some(f => f.shopping_peak)) score += 5;
     // Wire in specialized purpose scoring (FIXED: was disconnected)
     if (typeof scoreForNewPurpose === 'function') score += scoreForNewPurpose(p, purpose, nakIdx);
@@ -5122,14 +5144,18 @@ function updateMuhurthaPersonalized() {
 }
 
 // ============================================================
-//  MONTHLY CALENDAR VIEW
+//  MONTHLY CALENDAR VIEW (HIGH-PERFORMANCE & CACHED)
 // ============================================================
 let calYear, calMonth;
+const calMonthCache = new Map();
+let currentRenderedCalKey = '';
 
 function initCalendar() {
     const now = new Date();
-    calYear = now.getFullYear();
-    calMonth = now.getMonth(); // 0-indexed
+    if (calYear === undefined || calMonth === undefined) {
+        calYear = now.getFullYear();
+        calMonth = now.getMonth(); // 0-indexed
+    }
     renderCalendar();
 }
 
@@ -5143,7 +5169,24 @@ function calNavMonth(delta) {
 function renderCalendar() {
     const loc = getLocation();
     const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    document.getElementById('calMonthTitle').textContent = `${monthNames[calMonth]} ${calYear}`;
+    const titleText = `${monthNames[calMonth]} ${calYear}`;
+    document.getElementById('calMonthTitle').textContent = titleText;
+
+    const cacheKey = `${calYear}-${calMonth}-${loc.lat.toFixed(2)}-${loc.lon.toFixed(2)}`;
+    
+    // Check if current DOM already shows this exact month
+    if (currentRenderedCalKey === cacheKey && document.getElementById('calGrid').children.length > 0) {
+        return;
+    }
+
+    // Check in-memory month cache for instant sub-millisecond render
+    if (calMonthCache.has(cacheKey)) {
+        const cached = calMonthCache.get(cacheKey);
+        document.getElementById('calGrid').innerHTML = cached.gridHtml;
+        document.getElementById('calFestList').innerHTML = cached.festHtml;
+        currentRenderedCalKey = cacheKey;
+        return;
+    }
 
     const firstDay = new Date(calYear, calMonth, 1).getDay();
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
@@ -5158,9 +5201,9 @@ function renderCalendar() {
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
-        const p = computePanchanga(calYear, calMonth + 1, d, loc.lat, loc.lon, loc.tz);
-        const score = p ? scoreDayForMuhurtham(p, 'general') : 50;
+        const p = computePanchanga(calYear, calMonth + 1, d, loc.lat, loc.lon, loc.tz, { fast: true });
         const fests = p ? matchFestivals(p) : [];
+        const score = p ? scoreDayForMuhurtham(p, 'general', null, fests) : 50;
         const isToday = (today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d);
         const dow = new Date(calYear, calMonth, d).getDay();
 
@@ -5188,8 +5231,6 @@ function renderCalendar() {
         }
     }
 
-    document.getElementById('calGrid').innerHTML = gridHtml;
-
     // Festival list
     let festHtml = '';
     if (monthFestivals.length === 0) {
@@ -5199,7 +5240,13 @@ function renderCalendar() {
             festHtml += `<div class="window-row"><div class="window-dot ${f.shopping ? 'good' : 'neutral'}"></div><div class="window-name">${f.day} — ${f.name.en} <span style="font-family:var(--font-kn);color:var(--gold-light);">(${f.name.kn})</span></div></div>`;
         });
     }
+
+    document.getElementById('calGrid').innerHTML = gridHtml;
     document.getElementById('calFestList').innerHTML = festHtml;
+    
+    // Store in cache for instant future retrieval
+    calMonthCache.set(cacheKey, { gridHtml, festHtml });
+    currentRenderedCalKey = cacheKey;
 }
 
 function calDayClick(d) {
