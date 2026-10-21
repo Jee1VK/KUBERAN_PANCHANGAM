@@ -195,70 +195,96 @@
         }
         /* PRINT STYLES FOR PDF EXPORT */
         @media print {
-            *, *::before, *::after { box-sizing: border-box; }
-            body { background: #fff !important; color: #000 !important; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 0 !important; margin: 0 !important; }
-            @page { size: A4; margin: 12mm 10mm; }
+            *, *::before, *::after { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { background: #ffffff !important; color: #111111 !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; padding: 0 !important; margin: 0 !important; font-size: 11pt; line-height: 1.35; }
+            @page { size: A4 portrait; margin: 8mm 10mm; }
 
-            /* Hide everything not relevant */
+            /* Hide interactive UI elements */
             .top-bar, .bottom-nav, .install-banner, .tabs, .controls, .tab-nav,
             .btn-calc, .btn-print, .btn-today, .btn-add, .btn-del-person, .btn-share,
             #disclaimerModal, #jathakaInputArea, #jathakaHistoryArea, #jathakaLoading,
-            #btnGenJathaka, #btnPrintJathaka, #btnShareJathaka,
+            #btnGenJathaka, #btnPrintJathaka, #btnImageJathaka, #btnShareJathaka,
             .disclaimer-box, details, summary,
-            #jCityResults, #jCitySearchBtn { display: none !important; }
+            #jCityResults, #jCitySearchBtn,
+            #calYearSearchCard, #eclipseFinderCard { display: none !important; }
 
-            /* Hide matching INPUT form card */
+            /* Hide matching INPUT form card in print */
             #tab-matching > .container > .card:first-child { display: none !important; }
 
             /* Hide non-active tabs */
             .tab-content:not(.active) { display: none !important; }
 
-            /* Hide version footer */
-            body > div:last-of-type { display: none !important; }
-
-            /* Card reset */
-            .card { box-shadow: none !important; border: none !important; background: #fff !important; padding: 0 !important; margin: 0 !important; }
+            /* Card & Container Resets */
+            .card { box-shadow: none !important; border: none !important; background: transparent !important; padding: 0 !important; margin: 0 0 15px 0 !important; }
             .container { max-width: 100% !important; padding: 0 !important; }
 
-            /* Print Header with Logo */
-            .print-header { display: flex !important; align-items: center; justify-content: center; gap: 12px; padding: 10px 0 14px 0; border-bottom: 3px solid #8b1a2b; margin-bottom: 20px; }
-            .print-header img { width: 50px; height: 50px; border-radius: 6px; }
-            .print-header h1 { font-size: 1.4rem; color: #8b1a2b; margin: 0; letter-spacing: 1px; }
-            .print-header .sub { font-size: 0.7rem; color: #666; margin: 0; }
+            /* Print Header with Official Kuberan Branding */
+            .print-header { display: flex !important; align-items: center; justify-content: center; gap: 14px; padding: 6px 0 12px 0; border-bottom: 2.5px solid #8b1a2b; margin-bottom: 12px; }
+            .print-header img { width: 52px !important; height: 52px !important; border-radius: 6px; }
 
             /* Print Footer */
-            .print-footer { display: block !important; text-align: center; font-size: 0.7rem; color: #999; padding-top: 15px; border-top: 1px solid #ddd; margin-top: 25px; }
+            .print-footer { display: block !important; text-align: center; font-size: 0.72rem; color: #444 !important; padding-top: 10px; border-top: 1.5px solid #8b1a2b; margin-top: 18px; }
 
-            /* JATHAKA REPORT */
-            .jathaka-report { display: block !important; box-shadow: none !important; border: none !important; padding: 15px !important; margin: 0 !important; background: #fff !important; color: #000 !important; }
-            .jathaka-header { text-align: center; border-bottom: 2px solid #8b1a2b; padding-bottom: 10px; margin-bottom: 15px; }
-            .jathaka-header h2 { color: #8b1a2b !important; font-size: 1.5rem; text-shadow: none !important; }
-            .jathaka-header p { color: #555 !important; }
-            .jathaka-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-            .j-box { border: 1px solid #333 !important; border-left: 3px solid #8b1a2b !important; background: #fff !important; padding: 8px !important; border-radius: 4px !important; break-inside: avoid; }
-            .j-box .l { color: #666 !important; font-size: 0.7rem !important; }
-            .j-box .v { color: #000 !important; font-size: 1rem !important; }
+            /* ============================================================
+               HIGH-CONTRAST LEGIBLE JATHAKA REPORT FOR PDF / PRINT
+               ============================================================ */
+            .jathaka-report { display: block !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: #fff !important; color: #000 !important; }
+            
+            .jathaka-header { text-align: center; border-bottom: 2px solid #8b1a2b; padding-bottom: 8px; margin-bottom: 12px; }
+            .jathaka-header h2 { color: #8b1a2b !important; font-size: 1.45rem !important; font-weight: 800 !important; margin: 0 0 3px 0 !important; letter-spacing: 0.5px; }
+            .jathaka-header p { color: #222 !important; font-size: 0.85rem !important; font-weight: 600 !important; margin: 0 !important; }
 
-            /* Rasi Chart */
-            .si-chart { border: 2px solid #8b1a2b !important; background: #8b1a2b !important; max-width: 280px !important; margin: 15px auto !important; break-inside: avoid; }
-            .si-cell { background: #fff !important; border: 1px solid #8b1a2b !important; color: #000 !important; }
-            .si-cell-title { color: #666 !important; }
-            .si-center { background: #fffdf8 !important; color: #8b1a2b !important; text-shadow: none !important; border: none !important; }
+            /* 3x3 Balanced Birth Attributes Grid */
+            .jathaka-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; margin-bottom: 12px !important; page-break-inside: avoid; break-inside: avoid; }
+            .j-box { border: 1.5px solid #c9a96e !important; border-left: 5px solid #8b1a2b !important; background: #fffdf9 !important; padding: 6px 8px !important; border-radius: 4px !important; page-break-inside: avoid; break-inside: avoid; }
+            .j-box .l { color: #555 !important; font-size: 0.68rem !important; font-weight: 700 !important; text-transform: uppercase; margin-bottom: 2px; }
+            .j-box .v, .j-box .v * { color: #000000 !important; font-size: 0.95rem !important; font-weight: 800 !important; }
 
-            /* Dasha Timeline */
-            #jDashaTimeline { break-inside: avoid; }
+            /* South Indian Kundali Chart - Crisp Maroon & Ink */
+            .si-chart { display: grid !important; border: 2.5px solid #8b1a2b !important; background: #8b1a2b !important; width: 310px !important; height: 310px !important; margin: 12px auto !important; page-break-inside: avoid; break-inside: avoid; }
+            .si-cell { background: #ffffff !important; border: 1.5px solid #8b1a2b !important; color: #000000 !important; padding: 3px !important; }
+            .si-cell-title { color: #8b1a2b !important; font-weight: 800 !important; font-size: 0.68rem !important; text-align: left; }
+            .si-cell div { color: #000000 !important; font-weight: 800 !important; font-size: 0.82rem !important; }
+            .si-center { background: #fff8f0 !important; color: #8b1a2b !important; font-weight: 900 !important; font-size: 1.1rem !important; text-shadow: none !important; border: 2px solid #8b1a2b !important; }
 
-            /* Graha positions */
-            #jGrahaAtBirth { break-inside: avoid; }
-            #jGrahaAtBirth > div { background: #f9f9f9 !important; color: #000 !important; }
+            /* North Indian Chart SVG */
+            #northIndianChartContainer svg { border: 2px solid #8b1a2b !important; background: #fff !important; }
+            #northIndianChartContainer text { fill: #000 !important; font-weight: 700 !important; }
 
-            /* MATCH RESULTS */
-            #matchResultArea { display: block !important; background: #fff !important; padding: 15px !important; }
-            #matchScore { color: #8b1a2b !important; font-size: 2.5rem !important; }
-            #matchVerdict { color: #000 !important; }
-            #matchSubtext { color: #666 !important; }
-            #matchTable > div { color: #000 !important; }
-            #matchTable > div > div { color: #000 !important; }
+            /* Planetary Positions 9-Graha Table */
+            #jGrahaAtBirth { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; margin-top: 10px !important; page-break-inside: avoid; break-inside: avoid; }
+            #jGrahaAtBirth > div { background: #fffdf8 !important; border: 1.5px solid #d4a017 !important; border-radius: 6px !important; padding: 6px !important; text-align: center; }
+            #jGrahaAtBirth > div * { color: #111111 !important; }
+            #jGrahaAtBirth > div > div:nth-child(2) { font-size: 0.72rem !important; font-weight: 700 !important; color: #444 !important; }
+            #jGrahaAtBirth > div > div:nth-child(3) { color: #8b1a2b !important; font-weight: 800 !important; font-size: 0.88rem !important; }
+            #jGrahaAtBirth > div > div:nth-child(4) { color: #333 !important; font-size: 0.72rem !important; font-weight: 600 !important; }
+
+            /* Vimshottari Dasha Section */
+            #jDashaBalance { color: #8b1a2b !important; font-size: 1.15rem !important; font-weight: 800 !important; text-shadow: none !important; }
+            #jDashaTimeline { page-break-inside: avoid; break-inside: avoid; margin-top: 8px !important; }
+            #jDashaTimeline * { color: #111111 !important; }
+            #jDashaTimeline > div { border: 1px solid #c9a96e !important; background: #fff !important; margin-bottom: 3px !important; padding: 4px 8px !important; border-radius: 4px; }
+            #jDashaTimeline strong { color: #8b1a2b !important; font-weight: 800 !important; }
+
+            /* Kuja Dosha (Manglik) Section */
+            #jKujaDoshaCard { page-break-inside: avoid; break-inside: avoid; border: 1.5px solid #8b1a2b !important; border-radius: 6px !important; padding: 10px !important; margin-top: 14px !important; background: #fff !important; }
+            #jKujaDoshaCard * { color: #111111 !important; }
+            #jKujaDoshaContent > div:first-child { border: 1.5px solid #8b1a2b !important; background: #fffdfa !important; }
+            #jKujaDoshaContent strong, #jKujaDoshaContent b { color: #8b1a2b !important; }
+
+            /* Vedic Lucky Remedies Card */
+            #jVedicRemediesCard { page-break-inside: avoid; break-inside: avoid; border: 1.5px solid #c9a96e !important; border-radius: 6px !important; padding: 10px !important; margin-top: 14px !important; background: #fffdfa !important; }
+            #jVedicRemediesCard * { color: #111111 !important; }
+            #jVedicRemediesCard b, #jVedicRemediesCard strong { color: #8b1a2b !important; }
+
+            /* Marriage Match Results Print */
+            #matchResultArea { display: block !important; background: #fff !important; padding: 12px !important; border: 1.5px solid #8b1a2b !important; border-radius: 8px !important; }
+            #matchScore { color: #8b1a2b !important; font-size: 2.4rem !important; font-weight: 900 !important; }
+            #matchVerdict { color: #000000 !important; font-weight: 800 !important; }
+            #matchSubtext { color: #444444 !important; font-weight: 600 !important; }
+            #matchTable > div { color: #000000 !important; border-bottom: 1px solid #ddd !important; }
+            #matchTable > div * { color: #000000 !important; }
+            #matchKujaNote * { color: #111111 !important; }
         }
 
         /* LUXURY KUBERAN ROYAL SILK AESTHETIC POLISH */
@@ -343,10 +369,12 @@
 
 <!-- PRINT-ONLY: Branded header -->
 <div class="print-header" style="display:none;">
-    <img src="assets/images/kuberan_logo_white_bg.png" alt="Kuberan">
+    <a href="https://kuberansilks.com/" target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:inline-block;">
+        <img src="assets/images/kuberan_logo_white_bg.png" alt="Kuberan Silks Logo" style="width:52px; height:52px; border-radius:6px; border:1px solid #d4a017;">
+    </a>
     <div>
-        <h1>KUBERAN PANCHANGAM</h1>
-        <p class="sub">Vedic Astronomical Birth Chart & Matching Report</p>
+        <h1 style="color:#8b1a2b; margin:0; font-size:1.4rem; letter-spacing:1px; font-weight:900;">KUBERAN PANCHANGAM</h1>
+        <p class="sub" style="margin:2px 0 0 0; font-size:0.75rem; color:#444; font-weight:600;">Vedic Astronomical Janma Kundali & Ashtakoota Compatibility Report &bull; <a href="https://kuberansilks.com/" target="_blank" rel="noopener noreferrer" style="color:#8b1a2b; text-decoration:none;">kuberansilks.com</a></p>
     </div>
 </div>
 
@@ -1086,29 +1114,39 @@
 <!-- MATCHING TAB -->
 <div class="tab-content" id="tab-matching">
 <div class="container">
-    <div class="card">
-        <h2>💑 Marriage Matching (Ashtakoota & Kuja Dosha)</h2>
-        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:12px;">Calculate 36-Point Ashtakoota Guna Milan and Dual Kuja Dosha (Manglik) compatibility by Nakshatra or exact Birth Date & Time.</p>
-        
-        <!-- Input Mode Switcher -->
-        <div style="display:flex; justify-content:center; margin-bottom:14px;">
-            <div style="display:inline-flex; background:rgba(255,255,255,0.05); border:1px solid var(--card-border); border-radius:30px; padding:3px; gap:4px;">
-                <button type="button" id="btnMatchModeNak" onclick="setMatchInputMode('nak')" style="padding:6px 14px; border-radius:24px; font-size:0.75rem; font-weight:700; cursor:pointer; border:none; background:var(--gold); color:#000;">⭐ By Nakshatra & Pada</button>
-                <button type="button" id="btnMatchModeDob" onclick="setMatchInputMode('dob')" style="padding:6px 14px; border-radius:24px; font-size:0.75rem; font-weight:700; cursor:pointer; border:none; background:transparent; color:var(--text-dim);">🎂 By Birth Date & Time (Auto + Kuja Check)</button>
+    <div class="card" style="padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+            <h2 style="margin:0; font-size:0.95rem; border:none; padding:0; display:flex; align-items:center; gap:6px;">💑 Marriage Matching (Ashtakoota & Kuja)</h2>
+            <div style="display:inline-flex; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); border-radius:20px; padding:2px; gap:2px;">
+                <button type="button" id="btnMatchModeNak" onclick="setMatchInputMode('nak')" style="padding:4px 10px; border-radius:18px; font-size:0.7rem; font-weight:700; cursor:pointer; border:none; background:var(--gold); color:#000;">⭐ Nakshatra</button>
+                <button type="button" id="btnMatchModeDob" onclick="setMatchInputMode('dob')" style="padding:4px 10px; border-radius:18px; font-size:0.7rem; font-weight:700; cursor:pointer; border:none; background:transparent; color:var(--text-dim);">🎂 DOB & Kuja</button>
             </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
-            <div style="background:rgba(255,105,180,0.08); padding:12px; border-radius:8px; border:1px solid rgba(255,105,180,0.6);">
-                <h3 style="color:#ff69b4; margin-bottom:8px; font-size:0.95rem;">👰 Bride (Vadhū / ವಧು)</h3>
-                <div class="match-dob-box" id="matchGirlDobBox" style="display:none; margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed rgba(255,105,180,0.3);">
-                    <label style="font-size:0.72rem; color:var(--text-dim); display:block; margin-bottom:3px;">Birth Date & Time (ಜನ್ಮ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ)</label>
-                    <input type="datetime-local" id="matchGirlDob" onchange="autoCalcMatchFromDob('girl')" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:6px; font-size:0.8rem;">
-                    <label style="font-size:0.72rem; color:var(--text-dim); display:block; margin-bottom:3px;">Birth Place (ಜನ್ಮ ಸ್ಥಳ)</label>
-                    <select id="matchGirlPlace" onchange="autoCalcMatchFromDob('girl')" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.8rem;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+            <!-- BRIDE CARD -->
+            <div style="background:rgba(255,105,180,0.08); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,105,180,0.5);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="color:#ff69b4; font-weight:700; font-size:0.85rem;">👰 Bride (Vadhū / ವಧು)</span>
+                </div>
+                <!-- Nakshatra Mode Box -->
+                <div id="matchGirlNakBox">
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Nakshatra (ನಕ್ಷತ್ರ)</label>
+                    <select id="matchGirlNak" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:6px; font-size:0.78rem;"></select>
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Pada (Quarter / ಪಾದ)</label>
+                    <select id="matchGirlPada" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.78rem;">
+                        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    </select>
+                </div>
+                <!-- DOB Mode Box -->
+                <div class="match-dob-box" id="matchGirlDobBox" style="display:none;">
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Birth Date & Time (ಜನ್ಮ ದಿನಾಂಕ & ಸಮಯ)</label>
+                    <input type="datetime-local" id="matchGirlDob" onchange="autoCalcMatchFromDob('girl')" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:6px; font-size:0.75rem;">
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Birth Place (ಸ್ಥಳ)</label>
+                    <select id="matchGirlPlace" onchange="autoCalcMatchFromDob('girl')" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.75rem;">
                         <option value="12.9716,77.5946,Asia/Kolkata">Bengaluru (ಬೆಂಗಳೂರು)</option>
                         <option value="12.2958,76.6394,Asia/Kolkata">Mysuru (ಮೈಸೂರು)</option>
-                        <option value="15.3647,75.1240,Asia/Kolkata">Hubballi-Dharwad (ಹುಬ್ಬಳ್ಳಿ)</option>
+                        <option value="15.3647,75.1240,Asia/Kolkata">Hubballi (ಹುಬ್ಬಳ್ಳಿ)</option>
                         <option value="12.9141,74.8560,Asia/Kolkata">Mangaluru (ಮಂಗಳೂರು)</option>
                         <option value="13.3409,74.7421,Asia/Kolkata">Udupi (ಉಡುಪಿ)</option>
                         <option value="13.9299,75.5681,Asia/Kolkata">Shivamogga (ಶಿವಮೊಗ್ಗ)</option>
@@ -1119,26 +1157,33 @@
                         <option value="19.0760,72.8777,Asia/Kolkata">Mumbai</option>
                         <option value="28.6139,77.2090,Asia/Kolkata">New Delhi</option>
                     </select>
-                    <div id="matchGirlCalcBadge" style="font-size:0.72rem; color:var(--gold-light); margin-top:6px; font-weight:600; display:none;"></div>
+                    <div id="matchGirlCalcBadge" style="font-size:0.68rem; color:var(--gold-light); margin-top:4px; font-weight:600; line-height:1.2; display:none;"></div>
                 </div>
-                <label style="font-size:0.75rem; color:var(--text-dim);">Nakshatra (ನಕ್ಷತ್ರ)</label>
-                <select id="matchGirlNak" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:8px; font-size:0.85rem;"></select>
-                <label style="font-size:0.75rem; color:var(--text-dim);">Pada (Quarter / ಪಾದ)</label>
-                <select id="matchGirlPada" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.85rem;">
-                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                </select>
             </div>
             
-            <div style="background:rgba(59,130,246,0.08); padding:12px; border-radius:8px; border:1px solid rgba(59,130,246,0.6);">
-                <h3 style="color:#3b82f6; margin-bottom:8px; font-size:0.95rem;">🤵 Groom (Vara / ವರ)</h3>
-                <div class="match-dob-box" id="matchBoyDobBox" style="display:none; margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed rgba(59,130,246,0.3);">
-                    <label style="font-size:0.72rem; color:var(--text-dim); display:block; margin-bottom:3px;">Birth Date & Time (ಜನ್ಮ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ)</label>
-                    <input type="datetime-local" id="matchBoyDob" onchange="autoCalcMatchFromDob('boy')" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:6px; font-size:0.8rem;">
-                    <label style="font-size:0.72rem; color:var(--text-dim); display:block; margin-bottom:3px;">Birth Place (ಜನ್ಮ ಸ್ಥಳ)</label>
-                    <select id="matchBoyPlace" onchange="autoCalcMatchFromDob('boy')" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.8rem;">
+            <!-- GROOM CARD -->
+            <div style="background:rgba(59,130,246,0.08); padding:8px 10px; border-radius:8px; border:1px solid rgba(59,130,246,0.5);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="color:#3b82f6; font-weight:700; font-size:0.85rem;">🤵 Groom (Vara / ವರ)</span>
+                </div>
+                <!-- Nakshatra Mode Box -->
+                <div id="matchBoyNakBox">
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Nakshatra (ನಕ್ಷತ್ರ)</label>
+                    <select id="matchBoyNak" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:6px; font-size:0.78rem;"></select>
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Pada (Quarter / ಪಾದ)</label>
+                    <select id="matchBoyPada" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.78rem;">
+                        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    </select>
+                </div>
+                <!-- DOB Mode Box -->
+                <div class="match-dob-box" id="matchBoyDobBox" style="display:none;">
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Birth Date & Time (ಜನ್ಮ ದಿನಾಂಕ & ಸಮಯ)</label>
+                    <input type="datetime-local" id="matchBoyDob" onchange="autoCalcMatchFromDob('boy')" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:6px; font-size:0.75rem;">
+                    <label style="font-size:0.68rem; color:var(--text-dim); display:block; margin-bottom:2px;">Birth Place (ಸ್ಥಳ)</label>
+                    <select id="matchBoyPlace" onchange="autoCalcMatchFromDob('boy')" style="width:100%; padding:5px 6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.75rem;">
                         <option value="12.9716,77.5946,Asia/Kolkata">Bengaluru (ಬೆಂಗಳೂರು)</option>
                         <option value="12.2958,76.6394,Asia/Kolkata">Mysuru (ಮೈಸೂರು)</option>
-                        <option value="15.3647,75.1240,Asia/Kolkata">Hubballi-Dharwad (ಹುಬ್ಬಳ್ಳಿ)</option>
+                        <option value="15.3647,75.1240,Asia/Kolkata">Hubballi (ಹುಬ್ಬಳ್ಳಿ)</option>
                         <option value="12.9141,74.8560,Asia/Kolkata">Mangaluru (ಮಂಗಳೂರು)</option>
                         <option value="13.3409,74.7421,Asia/Kolkata">Udupi (ಉಡುಪಿ)</option>
                         <option value="13.9299,75.5681,Asia/Kolkata">Shivamogga (ಶಿವಮೊಗ್ಗ)</option>
@@ -1149,18 +1194,12 @@
                         <option value="19.0760,72.8777,Asia/Kolkata">Mumbai</option>
                         <option value="28.6139,77.2090,Asia/Kolkata">New Delhi</option>
                     </select>
-                    <div id="matchBoyCalcBadge" style="font-size:0.72rem; color:var(--gold-light); margin-top:6px; font-weight:600; display:none;"></div>
+                    <div id="matchBoyCalcBadge" style="font-size:0.68rem; color:var(--gold-light); margin-top:4px; font-weight:600; line-height:1.2; display:none;"></div>
                 </div>
-                <label style="font-size:0.75rem; color:var(--text-dim);">Nakshatra (ನಕ್ಷತ್ರ)</label>
-                <select id="matchBoyNak" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; margin-bottom:8px; font-size:0.85rem;"></select>
-                <label style="font-size:0.75rem; color:var(--text-dim);">Pada (Quarter / ಪಾದ)</label>
-                <select id="matchBoyPada" style="width:100%; padding:6px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:4px; font-size:0.85rem;">
-                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                </select>
             </div>
         </div>
         
-        <button onclick="doMarriageMatch()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;">Calculate Compatibility</button>
+        <button onclick="doMarriageMatch()" style="background:var(--gold);color:#000;border:none;padding:9px 18px;border-radius:6px;font-weight:800;cursor:pointer;width:100%;font-size:0.9rem;box-shadow:0 2px 6px rgba(212,160,23,0.3);">Calculate Compatibility (ಹೊಂದಾಣಿಕೆ ಪರಿಶೀಲಿಸಿ)</button>
     </div>
     
     <div class="card" id="matchResultArea" style="display:none;">
@@ -1192,9 +1231,23 @@
 <div class="container">
     <!-- YEAR-WIDE FESTIVAL SEARCH & QUICK JUMP -->
     <div class="card" id="calYearSearchCard">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h2 style="margin:0; border:none; padding:0;">🔎 Year-Wide Festival Finder & Quick Jump</h2>
-            <span id="calSearchYearBadge" style="font-size:0.75rem; color:var(--gold-light); font-weight:700; background:rgba(212,160,23,0.15); padding:2px 8px; border-radius:12px; border:1px solid rgba(212,160,23,0.3);">2026</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+            <h2 style="margin:0; border:none; padding:0; font-size:0.95rem;">🔎 Year-Wide Festival Finder & Quick Jump</h2>
+            <div style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); border-radius:18px; padding:2px 8px;">
+                <button type="button" onclick="changeFestivalSearchYear(-1)" style="background:none; border:none; color:var(--gold); font-size:0.75rem; cursor:pointer; padding:2px 4px; font-weight:700;" title="Previous Year">◀</button>
+                <select id="calSearchYearSelect" onchange="onFestivalSearchYearSelect(this.value)" style="background:transparent; border:none; color:var(--gold-light); font-weight:700; font-size:0.8rem; cursor:pointer; padding:2px; outline:none;">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                    <option value="2031">2031</option>
+                    <option value="2032">2032</option>
+                </select>
+                <button type="button" onclick="changeFestivalSearchYear(1)" style="background:none; border:none; color:var(--gold); font-size:0.75rem; cursor:pointer; padding:2px 4px; font-weight:700;" title="Next Year">▶</button>
+            </div>
         </div>
         <div style="display:flex; gap:8px; margin-bottom:8px;">
             <input type="text" id="calYearSearchInput" oninput="searchYearFestivals(this.value)" placeholder="Search any festival in the year (e.g. Ugadi, Deepavali, Ekadashi, Sankranti)..." style="flex:1; padding:9px 12px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:8px; font-size:0.85rem;">
@@ -1705,7 +1758,10 @@ function getTzOffset(tzName, targetYear, targetMonth, targetDay) {
 //  Amavasya (New Moon). This is the authoritative rule for
 //  South Indian (Karnataka) Panchangams.
 // ============================================================
+const _amantaMasaCache = new Map();
 function getAmantaMasaIdx(baseJD) {
+    const _mKey = Math.floor(baseJD * 2) / 2;
+    if (_amantaMasaCache.has(_mKey)) return _amantaMasaCache.get(_mKey);
     // Helper: find exact NM near a given JD (within ±20 days)
     function findNM(approxJD) {
         let nmJD = approxJD;
@@ -3324,7 +3380,7 @@ function checkKujaDosha(birthGrahas, lagnaRashiIdx) {
     const jupiter = birthGrahas.find(g => g.name === 'Jupiter');
 
     if (!mars || lagnaRashiIdx === undefined || lagnaRashiIdx === null) {
-        return { isDosha: false, severity: 'None', text: 'Insufficient data', statusText: 'Data Unavailable' };
+        return { isDosha: false, hasActiveDosha: false, status: 'none', severity: 'None', text: 'Insufficient data', statusText: 'Data Unavailable' };
     }
 
     const marsRashi = mars.rashiIdx;
@@ -3345,85 +3401,96 @@ function checkKujaDosha(birthGrahas, lagnaRashiIdx) {
     const hasBaseDosha = inLagnaHouses || inMoonHouses || inVenusHouses;
     const cancellations = [];
 
-    // 1. Swa-Kshetra (Aries or Scorpio)
-    if (marsRashi === 0 || marsRashi === 7) {
-        cancellations.push({
-            rule: "Swa-Kshetra (Own Sign / ಸ್ವಕ್ಷೇತ್ರ)",
-            desc: "Mars is placed in its own sign (Aries or Scorpio), neutralizing malefic effects.",
-            descKn: "ಕುಜನು ಸ್ವಕ್ಷೇತ್ರದಲ್ಲಿದ್ದಾನೆ (ಮೇಷ ಅಥವಾ ವೃಶ್ಚಿಕ), ದೋಷ ಶಮನವಾಗುತ್ತದೆ."
-        });
-    }
-
-    // 2. Uchcha (Capricorn)
-    if (marsRashi === 9) {
-        cancellations.push({
-            rule: "Uchcha (Exalted / ಉಚ್ಛ)",
-            desc: "Mars is exalted in Capricorn, transforming affliction into auspicious vigor.",
-            descKn: "ಕುಜನು ಮಕರದಲ್ಲಿ ಉಚ್ಛಸ್ಥಿತಿಯಲ್ಲಿದ್ದು, ದೋಷ ಪರಿಹಾರವಾಗುತ್ತದೆ."
-        });
-    }
-
-    // 3. Neecha (Cancer)
-    if (marsRashi === 3) {
-        cancellations.push({
-            rule: "Neecha (Debilitated / ನೀಚ)",
-            desc: "Mars is debilitated in Cancer, drastically mitigating dosha severity.",
-            descKn: "ಕುಜನು ಕರ್ಕಾಟಕದಲ್ಲಿ ನೀಚನಾಗಿದ್ದು, ದೋಷ ತೀವ್ರತೆ ರದ್ದಾಗುತ್ತದೆ."
-        });
-    }
-
-    // 4. Jupiter signs (Sagittarius or Pisces)
-    if (marsRashi === 8 || marsRashi === 11) {
-        cancellations.push({
-            rule: "Guru Kshetra (Jupiter Sign / ಗುರು ಕ್ಷೇತ್ರ)",
-            desc: "Mars in Sagittarius or Pisces (ruled by benefic Jupiter) eliminates dosha.",
-            descKn: "ಗುರು ಕ್ಷೇತ್ರವಾದ ಧನು ಅಥವಾ ಮೀನದಲ್ಲಿ ಕುಜನಿದ್ದರೆ ದೋಷವಿರುವುದಿಲ್ಲ."
-        });
-    }
-
-    // 5. Jupiter Conjunction or Aspect (Guru-Mangala Yoga)
-    if (jupiterRashi !== null) {
-        if (marsRashi === jupiterRashi) {
+    if (hasBaseDosha) {
+        // 1. Swa-Kshetra (Aries or Scorpio)
+        if (marsRashi === 0 || marsRashi === 7) {
             cancellations.push({
-                rule: "Guru-Mangala Yoga (Conjunction with Jupiter / ಗುರು-ಮಂಗಳ ಯುತಿ)",
-                desc: "Benefic Jupiter is conjunct with Mars, fully neutralizing Kuja Dosha.",
-                descKn: "ಗುರು-ಮಂಗಳ ಯುತಿಯಿಂದಾಗಿ ಕುಜ ದೋಷ ಸಂಪೂರ್ಣ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+                rule: "Swa-Kshetra (Own Sign / ಸ್ವಕ್ಷೇತ್ರ)",
+                desc: "Mars is placed in its own sign (Aries or Scorpio), neutralizing malefic effects.",
+                descKn: "ಕುಜನು ಸ್ವಕ್ಷೇತ್ರದಲ್ಲಿದ್ದಾನೆ (ಮೇಷ ಅಥವಾ ವೃಶ್ಚಿಕ), ದೋಷ ಶಮನವಾಗುತ್ತದೆ."
             });
         }
-        const distFromJup = ((marsRashi - jupiterRashi + 12) % 12) + 1;
-        if (distFromJup === 5 || distFromJup === 7 || distFromJup === 9) {
+
+        // 2. Uchcha (Capricorn)
+        if (marsRashi === 9) {
             cancellations.push({
-                rule: "Guru Drishti (Jupiter Aspect / ಗುರು ದೃಷ್ಟಿ)",
-                desc: "Benefic Jupiter aspects Mars (5th, 7th, or 9th drishti), pacifying Kuja Dosha.",
-                descKn: "ಗುರುವಿನ ದೃಷ್ಟಿ ಕುಜನ ಮೇಲಿರುವುದರಿಂದ ಕುಜ ದೋಷ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+                rule: "Uchcha (Exalted / ಉಚ್ಛ)",
+                desc: "Mars is exalted in Capricorn, transforming affliction into auspicious vigor.",
+                descKn: "ಕುಜನು ಮಕರದಲ್ಲಿ ಉಚ್ಛಸ್ಥಿತಿಯಲ್ಲಿದ್ದು, ದೋಷ ಪರಿಹಾರವಾಗುತ್ತದೆ."
             });
         }
-    }
 
-    // 6. Moon Conjunction (Chandra-Mangala Yoga)
-    if (moonRashi !== null && marsRashi === moonRashi) {
-        cancellations.push({
-            rule: "Chandra-Mangala Yoga (ಚಂದ್ರ-ಮಂಗಳ ಯುತಿ)",
-            desc: "Moon is conjunct with Mars, creating auspicious Chandra-Mangala yoga.",
-            descKn: "ಚಂದ್ರ-ಮಂಗಳ ಯುತಿಯಿಂದಾಗಿ ದೋಷ ಭಂಗವಾಗುತ್ತದೆ."
-        });
-    }
+        // 3. Neecha (Cancer)
+        if (marsRashi === 3) {
+            cancellations.push({
+                rule: "Neecha (Debilitated / ನೀಚ)",
+                desc: "Mars is debilitated in Cancer, drastically mitigating dosha severity.",
+                descKn: "ಕುಜನು ಕರ್ಕಾಟಕದಲ್ಲಿ ನೀಚನಾಗಿದ್ದು, ದೋಷ ತೀವ್ರತೆ ರದ್ದಾಗುತ್ತದೆ."
+            });
+        }
 
-    // 7. House-specific sign rules
-    if (houseFromLagna === 2 && (marsRashi === 2 || marsRashi === 5)) {
-        cancellations.push({ rule: "2nd House in Gemini/Virgo", desc: "Mars in 2nd house in Gemini or Virgo causes no dosha.", descKn: "ಮಿಥುನ/ಕನ್ಯಾದ 2ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
-    }
-    if (houseFromLagna === 4 && (marsRashi === 0 || marsRashi === 7)) {
-        cancellations.push({ rule: "4th House in Aries/Scorpio", desc: "Mars in 4th house in Aries or Scorpio causes no dosha.", descKn: "ಮೇಷ/ವೃಶ್ಚಿಕದ 4ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
-    }
-    if (houseFromLagna === 7 && (marsRashi === 9 || marsRashi === 11)) {
-        cancellations.push({ rule: "7th House in Capricorn/Pisces", desc: "Mars in 7th house in Capricorn or Pisces causes no dosha.", descKn: "ಮಕರ/ಮೀನದ 7ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
-    }
-    if (houseFromLagna === 8 && (marsRashi === 3 || marsRashi === 8)) {
-        cancellations.push({ rule: "8th House in Cancer/Sagittarius", desc: "Mars in 8th house in Cancer or Sagittarius causes no dosha.", descKn: "ಕರ್ಕಾಟಕ/ಧನುಸ್ಸಿನ 8ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
-    }
-    if (houseFromLagna === 12 && (marsRashi === 1 || marsRashi === 6)) {
-        cancellations.push({ rule: "12th House in Taurus/Libra", desc: "Mars in 12th house in Taurus or Libra causes no dosha.", descKn: "ವೃಷಭ/ತುಲಾದ 12ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+        // 4. Jupiter signs (Sagittarius or Pisces)
+        if (marsRashi === 8 || marsRashi === 11) {
+            cancellations.push({
+                rule: "Guru Kshetra (Jupiter Sign / ಗುರು ಕ್ಷೇತ್ರ)",
+                desc: "Mars in Sagittarius or Pisces (ruled by benefic Jupiter) eliminates dosha.",
+                descKn: "ಗುರು ಕ್ಷೇತ್ರವಾದ ಧನು ಅಥವಾ ಮೀನದಲ್ಲಿ ಕುಜನಿದ್ದರೆ ದೋಷವಿರುವುದಿಲ್ಲ."
+            });
+        }
+
+        // 5. Jupiter Conjunction or Aspect (Guru-Mangala Yoga)
+        if (jupiterRashi !== null) {
+            if (marsRashi === jupiterRashi) {
+                cancellations.push({
+                    rule: "Guru-Mangala Yoga (Conjunction with Jupiter / ಗುರು-ಮಂಗಳ ಯುತಿ)",
+                    desc: "Benefic Jupiter is conjunct with Mars, fully neutralizing Kuja Dosha.",
+                    descKn: "ಗುರು-ಮಂಗಳ ಯುತಿಯಿಂದಾಗಿ ಕುಜ ದೋಷ ಸಂಪೂರ್ಣ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+                });
+            }
+            const distFromJup = ((marsRashi - jupiterRashi + 12) % 12) + 1;
+            if (distFromJup === 5 || distFromJup === 7 || distFromJup === 9) {
+                cancellations.push({
+                    rule: "Guru Drishti (Jupiter Aspect / ಗುರು ದೃಷ್ಟಿ)",
+                    desc: "Benefic Jupiter aspects Mars (5th, 7th, or 9th drishti), pacifying Kuja Dosha.",
+                    descKn: "ಗುರುವಿನ ದೃಷ್ಟಿ ಕುಜನ ಮೇಲಿರುವುದರಿಂದ ಕುಜ ದೋಷ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+                });
+            }
+        }
+
+        // 6. Moon Conjunction (Chandra-Mangala Yoga)
+        if (moonRashi !== null && marsRashi === moonRashi) {
+            cancellations.push({
+                rule: "Chandra-Mangala Yoga (ಚಂದ್ರ-ಮಂಗಳ ಯುತಿ)",
+                desc: "Moon is conjunct with Mars, creating auspicious Chandra-Mangala yoga.",
+                descKn: "ಚಂದ್ರ-ಮಂಗಳ ಯುತಿಯಿಂದಾಗಿ ದೋಷ ಭಂಗವಾಗುತ್ತದೆ."
+            });
+        }
+
+        // 7. Yogakaraka Mars for Cancer (3) and Leo (4) Lagna
+        if (lagnaRashiIdx === 3 || lagnaRashiIdx === 4) {
+            cancellations.push({
+                rule: "Yogakaraka Mars (ಯೋಗಕಾರಕ ಕುಜ)",
+                desc: "For Cancer and Leo ascendants, Mars is the supreme benefic Yogakaraka, neutralizing malefic dosha.",
+                descKn: "ಕರ್ಕಾಟಕ ಮತ್ತು ಸಿಂಹ ಲಗ್ನಗಳಿಗೆ ಕುಜನು ಪರಮ ಯೋಗಕಾರಕನಾಗಿದ್ದು, ದೋಷ ಪರಿಹಾರವಾಗುತ್ತದೆ."
+            });
+        }
+
+        // 8. House-specific sign rules
+        if (houseFromLagna === 2 && (marsRashi === 2 || marsRashi === 5)) {
+            cancellations.push({ rule: "2nd House in Gemini/Virgo", desc: "Mars in 2nd house in Gemini or Virgo causes no dosha.", descKn: "ಮಿಥುನ/ಕನ್ಯಾದ 2ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+        }
+        if (houseFromLagna === 4 && (marsRashi === 0 || marsRashi === 7)) {
+            cancellations.push({ rule: "4th House in Aries/Scorpio", desc: "Mars in 4th house in Aries or Scorpio causes no dosha.", descKn: "ಮೇಷ/ವೃಶ್ಚಿಕದ 4ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+        }
+        if (houseFromLagna === 7 && (marsRashi === 9 || marsRashi === 11)) {
+            cancellations.push({ rule: "7th House in Capricorn/Pisces", desc: "Mars in 7th house in Capricorn or Pisces causes no dosha.", descKn: "ಮಕರ/ಮೀನದ 7ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+        }
+        if (houseFromLagna === 8 && (marsRashi === 3 || marsRashi === 8)) {
+            cancellations.push({ rule: "8th House in Cancer/Sagittarius", desc: "Mars in 8th house in Cancer or Sagittarius causes no dosha.", descKn: "ಕರ್ಕಾಟಕ/ಧನುಸ್ಸಿನ 8ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+        }
+        if (houseFromLagna === 12 && (marsRashi === 1 || marsRashi === 6)) {
+            cancellations.push({ rule: "12th House in Taurus/Libra", desc: "Mars in 12th house in Taurus or Libra causes no dosha.", descKn: "ವೃಷಭ/ತುಲಾದ 12ನೇ ಮನೆಯ ಕುಜ ದೋಷ ರಹಿತ." });
+        }
     }
 
     let status = 'none';
@@ -3445,6 +3512,7 @@ function checkKujaDosha(birthGrahas, lagnaRashiIdx) {
     return {
         hasBaseDosha,
         isCancelled: cancellations.length > 0,
+        hasActiveDosha: (hasBaseDosha && cancellations.length === 0),
         status,
         statusText,
         statusColor,
@@ -5300,6 +5368,8 @@ function renderCalendar() {
     document.getElementById('calMonthTitle').textContent = titleText;
     const yearBadgeEl = document.getElementById('calSearchYearBadge');
     if (yearBadgeEl) yearBadgeEl.textContent = calYear;
+    const yearSelectEl = document.getElementById('calSearchYearSelect');
+    if (yearSelectEl) yearSelectEl.value = String(calYear);
     const searchInp = document.getElementById('calYearSearchInput');
     if (searchInp && searchInp.value.trim() && typeof searchYearFestivals === 'function') {
         searchYearFestivals(searchInp.value);
@@ -5655,6 +5725,64 @@ function getYearFestivalsCached(year, lat, lon, tz) {
     return allEvents;
 }
 
+let festSearchYear = 2026;
+
+function onFestivalSearchYearSelect(val) {
+    festSearchYear = parseInt(val, 10);
+    const selectEl = document.getElementById('calSearchYearSelect');
+    if (selectEl) selectEl.value = String(festSearchYear);
+    
+    // Sync with monthly calendar view
+    calYear = festSearchYear;
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const titleEl = document.getElementById('calMonthTitle');
+    if (titleEl && calMonth !== undefined) {
+        titleEl.textContent = `${monthNames[calMonth]} ${calYear}`;
+    }
+    renderCalendar();
+
+    const inp = document.getElementById('calYearSearchInput');
+    if (inp && inp.value.trim()) {
+        searchYearFestivals(inp.value);
+    } else {
+        displayYearFestivalOverview(festSearchYear);
+    }
+}
+
+function changeFestivalSearchYear(delta) {
+    const curY = festSearchYear || (calYear || new Date().getFullYear());
+    onFestivalSearchYearSelect(curY + delta);
+}
+
+function displayYearFestivalOverview(year) {
+    const resultsEl = document.getElementById('calYearSearchResults');
+    if (!resultsEl) return;
+    const loc = getLocation();
+    const allEvents = getYearFestivalsCached(year, loc.lat, loc.lon, loc.tz);
+    const keyEvents = allEvents.filter(e => e.shoppingPeak || ['ugadi', 'makara_sankranti', 'deepavali', 'maha_shivaratri', 'ganesha_chaturthi', 'vijayadashami', 'akshaya_tritiya', 'varamahalakshmi', 'rama_navami', 'krishna_janmashtami'].includes(e.id));
+    
+    resultsEl.style.display = 'block';
+    resultsEl.innerHTML = `
+        <div style="font-size:0.75rem; color:var(--gold-light); font-weight:700; margin-bottom:6px;">✨ Major Festivals & Auspicious Observances in ${year} (${keyEvents.length}):</div>
+        ${keyEvents.map(ev => `
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; margin-bottom:4px; background:rgba(255,255,255,0.03); border:1px solid rgba(212,160,23,0.2); border-left:3px solid var(--gold); border-radius:6px;">
+                <div style="flex:1;">
+                    <div style="font-weight:700; font-size:0.82rem; color:var(--text);">
+                        ${ev.nameEn} <span style="font-family:var(--font-kn); color:var(--gold-light); font-size:0.78rem;">(${ev.nameKn})</span>
+                    </div>
+                    <div style="font-size:0.7rem; color:var(--text-dim); margin-top:1px;">
+                        📅 <b style="color:var(--gold-light);">${ev.displayDate}</b> &bull; ${ev.masa} Masa, ${ev.tithi}
+                    </div>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <button type="button" onclick="jumpToCalMonth(${ev.year}, ${ev.month - 1})" style="padding:3px 7px; font-size:0.68rem; border-radius:5px; background:rgba(255,255,255,0.07); border:1px solid var(--card-border); color:var(--text); cursor:pointer;">🗓️ Month</button>
+                    <button type="button" onclick="jumpToFestivalDate('${ev.dateStr}')" style="padding:3px 8px; font-size:0.68rem; font-weight:700; border-radius:5px; background:var(--gold); border:none; color:#000; cursor:pointer;">📅 Day</button>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
 function searchYearFestivals(query) {
     const resultsEl = document.getElementById('calYearSearchResults');
     if (!resultsEl) return;
@@ -5666,9 +5794,9 @@ function searchYearFestivals(query) {
     }
 
     const loc = getLocation();
-    const targetYear = (typeof calYear !== 'undefined' && calYear) ? calYear : new Date().getFullYear();
-    const badgeEl = document.getElementById('calSearchYearBadge');
-    if (badgeEl) badgeEl.textContent = targetYear;
+    const targetYear = festSearchYear || ((typeof calYear !== 'undefined' && calYear) ? calYear : new Date().getFullYear());
+    const selectEl = document.getElementById('calSearchYearSelect');
+    if (selectEl) selectEl.value = String(targetYear);
 
     const allEvents = getYearFestivalsCached(targetYear, loc.lat, loc.lon, loc.tz);
     const matches = allEvents.filter(ev => {
@@ -5758,19 +5886,25 @@ function setMatchInputMode(mode) {
     matchInputMode = mode;
     const btnNak = document.getElementById('btnMatchModeNak');
     const btnDob = document.getElementById('btnMatchModeDob');
-    const girlBox = document.getElementById('matchGirlDobBox');
-    const boyBox = document.getElementById('matchBoyDobBox');
+    const girlDobBox = document.getElementById('matchGirlDobBox');
+    const boyDobBox = document.getElementById('matchBoyDobBox');
+    const girlNakBox = document.getElementById('matchGirlNakBox');
+    const boyNakBox = document.getElementById('matchBoyNakBox');
 
     if (mode === 'dob') {
         if (btnDob) { btnDob.style.background = 'var(--gold)'; btnDob.style.color = '#000'; }
         if (btnNak) { btnNak.style.background = 'transparent'; btnNak.style.color = 'var(--text-dim)'; }
-        if (girlBox) girlBox.style.display = 'block';
-        if (boyBox) boyBox.style.display = 'block';
+        if (girlDobBox) girlDobBox.style.display = 'block';
+        if (boyDobBox) boyDobBox.style.display = 'block';
+        if (girlNakBox) girlNakBox.style.display = 'none';
+        if (boyNakBox) boyNakBox.style.display = 'none';
     } else {
         if (btnNak) { btnNak.style.background = 'var(--gold)'; btnNak.style.color = '#000'; }
         if (btnDob) { btnDob.style.background = 'transparent'; btnDob.style.color = 'var(--text-dim)'; }
-        if (girlBox) girlBox.style.display = 'none';
-        if (boyBox) boyBox.style.display = 'none';
+        if (girlDobBox) girlDobBox.style.display = 'none';
+        if (boyDobBox) boyDobBox.style.display = 'none';
+        if (girlNakBox) girlNakBox.style.display = 'block';
+        if (boyNakBox) boyNakBox.style.display = 'block';
     }
 }
 
@@ -5869,6 +6003,7 @@ function doMarriageMatch() {
     const result = calculateAshtakoota(bNak, bPada, gNak, gPada);
     
     document.getElementById('matchResultArea').style.display = 'block';
+    document.getElementById('matchResultArea').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     
     const scoreEl = document.getElementById('matchScore');
     scoreEl.textContent = `${result.total} / 36`;
@@ -5929,8 +6064,8 @@ function doMarriageMatch() {
     if (cachedBrideDobAnalysis && cachedGroomDobAnalysis) {
         const bk = cachedBrideDobAnalysis.kuja;
         const gk = cachedGroomDobAnalysis.kuja;
-        const brideActive = (bk.status === 'active');
-        const groomActive = (gk.status === 'active');
+        const brideActive = (bk.hasActiveDosha || bk.status === 'present' || bk.status === 'active');
+        const groomActive = (gk.hasActiveDosha || gk.status === 'present' || gk.status === 'active');
 
         let mutualTitle = '';
         let mutualDesc = '';
@@ -5955,20 +6090,25 @@ function doMarriageMatch() {
             kujaSummaryForCard = 'Kuja Dosha: Mismatch (Consult Purohit)';
         }
 
+        const brideBadgeColor = brideActive ? 'var(--red)' : (bk.isCancelled ? 'var(--orange)' : 'var(--green)');
+        const groomBadgeColor = groomActive ? 'var(--red)' : (gk.isCancelled ? 'var(--orange)' : 'var(--green)');
+
         kujaNote.innerHTML = `
-            <div style="margin-top:16px; background:${mutualBg}; border:1px solid ${mutualColor}; border-radius:8px; padding:12px;">
-                <div style="font-weight:800; font-size:0.9rem; color:${mutualColor}; margin-bottom:4px;">${mutualTitle}</div>
-                <div style="font-size:0.76rem; color:var(--text); line-height:1.4; margin-bottom:10px;">${mutualDesc}</div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.75rem;">
-                    <div style="background:rgba(0,0,0,0.25); padding:8px; border-radius:6px; border:1px solid rgba(255,105,180,0.3);">
+            <div style="margin-top:14px; background:${mutualBg}; border:1px solid ${mutualColor}; border-radius:8px; padding:10px 12px;">
+                <div style="font-weight:800; font-size:0.88rem; color:${mutualColor}; margin-bottom:4px;">${mutualTitle}</div>
+                <div style="font-size:0.75rem; color:var(--text); line-height:1.4; margin-bottom:8px;">${mutualDesc}</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.72rem;">
+                    <div style="background:rgba(0,0,0,0.25); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,105,180,0.3);">
                         <div style="color:#ff69b4; font-weight:700; margin-bottom:2px;">👰 Bride (${cachedBrideDobAnalysis.lagnaRashi} Lagna)</div>
-                        <div style="font-weight:700; color:${bk.status === 'active' ? 'var(--red)' : 'var(--green)'};">${bk.statusText}</div>
-                        <div style="color:var(--text-dim); font-size:0.7rem; margin-top:2px;">Mars in H${bk.houseFromLagna} (Lagna), H${bk.houseFromMoon} (Moon)</div>
+                        <div style="font-weight:700; color:${brideBadgeColor};">${bk.statusText}</div>
+                        <div style="color:var(--text-dim); font-size:0.68rem; margin-top:2px;">Mars in H${bk.houseFromLagna} (Lagna), H${bk.houseFromMoon} (Moon), H${bk.houseFromVenus} (Venus)</div>
+                        ${bk.cancellations && bk.cancellations.length > 0 ? `<div style="font-size:0.68rem; color:var(--gold-light); margin-top:2px;">🛡️ ${bk.cancellations[0].rule}</div>` : ''}
                     </div>
-                    <div style="background:rgba(0,0,0,0.25); padding:8px; border-radius:6px; border:1px solid rgba(59,130,246,0.3);">
+                    <div style="background:rgba(0,0,0,0.25); padding:6px 8px; border-radius:6px; border:1px solid rgba(59,130,246,0.3);">
                         <div style="color:#3b82f6; font-weight:700; margin-bottom:2px;">🤵 Groom (${cachedGroomDobAnalysis.lagnaRashi} Lagna)</div>
-                        <div style="font-weight:700; color:${gk.status === 'active' ? 'var(--red)' : 'var(--green)'};">${gk.statusText}</div>
-                        <div style="color:var(--text-dim); font-size:0.7rem; margin-top:2px;">Mars in H${gk.houseFromLagna} (Lagna), H${gk.houseFromMoon} (Moon)</div>
+                        <div style="font-weight:700; color:${groomBadgeColor};">${gk.statusText}</div>
+                        <div style="color:var(--text-dim); font-size:0.68rem; margin-top:2px;">Mars in H${gk.houseFromLagna} (Lagna), H${gk.houseFromMoon} (Moon), H${gk.houseFromVenus} (Venus)</div>
+                        ${gk.cancellations && gk.cancellations.length > 0 ? `<div style="font-size:0.68rem; color:var(--gold-light); margin-top:2px;">🛡️ ${gk.cancellations[0].rule}</div>` : ''}
                     </div>
                 </div>
             </div>`;
