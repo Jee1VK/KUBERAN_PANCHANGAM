@@ -3,7 +3,7 @@ const assert = require('assert');
 
 const html = fs.readFileSync('docs/index.html', 'utf8');
 
-console.log('Testing Top Bar Redesign:');
+console.log('Testing Top Bar Redesign & Calendar Performance:');
 
 // Check IDs
 ['dateInput', 'chipToday', 'chipTomorrow'].forEach(id => {
@@ -24,23 +24,27 @@ console.log('Testing Top Bar Redesign:');
     console.log(`  ✓ Handler "${h}" wired`);
 });
 
-// Check classes and structure
+// Check classes and CSS specificity fixes
 assert(html.includes('panchanga-controls-bar'), 'Missing panchanga-controls-bar');
-assert(html.includes('controls-top-row'), 'Missing controls-top-row');
+assert(html.includes('align-items: stretch !important'), 'Missing align-items: stretch !important fix');
+assert(html.includes('.panchanga-controls-bar input.date-picker-input'), 'Missing input specificity override');
+assert(html.includes('grid-template-columns: minmax(0, 1fr) auto'), 'Missing side-by-side Row 1 grid');
 assert(html.includes('controls-action-row'), 'Missing controls-action-row');
 assert(html.includes('day-switcher-pill'), 'Missing day-switcher-pill');
 assert(html.includes('btn-action-share'), 'Missing btn-action-share');
 assert(html.includes('btn-action-card'), 'Missing btn-action-card');
-console.log('  ✓ All container and button classes present');
+console.log('  ✓ All container, alignment, and specificity fixes present');
 
 // Verify removal of clashing styles
 assert(!html.includes('btn-share-wa'), 'btn-share-wa still present');
 assert(!html.includes('#25D366'), 'Clashing green color #25D366 still present');
 console.log('  ✓ No clashing green gradient present');
 
-// Verify responsive rules
-assert(html.includes('@media (max-width: 480px)'), 'Missing max-width 480px media query');
-assert(html.includes('@media (min-width: 720px)'), 'Missing min-width 720px media query');
-console.log('  ✓ Responsive media queries for mobile & desktop present');
+// Verify Calendar engine caches
+assert(html.includes('_sunriseCache'), 'Missing _sunriseCache');
+assert(html.includes('_nmMasaCache'), 'Missing _nmMasaCache');
+assert(html.includes('_tzOffsetCache'), 'Missing _tzOffsetCache');
+assert(html.includes('window._upFestsTimer'), 'Missing _upFestsTimer debounce');
+console.log('  ✓ Calendar & Astronomical caches present');
 
-console.log('\nAll Top Bar tests PASSED successfully!');
+console.log('\nAll Top Bar & Calendar checks PASSED successfully!');

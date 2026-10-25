@@ -308,142 +308,165 @@
             align-items: center;
             justify-content: space-between;
         }
-        /* PANCHANGA TOP CONTROLS & DATE ACTION BAR */
+        /* PANCHANGA TOP CONTROLS & DATE ACTION BAR — SLEEK UNIFIED TOOLBAR */
+        .controls.panchanga-controls-bar,
         .panchanga-controls-bar {
-            background: linear-gradient(145deg, #161b2e 0%, #1e172a 100%);
-            border: 1px solid rgba(212, 160, 23, 0.28);
-            border-radius: 12px;
-            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            padding: 0;
             margin-bottom: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: stretch !important;
+            gap: 8px;
+            width: 100%;
         }
         .controls-top-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .date-stepper-box {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .date-stepper-box {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(212, 160, 23, 0.22);
-            border-radius: 8px;
-            padding: 3px 4px;
+            height: 38px;
+            background: linear-gradient(145deg, #161b2e 0%, #1c1629 100%);
+            border: 1px solid rgba(212, 160, 23, 0.34);
+            border-radius: 10px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+            min-width: 0;
         }
         .date-stepper-box .btn-stepper {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 160, 23, 0.25);
-            color: var(--gold);
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            font-size: 1.25rem;
+            background: rgba(212, 160, 23, 0.06);
+            border: none;
+            color: var(--gold-light);
+            width: 34px;
+            height: 100%;
+            border-radius: 0;
+            font-size: 1.2rem;
             line-height: 1;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            transition: all 0.15s ease;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .date-stepper-box .btn-stepper:first-child {
+            border-right: 1px solid rgba(212, 160, 23, 0.18);
+        }
+        .date-stepper-box .btn-stepper:last-child {
+            border-left: 1px solid rgba(212, 160, 23, 0.18);
         }
         .date-stepper-box .btn-stepper:hover {
-            background: rgba(212, 160, 23, 0.2);
-            border-color: var(--gold);
+            background: rgba(212, 160, 23, 0.22);
             color: #fff;
         }
         .date-stepper-box .btn-stepper:active {
-            transform: scale(0.92);
+            background: rgba(212, 160, 23, 0.32);
         }
+        .panchanga-controls-bar input.date-picker-input,
+        .controls input[type="date"].date-picker-input,
         .date-picker-input {
-            background: transparent;
-            border: none;
-            color: var(--gold-light);
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 4px 6px;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #f8fafc !important;
+            font-weight: 700;
+            font-size: 0.84rem;
+            padding: 0 6px !important;
+            height: 100%;
+            width: 100%;
+            flex: 1;
+            min-width: 0 !important;
+            text-align: center;
             cursor: pointer;
             outline: none;
             font-family: inherit;
             color-scheme: dark;
-            min-width: 0 !important;
         }
         .date-picker-input::-webkit-calendar-picker-indicator {
-            filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg);
+            filter: invert(0.82) sepia(1) saturate(4.5) hue-rotate(5deg);
             cursor: pointer;
+            opacity: 0.85;
+            margin-left: 2px;
         }
 
         /* DAY SELECTOR (TODAY / TOMORROW) SEGMENTED CONTROL */
         .day-switcher-pill {
             display: inline-flex;
             align-items: center;
-            background: rgba(0, 0, 0, 0.32);
-            border: 1px solid rgba(212, 160, 23, 0.24);
-            border-radius: 30px;
+            height: 38px;
+            background: linear-gradient(145deg, #161b2e 0%, #1c1629 100%);
+            border: 1px solid rgba(212, 160, 23, 0.34);
+            border-radius: 10px;
             padding: 3px;
             gap: 2px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+            flex-shrink: 0;
         }
         .day-chip-btn {
             background: transparent;
             border: none;
             color: var(--text-dim);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            height: 100%;
+            padding: 0 11px;
+            border-radius: 7px;
+            font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
-            align-items: baseline;
-            gap: 5px;
-            transition: all 0.2s ease;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.18s ease;
             white-space: nowrap;
         }
         .day-chip-btn .day-text-kn {
-            font-size: 0.72rem;
-            opacity: 0.85;
-            font-weight: 500;
+            display: none;
+            font-family: var(--font-kn);
+            font-size: 0.78rem;
+        }
+        body[data-lang="kn"] .day-chip-btn .day-text-en {
+            display: none;
+        }
+        body[data-lang="kn"] .day-chip-btn .day-text-kn {
+            display: inline;
         }
         .day-chip-btn.active {
-            background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%);
-            color: #0b0d17;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+            color: #0c0f1a;
             font-weight: 700;
-            box-shadow: 0 2px 8px rgba(212, 160, 23, 0.35);
-        }
-        .day-chip-btn.active .day-text-kn {
-            color: #0b0d17;
-            font-weight: 700;
-            opacity: 0.95;
+            box-shadow: 0 1px 6px rgba(212, 160, 23, 0.35);
         }
         .day-chip-btn:hover:not(.active) {
             color: var(--gold-light);
             background: rgba(255, 255, 255, 0.05);
         }
-        .day-chip-btn:active {
-            transform: scale(0.96);
-        }
 
         /* VEDIC ACTION BUTTONS (SHARE & CARD) */
         .controls-action-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             align-items: center;
             gap: 8px;
             width: 100%;
         }
         .vedic-action-btn {
-            flex: 1;
-            min-height: 38px;
+            height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.84rem;
+            gap: 7px;
+            padding: 0 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -452,101 +475,104 @@
         }
         .vedic-action-btn .action-icon-svg {
             flex-shrink: 0;
+            width: 15px;
+            height: 15px;
         }
         .vedic-action-btn .action-btn-text {
             display: inline-flex;
-            align-items: baseline;
+            align-items: center;
             gap: 5px;
         }
         .vedic-action-btn .action-kn {
+            font-family: var(--font-kn);
             font-size: 0.72rem;
-            opacity: 0.85;
+            opacity: 0.88;
             font-weight: 500;
         }
         .vedic-action-btn:active {
             transform: scale(0.97);
         }
 
-        /* Share Button: Regal Kuberan Silk Maroon with Gold border */
+        /* Share Button: Regal Kuberan Silk Maroon with Gold Trim */
         .btn-action-share {
-            background: linear-gradient(135deg, #7b1e2d 0%, #4a0e19 100%);
-            border: 1px solid rgba(212, 160, 23, 0.45);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(123, 30, 45, 0.35);
+            background: linear-gradient(135deg, #6b1827 0%, #3f0c16 100%);
+            border: 1px solid rgba(212, 160, 23, 0.38);
+            color: #f8fafc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
         }
         .btn-action-share .action-icon-svg {
             stroke: var(--gold-light);
         }
+        .btn-action-share .action-kn {
+            color: var(--gold-light);
+        }
         .btn-action-share:hover {
             border-color: var(--gold);
-            background: linear-gradient(135deg, #8e2334 0%, #5a111f 100%);
-            box-shadow: 0 4px 14px rgba(123, 30, 45, 0.55);
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #7e1c2e 0%, #4e0f1b 100%);
+            box-shadow: 0 3px 12px rgba(123, 30, 45, 0.45);
         }
 
-        /* Card Button: Luxury Silk Gold / Bronze Gradient */
+        /* Card Button: Deep Obsidian Gold-Silk Trim */
         .btn-action-card {
-            background: linear-gradient(135deg, rgba(212, 160, 23, 0.16) 0%, rgba(123, 30, 45, 0.18) 100%);
-            border: 1px solid rgba(212, 160, 23, 0.45);
+            background: linear-gradient(135deg, #1a2036 0%, #241b30 100%);
+            border: 1px solid rgba(212, 160, 23, 0.38);
             color: var(--gold-light);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
         }
         .btn-action-card .action-icon-svg {
             stroke: var(--gold-light);
         }
+        .btn-action-card .action-kn {
+            color: #e2e8f0;
+        }
         .btn-action-card:hover {
             border-color: var(--gold);
-            background: linear-gradient(135deg, rgba(212, 160, 23, 0.26) 0%, rgba(123, 30, 45, 0.28) 100%);
-            box-shadow: 0 4px 12px rgba(212, 160, 23, 0.28);
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #222944 0%, #2e213c 100%);
+            box-shadow: 0 3px 12px rgba(212, 160, 23, 0.22);
             color: #fff;
         }
 
-        @media (max-width: 480px) {
-            .controls-top-row {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
-            }
-            .date-stepper-box {
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
-            }
-            .date-picker-input {
-                flex: 1;
-                text-align: center;
-            }
-            .day-switcher-pill {
-                display: flex;
-                width: 100%;
-            }
+        @media (max-width: 370px) {
             .day-chip-btn {
-                flex: 1;
-                justify-content: center;
+                padding: 0 8px;
+                font-size: 0.74rem;
+            }
+            .date-stepper-box .btn-stepper {
+                width: 28px;
+            }
+            .vedic-action-btn .action-kn {
+                display: none;
             }
         }
 
-        @media (min-width: 720px) {
+        @media (min-width: 680px) {
+            .controls.panchanga-controls-bar,
             .panchanga-controls-bar {
                 flex-direction: row;
                 justify-content: space-between;
-                align-items: center;
-                padding: 8px 16px;
-            }
-            .controls-top-row {
-                flex: 1;
-                justify-content: flex-start;
-                gap: 14px;
-            }
-            .controls-action-row {
-                width: auto;
-                flex: 0 0 auto;
+                align-items: center !important;
                 gap: 10px;
             }
-            .vedic-action-btn {
+            .controls-top-row {
+                display: flex;
+                flex: 1;
+                width: auto;
+                justify-content: flex-start;
+                gap: 10px;
+            }
+            .date-stepper-box {
+                width: 210px;
                 flex: 0 0 auto;
-                padding: 7px 18px;
+            }
+            .controls-action-row {
+                display: flex;
+                width: auto;
+                flex: 0 0 auto;
+                gap: 8px;
+            }
+            .vedic-action-btn {
+                height: 38px;
+                padding: 0 16px;
             }
         }
 
@@ -685,11 +711,11 @@
             <div class="day-switcher-pill" role="group" aria-label="Quick Day Switcher">
                 <button type="button" class="day-chip-btn active" id="chipToday" onclick="goToday()">
                     <span class="day-text-en">Today</span>
-                    <span class="day-text-kn">(ಇಂದು)</span>
+                    <span class="day-text-kn">ಇಂದು</span>
                 </button>
                 <button type="button" class="day-chip-btn" id="chipTomorrow" onclick="goTomorrow()">
                     <span class="day-text-en">Tomorrow</span>
-                    <span class="day-text-kn">(ನಾಳೆ)</span>
+                    <span class="day-text-kn">ನಾಳೆ</span>
                 </button>
             </div>
         </div>
@@ -698,14 +724,14 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="action-icon-svg" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                 <span class="action-btn-text">
                     <span class="action-en">Share</span>
-                    <span class="action-kn">(ಹಂಚಿಕೊಳ್ಳಿ)</span>
+                    <span class="action-kn">· ಹಂಚಿಕೊಳ್ಳಿ</span>
                 </span>
             </button>
             <button type="button" class="vedic-action-btn btn-action-card" onclick="exportPanchangaImageCard()" title="Download & Share Branded Panchangam Card Image">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="action-icon-svg" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                 <span class="action-btn-text">
                     <span class="action-en">Card</span>
-                    <span class="action-kn">(ಕಾರ್ಡ್)</span>
+                    <span class="action-kn">· ಕಾರ್ಡ್</span>
                 </span>
             </button>
         </div>
@@ -1856,22 +1882,24 @@ function getAllGrahaPositions(jd) {
 // ============================================================
 //  SUNRISE / SUNSET — Astronomy Engine (high-precision)
 // ============================================================
+const _sunriseCache = new Map();
 function computeSunrise(year, month, day, lat, lon, tzOff) {
+    const baseJD = julianDay(year, month, day, 0);
+    const _srKey = `${baseJD}-${lat.toFixed(2)}-${lon.toFixed(2)}`;
+    if (_sunriseCache.has(_srKey)) return _sunriseCache.get(_srKey);
     // FIXED: Start search from LOCAL midnight (in UTC) to prevent finding next-day
     // sunrise in eastern time zones (Tokyo, Sydney etc.)
-    const localMidnightJD = julianDay(year, month, day, 0) - ((tzOff || 5.5) / 24);
+    const localMidnightJD = baseJD - ((tzOff || 5.5) / 24);
     const startTime = new Astronomy.AstroTime(localMidnightJD - 2451545.0);
     const obs = new Astronomy.Observer(lat, lon, 0);
     const rise = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, 1, startTime, 1);
     const set = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, -1, startTime, 1);
     
-    // Return fractional UTC hours on the given day
-    const baseJD = julianDay(year, month, day, 0); 
     const riseJD = rise ? (rise.ut + 2451545.0) : (baseJD + 6/24);
     const setJD = set ? (set.ut + 2451545.0) : (baseJD + 18/24);
-    // Astronomy Engine already applies 16' upper-limb + 34' refraction correction
-    // Do NOT manually adjust — was causing double-correction of ~66 seconds (FIXED)
-    return { rise: (riseJD - baseJD) * 24, set: (setJD - baseJD) * 24 };
+    const _res = { rise: (riseJD - baseJD) * 24, set: (setJD - baseJD) * 24 };
+    _sunriseCache.set(_srKey, _res);
+    return _res;
 }
 
 // ============================================================
@@ -1898,7 +1926,7 @@ function prevBoundary(jd, angleFn, unit) {
         hi = lo;
         lo = hi - step;
     }
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 22; i++) {
         const mid = (lo + hi) / 2;
         const diff = ((angleFn(mid) - target + 540) % 360) - 180;
         if (diff >= 0) hi = mid; else lo = mid;
@@ -1924,8 +1952,8 @@ function nextBoundary(jd, angleFn, unit) {
         lo = hi;
         hi = lo + step;
     }
-    // Bisect within verified bracket (50 iterations → ~0.05 second precision)
-    for (let i = 0; i < 50; i++) {
+    // Bisect within verified bracket (22 iterations → ~0.8ms precision)
+    for (let i = 0; i < 22; i++) {
         const mid = (lo + hi) / 2;
         const diff = ((angleFn(mid) - target + 540) % 360) - 180;
         if (diff >= 0) hi = mid; else lo = mid;
@@ -1974,13 +2002,19 @@ function jdToLocalTimeStr24(jd, tzOffsetHours) {
     return `${pad2(h)}:${pad2(m)}`;
 }
 
+const _tzOffsetCache = new Map();
 function getTzOffset(tzName, targetYear, targetMonth, targetDay) {
+    if (!tzName || tzName === 'Asia/Kolkata' || tzName === 'Asia/Calcutta') return 5.5;
+    const key = `${tzName}-${targetYear || 0}-${targetMonth || 0}`;
+    if (_tzOffsetCache.has(key)) return _tzOffsetCache.get(key);
     // Get offset for a timezone at the TARGET date (handles DST)
     try {
         const now = (targetYear && targetMonth && targetDay) ? new Date(targetYear, targetMonth - 1, targetDay, 12, 0, 0) : new Date();
         const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
         const localStr = now.toLocaleString('en-US', { timeZone: tzName });
-        return (new Date(localStr) - new Date(utcStr)) / 3600000;
+        const off = (new Date(localStr) - new Date(utcStr)) / 3600000;
+        _tzOffsetCache.set(key, off);
+        return off;
     } catch (e) {
         return 5.5; // default IST
     }
@@ -1997,9 +2031,8 @@ function getTzOffset(tzName, targetYear, targetMonth, targetDay) {
 //  South Indian (Karnataka) Panchangams.
 // ============================================================
 const _amantaMasaCache = new Map();
+const _nmMasaCache = new Map();
 function getAmantaMasaIdx(baseJD) {
-    const _mKey = Math.floor(baseJD * 2) / 2;
-    if (_amantaMasaCache.has(_mKey)) return _amantaMasaCache.get(_mKey);
     // Helper: find exact NM near a given JD (within ±20 days)
     function findNM(approxJD) {
         let nmJD = approxJD;
@@ -2032,28 +2065,26 @@ function getAmantaMasaIdx(baseJD) {
     }
 
     // Step 1: Find approximate days to next New Moon
-    const elong = ((moonLongitude(baseJD) - sunLongitude(baseJD)) % 360 + 360) % 360;
+    const elong = curElong;
     const moonSpeed = 13.176;
     const sunSpeed = 0.9856;
     const relSpeed = moonSpeed - sunSpeed;
     let daysToNM = (360 - elong) / relSpeed;
     if (daysToNM < 0.5) daysToNM += 29.53;
-    
-    // Step 2: Iterative refinement (5 iterations for sub-minute precision)
-    const nmJD = findNM(baseJD + daysToNM);
-    
-    // Step 3: Sun's sidereal rashi at the exact New Moon moment
-    const rashiIdx = sunRashiAt(nmJD);
 
-    // Step 4: Check for Adhika Masa — find previous NM and compare Sun rashis
+    // Step 2: Check lunation cache by approximate New Moon index (every NM is 29.53 days apart)
+    const approxNmKey = Math.round((baseJD + daysToNM) / 5);
+    if (_nmMasaCache.has(approxNmKey)) return _nmMasaCache.get(approxNmKey);
+
+    const nmJD = findNM(baseJD + daysToNM);
+    const rashiIdx = sunRashiAt(nmJD);
     const prevNmJD = findNM(nmJD - 29.53);
     const prevRashi = sunRashiAt(prevNmJD);
-    // If two consecutive NMs have Sun in the same rashi, the first month is Adhika.
-    // In classical Amanta, Adhika takes the name of the upcoming month: (rashiIdx + 1) % 12.
     const isAdhika = (prevRashi === rashiIdx);
     const finalIdx = isAdhika ? ((rashiIdx + 1) % 12) : rashiIdx;
-
-    return { idx: finalIdx, isAdhika };
+    const res = { idx: finalIdx, isAdhika };
+    _nmMasaCache.set(approxNmKey, res);
+    return res;
 }
 
 // ============================================================
@@ -2134,12 +2165,12 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
     if (tithiNo === 15) { tithiName = "Purnima"; tithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
     else if (tithiNo === 30) { tithiName = "Amavasya"; tithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
     else { const idx = (tithiNo - 1) % 15; tithiName = TITHI_EN[idx]; tithiNameKn = TITHI_KN[idx]; }
-    const tithiEnd = nextBoundary(riseJD, elongation, 12);
+    const tithiEnd = isFast ? null : nextBoundary(riseJD, elongation, 12);
 
     // Nakshatra
     const nakIdx = Math.floor(m / (360 / 27));
     const pada = Math.min(4, Math.floor((m % (360 / 27)) / (360 / 108)) + 1); // FIXED: guard against FP overflow producing pada=5
-    const nakEnd = nextBoundary(riseJD, siderealMoon, 360 / 27);
+    const nakEnd = isFast ? null : nextBoundary(riseJD, siderealMoon, 360 / 27);
 
     // Yoga
     const yogaIdx = Math.floor(ya / (360 / 27));
@@ -2570,21 +2601,24 @@ function renderPanchanga(p) {
     }
 
     // --- UPCOMING FESTIVALS ---
-    setTimeout(() => {
+    if (window._upFestsTimer) clearTimeout(window._upFestsTimer);
+    window._upFestsTimer = setTimeout(() => {
         let upFests = [];
         let scanJd = p.sunrise + 1; // Start from tomorrow
         let daysScanned = 0;
+        const loc = getLocation();
+        let prevNp = p;
         
         while (upFests.length < 5 && daysScanned < 90) {
-            const loc = getLocation();
             // Need gregorian date for computePanchanga
             const cd = new Date((scanJd - 2440587.5) * 86400000);
-            const np = computePanchanga(cd.getFullYear(), cd.getMonth() + 1, cd.getDate(), loc.lat, loc.lon, loc.tz);
+            const np = computePanchanga(cd.getFullYear(), cd.getMonth() + 1, cd.getDate(), loc.lat, loc.lon, loc.tz, { fast: true });
             if (np) {
-                const fs = matchFestivals(np);
+                const fs = matchFestivals(np, prevNp);
                 fs.forEach(f => {
                     if (upFests.length < 5) upFests.push({ date: cd, f });
                 });
+                prevNp = np;
             }
             scanJd += 1;
             daysScanned++;
@@ -2850,13 +2884,14 @@ function matchFestivals(p, pYesterday) {
 
     let tomorrowSunrise = p.sunrise + 1.0;
 
-    if (p.tithi.endJD && p.tithi.endJD < p.sunset + 0.5) {
+    {
         const srTom = computeSunrise(p.year, p.month, p.day + 1, 12.9716, 77.5946, p.tzOff || 5.5);
         if (srTom) tomorrowSunrise = julianDay(p.year, p.month, p.day + 1, srTom.rise);
-        const nextTithiEndJD = nextBoundary(p.tithi.endJD + 0.005, elongation, 12);
-        if (nextTithiEndJD < tomorrowSunrise) {
+        const tomElong = elongation(tomorrowSunrise);
+        const tomTithiNum = Math.floor(tomElong / 12) + 1;
+        if (tomTithiNum !== tithiNum && tomTithiNum !== nextTithiNum) {
             nextTithiIsKshaya = true;
-            const nm = getAmantaMasaIdx(p.tithi.endJD + 0.1);
+            const nm = getAmantaMasaIdx(tomorrowSunrise - 0.1);
             if (!nm.isAdhika) nextTithiMasaName = MASA_EN[nm.idx];
         }
     }
@@ -2886,6 +2921,7 @@ function matchFestivals(p, pYesterday) {
 
     // Match major festivals
     for (const f of FESTIVAL_RULES) {
+        if (f.masa && f.masa !== masaName && f.masa !== nextTithiMasaName && f.masa !== yMasaName) continue;
         let matched = false;
 
         if (f.kaala) {
@@ -5641,9 +5677,11 @@ function renderCalendar() {
         gridHtml += '<div style="padding:4px;"></div>';
     }
 
+    let _prevCalP = computePanchanga(calYear, calMonth + 1, 0, loc.lat, loc.lon, loc.tz, { fast: true });
     for (let d = 1; d <= daysInMonth; d++) {
         const p = computePanchanga(calYear, calMonth + 1, d, loc.lat, loc.lon, loc.tz, { fast: true });
-        const fests = p ? matchFestivals(p) : [];
+        const fests = p ? matchFestivals(p, _prevCalP) : [];
+        _prevCalP = p;
         const score = p ? scoreDayForMuhurtham(p, 'general', null, fests) : 50;
         const isToday = (today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d);
         const dow = new Date(calYear, calMonth, d).getDay();
@@ -5706,10 +5744,12 @@ function exportMonthICS() {
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
     let events = [];
 
+    let _prevIcsP = computePanchanga(calYear, calMonth + 1, 0, loc.lat, loc.lon, loc.tz, { fast: true });
     for (let d = 1; d <= daysInMonth; d++) {
-        const p = computePanchanga(calYear, calMonth + 1, d, loc.lat, loc.lon, loc.tz);
+        const p = computePanchanga(calYear, calMonth + 1, d, loc.lat, loc.lon, loc.tz, { fast: true });
         if (!p) continue;
-        const fests = matchFestivals(p);
+        const fests = matchFestivals(p, _prevIcsP);
+        _prevIcsP = p;
         fests.forEach(f => {
             const dateStr = `${calYear}${pad2(calMonth + 1)}${pad2(d)}`;
             events.push(`BEGIN:VEVENT\nDTSTART;VALUE=DATE:${dateStr}\nDTEND;VALUE=DATE:${dateStr}\nSUMMARY:${f.name.en} (${f.name.kn})\nDESCRIPTION:Festival from Kuberan Panchangam\nEND:VEVENT`);
@@ -5934,16 +5974,19 @@ function getYearFestivalsCached(year, lat, lon, tz) {
     const monthNamesShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const weekdayShort = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+    let _prevYearP = computePanchanga(year, 1, 0, lat, lon, tz, { fast: true });
     for (let m = 1; m <= 12; m++) {
         const daysInM = new Date(year, m, 0).getDate();
         for (let d = 1; d <= daysInM; d++) {
             const p = computePanchanga(year, m, d, lat, lon, tz, { fast: true });
             if (!p) continue;
-            const fests = matchFestivals(p);
+            const fests = matchFestivals(p, _prevYearP);
+            _prevYearP = p;
             if (fests && fests.length > 0) {
                 const dow = new Date(year, m - 1, d).getDay();
                 fests.forEach(f => {
                     allEvents.push({
+                        id: f.id,
                         year,
                         month: m,
                         day: d,
@@ -5951,7 +5994,7 @@ function getYearFestivalsCached(year, lat, lon, tz) {
                         displayDate: `${weekdayShort[dow]}, ${d} ${monthNamesShort[m - 1]} ${year}`,
                         nameEn: f.name.en,
                         nameKn: f.name.kn,
-                        masa: p.masa ? p.masa.name : '',
+                        masa: p.masa ? (p.masa.en || p.masa.name || '') : '',
                         tithi: p.tithi ? `${p.tithi.paksha} ${p.tithi.name}` : '',
                         shoppingPeak: !!f.shopping_peak
                     });
