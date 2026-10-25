@@ -1,14 +1,14 @@
 {
   "id": "com.kuberansilks.panchangam",
-  "name": "Kuberan Panchangam",
-  "short_name": "Panchangam",
-  "description": "South Indian Vedic Panchangam & Muhurtha Engine by Kuberan — works offline, anywhere in the world.",
-  "start_url": ".",
+  "name": "Kuberan Panchangam — Vedic Drik Ganita",
+  "short_name": "Kuberan Panchangam",
+  "description": "Authentic South Indian & Karnataka Vedic Panchangam, Muhurtha, Jathaka & Marriage Matching by Kuberan Silks.",
+  "start_url": "./index.html",
   "scope": ".",
   "lang": "en",
   "display": "standalone",
   "background_color": "#0c0f1a",
-  "theme_color": "#f59e0b",
+  "theme_color": "#7b1e2d",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -16,6 +16,12 @@
       "sizes": "1024x1024",
       "type": "image/jpeg",
       "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/kuberan_logo_white_bg.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

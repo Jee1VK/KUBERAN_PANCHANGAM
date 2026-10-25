@@ -1,0 +1,20 @@
+/* ============================================================
+ * Kuberan Panchangam — Royal Silk & Vedic Gold ThemeVariables & Utilities
+ * ============================================================ */
+:root {
+    --kuberan-maroon: #7b1e2d;
+    --kuberan-maroon-dark: #4a0e17;
+    --kuberan-gold: #d4a017;
+    --kuberan-gold-light: #f5c842;
+    --kuberan-bg: #0c0f1a;
+    --kuberan-card: #161b2e;
+    --kuberan-border: #232a42;
+}
+
+/* Smooth transitions for interactive badges and family chips */
+#rashifalFamilyChips button:hover,
+#familyProfilesList button:hover,
+#festivalList button:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}

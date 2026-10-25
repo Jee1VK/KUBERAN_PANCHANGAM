@@ -1,12 +1,20 @@
-const CACHE_NAME = 'kuberan-panchangam-v55';
+const CACHE_NAME = 'kuberan-panchangam-v56';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
+  './assets/css/style.css',
   './assets/images/kuberan_logo_white_bg.png',
   './assets/images/app_icon.jpg',
   './js/astronomy.js',
-  './js/ashtakoota.js'
+  './js/ashtakoota.js',
+  './js/ephemeris.js',
+  './js/ayanamsa.js',
+  './js/cities.js',
+  './js/familyStore.js',
+  './js/muhurthaEngine.js',
+  './js/exportUtils.js',
+  './js/app.js'
 ];
 
 self.addEventListener('install', (event) => {
