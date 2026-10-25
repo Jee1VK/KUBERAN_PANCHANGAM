@@ -1436,13 +1436,104 @@
 <!-- JATHAKA TAB -->
 <div class="tab-content" id="tab-jathaka">
 <div class="container">
+    <!-- SAVED FAMILY PROFILES IN JATHAKA TAB -->
+    <div class="card" id="jathakaFamilyCard">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+            <h2 style="margin:0; border:none; padding:0; font-size:0.95rem;">👨‍👩‍👧‍👦 Saved Family Profiles (ಕುಟುಂಬ ಸದಸ್ಯರ ಜಾತಕ)</h2>
+            <button type="button" onclick="toggleJathakaAddFamilyForm()" style="background:rgba(212,160,23,0.15); border:1px solid var(--gold); color:var(--gold-light); padding:5px 12px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">+ Add Family Member</button>
+        </div>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:10px;">Select a saved family member to instantly view their Janma Jathaka, or add family members for 1-tap access across Jathaka, Muhurtha & Rashifal.</p>
+
+        <div id="jathakaAddFamilyFormWrap" style="display:none; background:rgba(0,0,0,0.28); border:1px solid var(--gold); border-radius:8px; padding:12px; margin-bottom:10px;">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--gold-light); margin-bottom:8px;">➕ Add Family Member Profile</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                <div>
+                    <label style="font-size:0.7rem; color:var(--text-dim);">Full Name (ಹೆಸರು)</label>
+                    <input type="text" id="jFamNameInput" placeholder="e.g. Ramesh Kumar" style="width:100%; padding:7px 8px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:6px; font-size:0.82rem;">
+                </div>
+                <div>
+                    <label style="font-size:0.7rem; color:var(--text-dim);">Relation (ಸಂಬಂಧ)</label>
+                    <select id="jFamRelationInput" style="width:100%; padding:7px 8px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:6px; font-size:0.82rem;">
+                        <option value="Self">Self (ಸ್ವಂತ)</option>
+                        <option value="Spouse">Spouse (ಪತಿ / ಪತ್ನಿ)</option>
+                        <option value="Son">Son (ಮಗ)</option>
+                        <option value="Daughter">Daughter (ಮಗಳು)</option>
+                        <option value="Father">Father (ತಂದೆ)</option>
+                        <option value="Mother">Mother (ತಾಯಿ)</option>
+                        <option value="Family Member">Other Family Member</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.7rem; color:var(--text-dim);">Birth Date & Time (ಜನ್ಮ ದಿನಾಂಕ & ಸಮಯ)</label>
+                    <input type="datetime-local" id="jFamDobInput" onchange="autoFillFamilyRashiNakFromDob('j')" style="width:100%; padding:7px 8px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:6px; font-size:0.82rem;">
+                </div>
+                <div>
+                    <label style="font-size:0.7rem; color:var(--text-dim);">Birth City (ಜನ್ಮ ಸ್ಥಳ)</label>
+                    <select id="jFamPlaceSelect" onchange="autoFillFamilyRashiNakFromDob('j')" style="width:100%; padding:7px 8px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:6px; font-size:0.82rem;">
+                        <option value="12.9716,77.5946,Asia/Kolkata,Bengaluru">Bengaluru (ಬೆಂಗಳೂರು)</option>
+                        <option value="12.2958,76.6394,Asia/Kolkata,Mysuru">Mysuru (ಮೈಸೂರು)</option>
+                        <option value="15.3647,75.1240,Asia/Kolkata,Hubballi">Hubballi (ಹುಬ್ಬಳ್ಳಿ)</option>
+                        <option value="12.9141,74.8560,Asia/Kolkata,Mangaluru">Mangaluru (ಮಂಗಳೂರು)</option>
+                        <option value="13.3409,74.7421,Asia/Kolkata,Udupi">Udupi (ಉಡುಪಿ)</option>
+                        <option value="13.9299,75.5681,Asia/Kolkata,Shivamogga">Shivamogga (ಶಿವಮೊಗ್ಗ)</option>
+                        <option value="15.8497,74.4977,Asia/Kolkata,Belagavi">Belagavi (ಬೆಳಗಾವಿ)</option>
+                        <option value="13.0827,80.2707,Asia/Kolkata,Chennai">Chennai</option>
+                        <option value="19.0760,72.8777,Asia/Kolkata,Mumbai">Mumbai</option>
+                        <option value="28.6139,77.2090,Asia/Kolkata,New Delhi">New Delhi</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.7rem; color:var(--text-dim);">Janma Rashi (ರಾಶಿ — Auto or Manual)</label>
+                    <select id="jFamRashiSelect" style="width:100%; padding:7px 8px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:6px; font-size:0.82rem;">
+                        <option value="0">Mesha (ಮೇಷ)</option>
+                        <option value="1">Vrishabha (ವೃಷಭ)</option>
+                        <option value="2">Mithuna (ಮಿಥುನ)</option>
+                        <option value="3">Karka (ಕರ್ಕಾಟಕ)</option>
+                        <option value="4">Simha (ಸಿಂಹ)</option>
+                        <option value="5">Kanya (ಕನ್ಯಾ)</option>
+                        <option value="6">Tula (ತುಲಾ)</option>
+                        <option value="7">Vrishchika (ವೃಶ್ಚಿಕ)</option>
+                        <option value="8">Dhanu (ಧನುಸ್ಸು)</option>
+                        <option value="9">Makara (ಮಕರ)</option>
+                        <option value="10">Kumbha (ಕುಂಭ)</option>
+                        <option value="11">Meena (ಮೀನ)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.7rem; color:var(--text-dim);">Janma Nakshatra (ನಕ್ಷತ್ರ — Auto or Manual)</label>
+                    <select id="jFamNakSelect" style="width:100%; padding:7px 8px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:6px; font-size:0.82rem;"></select>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button type="button" onclick="toggleJathakaAddFamilyForm()" style="background:transparent; border:1px solid var(--card-border); color:var(--text-dim); padding:6px 12px; border-radius:6px; font-size:0.76rem; cursor:pointer;">Cancel</button>
+                <button type="button" onclick="saveNewFamilyMemberFromJathakaForm()" style="background:var(--gold); border:none; color:#000; padding:6px 14px; border-radius:6px; font-size:0.76rem; font-weight:700; cursor:pointer;">💾 Save Family Profile</button>
+            </div>
+        </div>
+
+        <div id="jathakaFamilyList" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+
     <div class="card" id="jathakaInputArea">
         <h2>📜 Janma Kundali (Birth Details)</h2>
         <p style="font-size:0.8rem; color: var(--text-dim); margin-bottom: 12px;">Enter exact birth details to generate your Janma Jathaka (Astrological Birth Chart) and Vimshottari Dasha balance.</p>
         
-        <div style="display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:12px;">
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:10px;">
             <div><label>Full Name</label><input type="text" id="jName" placeholder="E.g., Ramesh Kumar" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.9rem;"></div>
-            <div><label>Date & Time of Birth</label><input type="datetime-local" id="jDob" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.9rem;"></div>
+            <div>
+                <label>Relation</label>
+                <select id="jRelation" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.9rem;">
+                    <option value="Self">Self (ಸ್ವಂತ)</option>
+                    <option value="Spouse">Spouse (ಪತಿ/ಪತ್ನಿ)</option>
+                    <option value="Son">Son (ಮಗ)</option>
+                    <option value="Daughter">Daughter (ಮಗಳು)</option>
+                    <option value="Father">Father (ತಂದೆ)</option>
+                    <option value="Mother">Mother (ತಾಯಿ)</option>
+                    <option value="Family Member" selected>Family Member</option>
+                </select>
+            </div>
+        </div>
+        <div style="margin-bottom:12px;">
+            <label>Date & Time of Birth</label><input type="datetime-local" id="jDob" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.9rem;">
         </div>
         
         <label>Birth Location</label>
@@ -1464,7 +1555,10 @@
             <input type="hidden" id="jTz" value="Asia/Kolkata">
         </div>
 
-        <button class="btn-calc" id="btnGenJathaka" onclick="generateJathaka()">Generate Jathaka</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-calc" id="btnGenJathaka" onclick="generateJathaka()" style="flex:2; min-width:160px; margin:0;">📜 Generate Jathaka</button>
+            <button type="button" onclick="generateAndSaveFamilyJathaka()" style="flex:1; min-width:150px; background:rgba(212,160,23,0.16); border:1px solid var(--gold); color:var(--gold-light); padding:10px 14px; border-radius:8px; font-weight:700; font-size:0.84rem; cursor:pointer;">👨‍👩‍👧‍👦 Generate & Save to Family</button>
+        </div>
         <div id="jathakaLoading" style="display:none; text-align:center; margin-top:15px; color:var(--gold);">
             <p>⏳ Computing planetary positions...</p>
         </div>
@@ -3525,8 +3619,8 @@ document.querySelectorAll('.tab-nav').forEach(btn => {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll(`.tab-nav[data-tab="${btn.dataset.tab}"]`).forEach(b => b.classList.add('active'));
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-        if (btn.dataset.tab === 'muhurtha') updateMuhurthaPersonalized();
-        if (btn.dataset.tab === 'jathaka') loadJathakaHistory();
+        if (btn.dataset.tab === 'muhurtha') { updateMuhurthaPersonalized(); renderSavedFamilyProfiles(); }
+        if (btn.dataset.tab === 'jathaka') { loadJathakaHistory(); renderSavedFamilyProfiles(); }
         if (btn.dataset.tab === 'calendar') {
             const loc = getLocation();
             const now = new Date();
@@ -3772,7 +3866,10 @@ function loadJathakaHistory() {
                 <div style="font-weight:600; font-size:0.9rem;">${h.name}</div>
                 <div style="font-size:0.75rem; color:var(--text-dim);">${h.dobStr} | ${h.nakName} Nakshatra</div>
             </div>
-            <button onclick="deleteJathaka(${idx})" style="background:none; border:none; color:var(--red); padding:5px; cursor:pointer;" title="Delete">🗑️</button>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <button type="button" onclick="saveHistoryItemToFamily(${idx})" style="background:rgba(212,160,23,0.15); border:1px solid var(--gold); color:var(--gold-light); padding:4px 8px; border-radius:6px; font-size:0.7rem; font-weight:600; cursor:pointer;" title="Save to Permanent Family Profiles">👨‍👩‍👧‍👦 + Family</button>
+                <button type="button" onclick="deleteJathaka(${idx})" style="background:none; border:none; color:var(--red); padding:5px; cursor:pointer;" title="Delete">🗑️</button>
+            </div>
         `;
         list.appendChild(div);
     });
@@ -7166,20 +7263,216 @@ function saveNewFamilyMemberFromForm() {
     renderSavedFamilyProfiles();
 }
 
+function toggleJathakaAddFamilyForm() {
+    const wrap = document.getElementById('jathakaAddFamilyFormWrap');
+    if (!wrap) return;
+    const isHidden = wrap.style.display === 'none';
+    wrap.style.display = isHidden ? 'block' : 'none';
+    const nakSel = document.getElementById('jFamNakSelect');
+    if (nakSel && nakSel.options.length === 0) {
+        nakSel.innerHTML = NAK_EN.map((n, i) => `<option value="${i + 1}">${String(i + 1).padStart(2, '0')}. ${n} (${NAK_KN[i]})</option>`).join('');
+    }
+}
+
+function autoFillFamilyRashiNakFromDob(prefix) {
+    const dobVal = document.getElementById(prefix === 'j' ? 'jFamDobInput' : 'famDobInput')?.value;
+    if (!dobVal) return;
+    const placeVal = document.getElementById(prefix === 'j' ? 'jFamPlaceSelect' : '')?.value || '12.9716,77.5946,Asia/Kolkata,Bengaluru';
+    const parts = placeVal.split(',');
+    const tz = parts[2] || 'Asia/Kolkata';
+    const d = new Date(dobVal);
+    if (isNaN(d.getTime())) return;
+    const y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+    const hours = d.getHours() + (d.getMinutes() / 60);
+    const tzOffHrs = getTzOffset(tz, y, m, day);
+    const jdUTC = julianDay(y, m, day, hours - tzOffHrs);
+    const moonLng = (moonLongitude(jdUTC) - lahiriAyanamsa(jdUTC) + 360) % 360;
+    const rashiIdx = Math.floor(moonLng / 30);
+    const nakNum = Math.floor(moonLng / (360 / 27)) + 1;
+    const rSel = document.getElementById(prefix === 'j' ? 'jFamRashiSelect' : 'famRashiSelect');
+    const nSel = document.getElementById(prefix === 'j' ? 'jFamNakSelect' : 'famNakSelect');
+    if (rSel) rSel.value = String(rashiIdx);
+    if (nSel) {
+        if (nSel.options.length === 0) {
+            nSel.innerHTML = NAK_EN.map((n, i) => `<option value="${i + 1}">${String(i + 1).padStart(2, '0')}. ${n} (${NAK_KN[i]})</option>`).join('');
+        }
+        nSel.value = String(nakNum);
+    }
+}
+
+function saveNewFamilyMemberFromJathakaForm() {
+    if (typeof saveFamilyProfile !== 'function') return;
+    const name = (document.getElementById('jFamNameInput')?.value || '').trim();
+    const relation = (document.getElementById('jFamRelationInput')?.value || 'Family Member').trim();
+    const dobRaw = (document.getElementById('jFamDobInput')?.value || '').trim();
+    const placeVal = document.getElementById('jFamPlaceSelect')?.value || '12.9716,77.5946,Asia/Kolkata,Bengaluru';
+    const parts = placeVal.split(',');
+    const lat = parseFloat(parts[0]) || 12.9716;
+    const lon = parseFloat(parts[1]) || 77.5946;
+    const tz = parts[2] || 'Asia/Kolkata';
+    const placeName = parts[3] || 'Bengaluru, Karnataka';
+
+    if (!name) {
+        alert('Please enter the family member name.');
+        return;
+    }
+    if (dobRaw) autoFillFamilyRashiNakFromDob('j');
+    const rashi = parseInt(document.getElementById('jFamRashiSelect')?.value || '0', 10);
+    const nakshatra = parseInt(document.getElementById('jFamNakSelect')?.value || '1', 10);
+    const rawParts = dobRaw.split('T');
+
+    saveFamilyProfile({
+        name,
+        relation,
+        birthDate: rawParts[0] || '',
+        birthTime: rawParts[1] || '',
+        dobStrRaw: dobRaw,
+        rashi,
+        nakshatra,
+        lat,
+        lon,
+        tz,
+        placeName
+    });
+
+    document.getElementById('jFamNameInput').value = '';
+    document.getElementById('jFamDobInput').value = '';
+    document.getElementById('jathakaAddFamilyFormWrap').style.display = 'none';
+    renderSavedFamilyProfiles();
+}
+
 function saveCurrentJathakaToFamily() {
     if (!currentJathakaData || typeof saveFamilyProfile !== 'function') return;
     const d = currentJathakaData;
     const rawParts = (d.dobStrRaw || '').split('T');
+    const relation = document.getElementById('jRelation')?.value || 'Family Member';
+    const lat = parseFloat(document.getElementById('jLat')?.value || '12.9716');
+    const lon = parseFloat(document.getElementById('jLon')?.value || '77.5946');
+    const tz = document.getElementById('jTz')?.value || 'Asia/Kolkata';
+    const placeName = document.getElementById('jCityName')?.textContent || 'Bengaluru, India';
+
     saveFamilyProfile({
         name: d.name || 'Family Member',
+        relation,
+        birthDate: rawParts[0] || '',
+        birthTime: rawParts[1] || '',
+        dobStrRaw: d.dobStrRaw || '',
+        rashi: (d.rashiIdx !== undefined) ? d.rashiIdx : 0,
+        nakshatra: (d.nakIdx !== undefined) ? (d.nakIdx + 1) : 1,
+        pada: d.pada || 1,
+        lat,
+        lon,
+        tz,
+        placeName
+    });
+    renderSavedFamilyProfiles();
+    alert(`✅ Saved ${d.name} to Family Profiles! Available in Jathaka, Muhurtha & Daily Rashifal.`);
+}
+
+function generateAndSaveFamilyJathaka() {
+    const name = (document.getElementById('jName')?.value || '').trim();
+    const dobStrRaw = document.getElementById('jDob')?.value || '';
+    if (!name || !dobStrRaw) {
+        alert('Please enter Full Name and Date & Time of Birth first.');
+        return;
+    }
+    const relation = document.getElementById('jRelation')?.value || 'Family Member';
+    const lat = parseFloat(document.getElementById('jLat')?.value || '12.9716');
+    const lon = parseFloat(document.getElementById('jLon')?.value || '77.5946');
+    const tz = document.getElementById('jTz')?.value || 'Asia/Kolkata';
+    const placeName = document.getElementById('jCityName')?.textContent || 'Bengaluru, India';
+
+    const d = new Date(dobStrRaw);
+    if (!isNaN(d.getTime()) && typeof saveFamilyProfile === 'function') {
+        const y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+        const hours = d.getHours() + (d.getMinutes() / 60);
+        const tzOffHrs = getTzOffset(tz, y, m, day);
+        const jdUTC = julianDay(y, m, day, hours - tzOffHrs);
+        const moonLng = (moonLongitude(jdUTC) - lahiriAyanamsa(jdUTC) + 360) % 360;
+        const rashiIdx = Math.floor(moonLng / 30);
+        const nakNum = Math.floor(moonLng / (360 / 27)) + 1;
+        const rawParts = dobStrRaw.split('T');
+        saveFamilyProfile({
+            name,
+            relation,
+            birthDate: rawParts[0] || '',
+            birthTime: rawParts[1] || '',
+            dobStrRaw,
+            rashi: rashiIdx,
+            nakshatra: nakNum,
+            lat,
+            lon,
+            tz,
+            placeName
+        });
+        renderSavedFamilyProfiles();
+    }
+    generateJathaka();
+}
+
+function saveHistoryItemToFamily(idx) {
+    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    const h = history[idx];
+    if (!h || typeof saveFamilyProfile !== 'function') return;
+    const d = new Date(h.dobStrRaw);
+    let rashiIdx = 0;
+    let nakNum = 1;
+    if (!isNaN(d.getTime())) {
+        const y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+        const hours = d.getHours() + (d.getMinutes() / 60);
+        const tzOffHrs = getTzOffset(h.tz || 'Asia/Kolkata', y, m, day);
+        const jdUTC = julianDay(y, m, day, hours - tzOffHrs);
+        const moonLng = (moonLongitude(jdUTC) - lahiriAyanamsa(jdUTC) + 360) % 360;
+        rashiIdx = Math.floor(moonLng / 30);
+        nakNum = Math.floor(moonLng / (360 / 27)) + 1;
+    }
+    const rawParts = (h.dobStrRaw || '').split('T');
+    saveFamilyProfile({
+        name: h.name,
         relation: 'Family Member',
         birthDate: rawParts[0] || '',
         birthTime: rawParts[1] || '',
-        rashi: (d.rashiIdx !== undefined) ? d.rashiIdx : 0,
-        nakshatra: (d.nakIdx !== undefined) ? (d.nakIdx + 1) : 1
+        dobStrRaw: h.dobStrRaw || '',
+        rashi: rashiIdx,
+        nakshatra: nakNum,
+        pada: h.pada || 1,
+        lat: h.lat || 12.9716,
+        lon: h.lon || 77.5946,
+        tz: h.tz || 'Asia/Kolkata'
     });
     renderSavedFamilyProfiles();
-    alert(`✅ Saved ${d.name} to Family Profiles! Available in Muhurtha & Daily Rashifal.`);
+    alert(`✅ Saved ${h.name} to Family Profiles!`);
+}
+
+function loadFamilyProfileIntoJathaka(profileId) {
+    if (typeof getFamilyProfiles !== 'function') return;
+    const profiles = getFamilyProfiles();
+    const prof = profiles.find(p => p.id === profileId);
+    if (!prof) return;
+
+    const nameEl = document.getElementById('jName');
+    const relEl = document.getElementById('jRelation');
+    const dobEl = document.getElementById('jDob');
+    const latEl = document.getElementById('jLat');
+    const lonEl = document.getElementById('jLon');
+    const tzEl = document.getElementById('jTz');
+    const cityEl = document.getElementById('jCityName');
+
+    if (nameEl) nameEl.value = prof.name || '';
+    if (relEl && prof.relation) relEl.value = prof.relation;
+    if (latEl && prof.lat) latEl.value = prof.lat;
+    if (lonEl && prof.lon) lonEl.value = prof.lon;
+    if (tzEl && prof.tz) tzEl.value = prof.tz;
+    if (cityEl && prof.placeName) cityEl.textContent = prof.placeName;
+
+    const dobVal = prof.dobStrRaw || (prof.birthDate && prof.birthTime ? `${prof.birthDate}T${prof.birthTime}` : '');
+    if (dobVal && dobEl) {
+        dobEl.value = dobVal;
+        generateJathaka();
+    } else if (dobEl) {
+        dobEl.focus();
+        alert(`👤 Loaded ${prof.name} (${RASHI_EN[prof.rashi || 0]} · ${NAK_EN[(prof.nakshatra || 1) - 1]}). Please enter their Birth Date & Time below and click "Generate & Save to Family" to view their full Kundali.`);
+    }
 }
 
 function removeSavedFamilyMember(id) {
@@ -7276,10 +7569,37 @@ function renderSavedFamilyProfiles() {
     if (typeof getFamilyProfiles !== 'function') return;
     const profiles = getFamilyProfiles();
     const listEl = document.getElementById('familyProfilesList');
+    const jathakaListEl = document.getElementById('jathakaFamilyList');
     const loadBtn = document.getElementById('btnLoadFamilyCompat');
     const chipsEl = document.getElementById('rashifalFamilyChips');
 
     if (loadBtn) loadBtn.style.display = profiles.length > 0 ? 'inline-block' : 'none';
+
+    if (jathakaListEl) {
+        if (profiles.length === 0) {
+            jathakaListEl.innerHTML = '<div style="font-size:0.78rem; color:var(--text-dim); padding:10px; text-align:center; border:1px dashed var(--card-border); border-radius:6px;">No saved family profiles yet. Click <b>"+ Add Family Member"</b> above or enter birth details below and click <b>"Generate & Save to Family"</b>.</div>';
+        } else {
+            jathakaListEl.innerHTML = profiles.map(prof => {
+                const rIdx = Math.max(0, Math.min(11, parseInt(prof.rashi, 10) || 0));
+                const nIdx = Math.max(0, Math.min(26, (parseInt(prof.nakshatra, 10) || 1) - 1));
+                const hasDob = !!(prof.dobStrRaw || (prof.birthDate && prof.birthTime));
+                const dobBadge = hasDob
+                    ? `<span style="font-size:0.68rem; color:var(--text-dim);">📅 ${(prof.dobStrRaw || prof.birthDate).replace('T', ' ')}</span>`
+                    : `<span style="font-size:0.68rem; color:var(--orange);">⚠️ Add DOB for Full Chart</span>`;
+                return `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 10px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-left:3px solid var(--gold); border-radius:6px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:150px; cursor:pointer;" onclick="loadFamilyProfileIntoJathaka('${prof.id}')">
+                        <div style="font-weight:700; font-size:0.86rem; color:var(--text);">👤 ${prof.name} <span style="font-size:0.72rem; color:var(--gold); font-weight:600;">(${prof.relation || 'Family'})</span></div>
+                        <div style="font-size:0.73rem; color:var(--gold-light); margin-top:2px;">🌙 ${RASHI_EN[rIdx]} (${RASHI_KN[rIdx]}) &bull; ⭐ ${NAK_EN[nIdx]} (${NAK_KN[nIdx]})</div>
+                        <div style="margin-top:2px;">${dobBadge}</div>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <button type="button" onclick="loadFamilyProfileIntoJathaka('${prof.id}')" style="background:var(--gold); border:none; color:#000; padding:5px 10px; border-radius:6px; font-size:0.73rem; font-weight:700; cursor:pointer;">📜 View Jathaka</button>
+                        <button type="button" onclick="removeSavedFamilyMember('${prof.id}')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:0.82rem; padding:4px;" title="Remove">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    }
 
     if (listEl) {
         if (profiles.length === 0) {

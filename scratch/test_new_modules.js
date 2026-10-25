@@ -244,7 +244,22 @@ const savedProfs = sandbox.getFamilyProfiles();
 assert.strictEqual(savedProfs.length, 1, '1 family profile saved');
 assert.strictEqual(savedProfs[0].name, 'Ananya');
 assert(getEl('familyProfilesList').innerHTML.includes('Ananya'), 'Family profile rendered in Muhurtha list');
+assert(getEl('jathakaFamilyList').innerHTML.includes('Ananya'), 'Family profile rendered in Jathaka list');
 assert(getEl('rashifalFamilyChips').innerHTML.includes('Ananya (Simha)'), 'Family chip rendered in Daily Rashifal');
+
+// Test adding a family member with DOB directly from Jathaka Family form and loading their Jathaka
+getEl('jFamNameInput').value = 'Ramesh Kumar';
+getEl('jFamRelationInput').value = 'Self';
+getEl('jFamDobInput').value = '1990-05-15T10:30';
+getEl('jFamPlaceSelect').value = '12.9716,77.5946,Asia/Kolkata,Bengaluru';
+sandbox.saveNewFamilyMemberFromJathakaForm();
+const savedProfs2 = sandbox.getFamilyProfiles();
+assert.strictEqual(savedProfs2.length, 2, '2 family profiles saved');
+assert(getEl('jathakaFamilyList').innerHTML.includes('Ramesh Kumar'), 'Ramesh Kumar rendered in Jathaka Family list');
+const rameshProf = savedProfs2.find(p => p.name === 'Ramesh Kumar');
+sandbox.loadFamilyProfileIntoJathaka(rameshProf.id);
+assert.strictEqual(getEl('jName').value, 'Ramesh Kumar', 'Loaded Ramesh Kumar into Jathaka input');
+assert.strictEqual(getEl('jDob').value, '1990-05-15T10:30', 'Loaded Ramesh Kumar DOB into Jathaka input');
 
 sandbox.evaluateFamilyMemberToday(savedProfs[0].id);
 assert(getEl('tarabalamResult').innerHTML.includes('Ananya'), 'Tarabala evaluated for Ananya');
