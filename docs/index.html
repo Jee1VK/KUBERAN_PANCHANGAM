@@ -4877,15 +4877,26 @@ let _prevMoonDeg = null;
 let _currentTargetMoonDeg = 0;
 let _moonAnimFrameId = null;
 
-function getMoonPhaseEmoji(deg) {
+function getMoonPhaseEmoji(deg, tithiNo) {
+    // If Tithi number (1..30) is known, strictly align the phase icon with the Vedic Tithi of the day
+    if (typeof tithiNo === 'number' && tithiNo >= 1 && tithiNo <= 30) {
+        if (tithiNo === 30) return '🌑'; // Amavasya (New Moon)
+        if (tithiNo <= 6)   return '🌒'; // Shukla Prathama..Shashthi (Waxing Crescent)
+        if (tithiNo <= 8)   return '🌓'; // Shukla Saptami..Ashtami (First Quarter)
+        if (tithiNo <= 14)  return '🌔'; // Shukla Navami..Chaturdashi (Waxing Gibbous)
+        if (tithiNo === 15) return '🌕'; // Pournami (Full Moon)
+        if (tithiNo <= 21)  return '🌖'; // Krishna Prathama..Shashthi (Waning Gibbous)
+        if (tithiNo <= 23)  return '🌗'; // Krishna Saptami..Ashtami (Last Quarter)
+        return '🌘';                     // Krishna Navami..Chaturdashi (Waning Crescent)
+    }
     const d = ((deg % 360) + 360) % 360;
-    if (d < 15 || d >= 345) return '🌑';
-    if (d < 75) return '🌒';
-    if (d < 105) return '🌓';
-    if (d < 165) return '🌔';
-    if (d < 195) return '🌕';
-    if (d < 255) return '🌖';
-    if (d < 285) return '🌗';
+    if (d < 6 || d >= 354) return '🌑';
+    if (d < 78) return '🌒';
+    if (d < 102) return '🌓';
+    if (d < 174) return '🌔';
+    if (d <= 186) return '🌕';
+    if (d < 258) return '🌖';
+    if (d < 282) return '🌗';
     return '🌘';
 }
 
@@ -4990,22 +5001,21 @@ function _setMoonPhaseDOMAtAngle(deg, size = 42, updateText = false) {
     }
 }
 
-function animateMoonPhaseTransition(fromDeg, toDeg, durationMs = 520) {
+function animateMoonPhaseTransition(fromDeg, toDeg, durationMs = 520, isFullCycleReplay = false) {
     if (_moonAnimFrameId && typeof cancelAnimationFrame === 'function') {
         cancelAnimationFrame(_moonAnimFrameId);
         _moonAnimFrameId = null;
     }
     if (typeof requestAnimationFrame !== 'function' || typeof performance === 'undefined') {
-        _setMoonPhaseDOMAtAngle(toDeg, 42, true);
+        _setMoonPhaseDOMAtAngle(toDeg, 42, false);
         return;
     }
-    // Shortest angular delta unless doing a full-cycle replay (> 180 explicit span)
     let diff = toDeg - fromDeg;
-    if (Math.abs(diff) <= 360) {
+    if (!isFullCycleReplay) {
         diff = ((diff + 540) % 360) - 180;
     }
     if (Math.abs(diff) < 0.5) {
-        _setMoonPhaseDOMAtAngle(toDeg, 42, true);
+        _setMoonPhaseDOMAtAngle(toDeg, 42, false);
         return;
     }
     const startTime = performance.now();
@@ -5013,12 +5023,12 @@ function animateMoonPhaseTransition(fromDeg, toDeg, durationMs = 520) {
         const t = Math.min(1, (now - startTime) / durationMs);
         const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
         const curDeg = ((fromDeg + diff * ease) % 360 + 360) % 360;
-        _setMoonPhaseDOMAtAngle(curDeg, 42, true);
+        _setMoonPhaseDOMAtAngle(curDeg, 42, false);
         if (t < 1) {
             _moonAnimFrameId = requestAnimationFrame(step);
         } else {
             _moonAnimFrameId = null;
-            _setMoonPhaseDOMAtAngle(toDeg, 42, true);
+            _setMoonPhaseDOMAtAngle(toDeg, 42, false);
         }
     }
     _moonAnimFrameId = requestAnimationFrame(step);
@@ -5027,15 +5037,34 @@ function animateMoonPhaseTransition(fromDeg, toDeg, durationMs = 520) {
 function replayMoonPhaseAnimation() {
     const target = _currentTargetMoonDeg || 0;
     // Sweep a full 360° lunar cycle and settle on the current day's exact elongation
-    animateMoonPhaseTransition(target, target + 360, 1250);
+    animateMoonPhaseTransition(target, target + 360, 1250, true);
 }
 
 function updateMoonPhaseDisplay(p) {
-    const deg = (p && p.elongation !== undefined) ? ((p.elongation % 360) + 360) % 360 : 0;
+    const rawDeg = (p && p.elongation !== undefined) ? ((p.elongation % 360) + 360) % 360 : 0;
+    const tithiNo = (p && p.tithi && typeof p.tithi.no === 'number') ? p.tithi.no : null;
+
+    // Align visual SVG angle with Tithi boundaries so Pournami is 100% Full (180°),
+    // Amavasya is 0% New (0°), and Prathama / Chaturdashi never render as New/Full Moon
+    let deg = rawDeg;
+    if (tithiNo === 15) {
+        deg = 180; // Pournami (Full Moon)
+    } else if (tithiNo === 30) {
+        deg = 0;   // Amavasya (New Moon)
+    } else if (tithiNo === 1 && deg < 10) {
+        deg = 10;  // Shukla Prathama — ensure visible right waxing crescent
+    } else if (tithiNo === 14 && deg > 170) {
+        deg = 170; // Shukla Chaturdashi — keep waxing gibbous distinct from Pournami
+    } else if (tithiNo === 16 && deg < 190) {
+        deg = 190; // Krishna Prathama — keep waning gibbous distinct from Pournami
+    } else if (tithiNo === 29 && deg > 350) {
+        deg = 350; // Krishna Chaturdashi — ensure visible left waning crescent
+    }
+
     _currentTargetMoonDeg = deg;
     const rad = deg * Math.PI / 180;
-    const illum = ((1 - Math.cos(rad)) / 2 * 100).toFixed(0);
-    const isWaxing = deg < 180;
+    const illum = (tithiNo === 15) ? '100' : (tithiNo === 30) ? '0' : ((1 - Math.cos(rad)) / 2 * 100).toFixed(0);
+    const isWaxing = (tithiNo !== null) ? (tithiNo <= 15) : (deg < 180);
     
     const svgEl = document.getElementById('moonPhaseSvgContainer');
     const nameEl = document.getElementById('moonPhaseName');
@@ -5046,10 +5075,10 @@ function updateMoonPhaseDisplay(p) {
     
     let phaseNameEn = '';
     let phaseNameKn = '';
-    if (p && p.tithi && p.tithi.no === 15) {
+    if (tithiNo === 15) {
         phaseNameEn = 'Pournami';
         phaseNameKn = 'ಹುಣ್ಣಿಮೆ';
-    } else if (p && p.tithi && p.tithi.no === 30) {
+    } else if (tithiNo === 30) {
         phaseNameEn = 'Amavasya';
         phaseNameKn = 'ಅಮಾವಾಸ್ಯೆ';
     } else if (isWaxing) {
@@ -5060,15 +5089,15 @@ function updateMoonPhaseDisplay(p) {
         phaseNameKn = 'ಕೃಷ್ಣ ಪಕ್ಷ';
     }
     
+    const phaseEmoji = getMoonPhaseEmoji(deg, tithiNo);
     if (nameEl) nameEl.textContent = `${phaseNameEn} (${phaseNameKn})`;
-    if (illumEl) illumEl.textContent = `${getMoonPhaseEmoji(deg)} ${illum}% Illumination`;
+    if (illumEl) illumEl.textContent = `${phaseEmoji} ${illum}% Illumination`;
 
-    // Smoothly animate terminator transition in browser when changing dates or on first load
-    const startDeg = (_prevMoonDeg === null) ? ((deg - 65 + 360) % 360) : _prevMoonDeg;
-    _prevMoonDeg = deg;
-    if (Math.abs(startDeg - deg) > 0.5) {
-        animateMoonPhaseTransition(startDeg, deg, 520);
+    // Smoothly animate SVG terminator when stepping between dates (staying within the same hemisphere on first load)
+    if (_prevMoonDeg !== null && Math.abs(_prevMoonDeg - deg) > 0.5) {
+        animateMoonPhaseTransition(_prevMoonDeg, deg, 460, false);
     }
+    _prevMoonDeg = deg;
 }
 
 function getTodayStr() {
