@@ -953,8 +953,8 @@
     <div class="card" id="glanceCard" style="background:linear-gradient(135deg, #1a1f38, #0f1320); border:1px solid var(--gold); border-left:4px solid var(--gold);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(212,160,23,0.25); padding-bottom:8px;">
             <h2 style="margin:0; border:none; padding:0; font-size:0.95rem;">🕉️ Today at a Glance</h2>
-            <div id="glanceMoonPhase" style="display:flex; align-items:center; gap:8px;">
-                <div id="moonPhaseSvgContainer"></div>
+            <div id="glanceMoonPhase" onclick="if(typeof replayMoonPhaseAnimation==='function') replayMoonPhaseAnimation()" title="Tap to animate lunar cycle" style="display:flex; align-items:center; gap:9px; cursor:pointer; user-select:none; padding:2px 6px; border-radius:8px; transition:background 0.2s;">
+                <div id="moonPhaseSvgContainer" style="display:flex; align-items:center; justify-content:center; width:44px; height:44px;"></div>
                 <div style="text-align:right;">
                     <div id="moonPhaseName" style="font-size:0.75rem; font-weight:700; color:var(--gold-light);">—</div>
                     <div id="moonPhaseIllum" style="font-size:0.68rem; color:var(--text-dim);">—</div>
@@ -4873,33 +4873,166 @@ function updateLiveNowIndicators() {
 //  UI/UX PRO MAX SUITE: LIVE MUHURTHA, MOON PHASE, STEPPER, SHARE
 // ============================================================
 
+let _prevMoonDeg = null;
+let _currentTargetMoonDeg = 0;
+let _moonAnimFrameId = null;
+
+function getMoonPhaseEmoji(deg) {
+    const d = ((deg % 360) + 360) % 360;
+    if (d < 15 || d >= 345) return '🌑';
+    if (d < 75) return '🌒';
+    if (d < 105) return '🌓';
+    if (d < 165) return '🌔';
+    if (d < 195) return '🌕';
+    if (d < 255) return '🌖';
+    if (d < 285) return '🌗';
+    return '🌘';
+}
+
+function computeMoonTerminatorPath(deg, cx, cy, R) {
+    const d = ((deg % 360) + 360) % 360;
+    if (d <= 1.2 || d >= 358.8) {
+        return ''; // New Moon (Amavasya) — unlit disc with earthshine
+    }
+    const k = 0.5522847498; // Exact cubic Bezier circle/ellipse kappa: 4*(sqrt(2)-1)/3
+    const isWaxing = d <= 180;
+    const rad = d * Math.PI / 180;
+    const outerX = isWaxing ? R : -R;
+    // Continuous terminator semi-axis: +R*cos(rad) when waxing, -R*cos(rad) when waning
+    const termX = outerX * Math.cos(rad);
+
+    const f = (n) => Number(n.toFixed(2));
+    // Outer illuminated limb from North Pole (cx, cy-R) through Equator (cx+outerX, cy) to South Pole (cx, cy+R)
+    const p1 = `M ${f(cx)} ${f(cy - R)}`;
+    const p2 = `C ${f(cx + outerX * k)} ${f(cy - R)}, ${f(cx + outerX)} ${f(cy - R * k)}, ${f(cx + outerX)} ${f(cy)}`;
+    const p3 = `C ${f(cx + outerX)} ${f(cy + R * k)}, ${f(cx + outerX * k)} ${f(cy + R)}, ${f(cx)} ${f(cy + R)}`;
+    // Terminator curve back from South Pole (cx, cy+R) through Equator (cx+termX, cy) to North Pole (cx, cy-R)
+    const p4 = `C ${f(cx + termX * k)} ${f(cy + R)}, ${f(cx + termX)} ${f(cy + R * k)}, ${f(cx + termX)} ${f(cy)}`;
+    const p5 = `C ${f(cx + termX)} ${f(cy - R * k)}, ${f(cx + termX * k)} ${f(cy - R)}, ${f(cx)} ${f(cy - R)} Z`;
+    return `${p1} ${p2} ${p3} ${p4} ${p5}`;
+}
+
 function renderMoonPhaseSVG(deg, size = 44) {
-    const R = size / 2 - 2;
+    const R = size / 2 - 3;
     const cx = size / 2;
     const cy = size / 2;
-    const rad = deg * Math.PI / 180;
-    const isWaxing = deg < 180;
-    const rx = Math.max(0.1, Math.abs(R * Math.cos(rad)));
-    let pathD = '';
-    if (deg >= 358 || deg <= 2) {
-        pathD = ''; // New Moon (Amavasya)
-    } else if (deg >= 178 && deg <= 182) {
-        pathD = `M ${cx} ${cy - R} A ${R} ${R} 0 1 1 ${cx} ${cy + R} A ${R} ${R} 0 1 1 ${cx} ${cy - R} Z`;
-    } else if (isWaxing) {
-        const termSweep = deg < 90 ? 0 : 1;
-        pathD = `M ${cx} ${cy - R} A ${R} ${R} 0 0 1 ${cx} ${cy + R} A ${rx} ${R} 0 0 ${termSweep} ${cx} ${cy - R} Z`;
-    } else {
-        const termSweep = deg < 270 ? 1 : 0;
-        pathD = `M ${cx} ${cy - R} A ${R} ${R} 0 0 0 ${cx} ${cy + R} A ${rx} ${R} 0 0 ${termSweep} ${cx} ${cy - R} Z`;
-    }
-    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter: drop-shadow(0 0 6px rgba(245,200,66,0.35)); vertical-align:middle;">
-        <circle cx="${cx}" cy="${cy}" r="${R}" fill="#161b2e" stroke="rgba(212,160,23,0.4)" stroke-width="1.5" />
-        ${pathD ? `<path d="${pathD}" fill="#fdf0cd" />` : ''}
+    const pathD = computeMoonTerminatorPath(deg, cx, cy, R);
+    const clipId = `moonLitClip_${size}`;
+    const gradId = `moonLitGrad_${size}`;
+    const darkGradId = `moonDarkGrad_${size}`;
+
+    return `<svg class="moon-phase-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter: drop-shadow(0 0 7px rgba(245,200,66,0.42)); vertical-align:middle; overflow:visible;">
+        <defs>
+            <radialGradient id="${gradId}" cx="38%" cy="35%" r="68%">
+                <stop offset="0%" stop-color="#fffef5" />
+                <stop offset="65%" stop-color="#f8e298" />
+                <stop offset="100%" stop-color="#d8a22a" />
+            </radialGradient>
+            <radialGradient id="${darkGradId}" cx="50%" cy="50%" r="55%">
+                <stop offset="0%" stop-color="#1d243d" />
+                <stop offset="100%" stop-color="#0f1424" />
+            </radialGradient>
+            <clipPath id="${clipId}">
+                <path class="moon-clip-path" d="${pathD || 'M0 0'}" />
+            </clipPath>
+        </defs>
+        <!-- Outer subtle gold aura ring -->
+        <circle cx="${cx}" cy="${cy}" r="${R + 1.5}" fill="none" stroke="rgba(245,200,66,0.18)" stroke-width="1" />
+        <!-- Dark Lunar Disc (Earthshine) -->
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#${darkGradId})" stroke="rgba(212,160,23,0.48)" stroke-width="1.3" />
+        <!-- Faint Earthshine Craters -->
+        <circle cx="${(cx - R * 0.28).toFixed(1)}" cy="${(cy - R * 0.22).toFixed(1)}" r="${(R * 0.22).toFixed(1)}" fill="rgba(255,255,255,0.035)" />
+        <circle cx="${(cx + R * 0.24).toFixed(1)}" cy="${(cy - R * 0.12).toFixed(1)}" r="${(R * 0.18).toFixed(1)}" fill="rgba(255,255,255,0.03)" />
+        <circle cx="${(cx - R * 0.12).toFixed(1)}" cy="${(cy + R * 0.30).toFixed(1)}" r="${(R * 0.16).toFixed(1)}" fill="rgba(255,255,255,0.03)" />
+        <!-- Illuminated Lunar Hemisphere -->
+        <path class="moon-lit-path" d="${pathD}" fill="url(#${gradId})" style="${pathD ? '' : 'display:none;'}" />
+        <!-- Lunar Maria / Craters clipped to Illuminated Hemisphere -->
+        <g clip-path="url(#${clipId})">
+            <circle cx="${(cx - R * 0.28).toFixed(1)}" cy="${(cy - R * 0.22).toFixed(1)}" r="${(R * 0.22).toFixed(1)}" fill="rgba(165,120,28,0.18)" />
+            <circle cx="${(cx + R * 0.24).toFixed(1)}" cy="${(cy - R * 0.12).toFixed(1)}" r="${(R * 0.18).toFixed(1)}" fill="rgba(165,120,28,0.16)" />
+            <circle cx="${(cx + R * 0.15).toFixed(1)}" cy="${(cy + R * 0.22).toFixed(1)}" r="${(R * 0.14).toFixed(1)}" fill="rgba(165,120,28,0.14)" />
+            <circle cx="${(cx - R * 0.12).toFixed(1)}" cy="${(cy + R * 0.30).toFixed(1)}" r="${(R * 0.16).toFixed(1)}" fill="rgba(165,120,28,0.15)" />
+        </g>
+        <!-- Crisp Rim Border -->
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(245,200,66,0.45)" stroke-width="1.1" />
     </svg>`;
 }
 
+function _setMoonPhaseDOMAtAngle(deg, size = 42, updateText = false) {
+    const svgEl = document.getElementById('moonPhaseSvgContainer');
+    if (!svgEl) return;
+    const R = size / 2 - 3;
+    const cx = size / 2;
+    const cy = size / 2;
+    const litPath = svgEl.querySelector('.moon-lit-path');
+    const clipPath = svgEl.querySelector('.moon-clip-path');
+    if (!litPath || !clipPath) {
+        svgEl.innerHTML = renderMoonPhaseSVG(deg, size);
+    } else {
+        const pathD = computeMoonTerminatorPath(deg, cx, cy, R);
+        if (pathD) {
+            litPath.setAttribute('d', pathD);
+            litPath.style.display = '';
+            clipPath.setAttribute('d', pathD);
+        } else {
+            litPath.setAttribute('d', '');
+            litPath.style.display = 'none';
+            clipPath.setAttribute('d', 'M0 0');
+        }
+    }
+    if (updateText) {
+        const illumEl = document.getElementById('moonPhaseIllum');
+        if (illumEl) {
+            const rad = deg * Math.PI / 180;
+            const illum = ((1 - Math.cos(rad)) / 2 * 100).toFixed(0);
+            illumEl.textContent = `${getMoonPhaseEmoji(deg)} ${illum}% Illumination`;
+        }
+    }
+}
+
+function animateMoonPhaseTransition(fromDeg, toDeg, durationMs = 520) {
+    if (_moonAnimFrameId && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(_moonAnimFrameId);
+        _moonAnimFrameId = null;
+    }
+    if (typeof requestAnimationFrame !== 'function' || typeof performance === 'undefined') {
+        _setMoonPhaseDOMAtAngle(toDeg, 42, true);
+        return;
+    }
+    // Shortest angular delta unless doing a full-cycle replay (> 180 explicit span)
+    let diff = toDeg - fromDeg;
+    if (Math.abs(diff) <= 360) {
+        diff = ((diff + 540) % 360) - 180;
+    }
+    if (Math.abs(diff) < 0.5) {
+        _setMoonPhaseDOMAtAngle(toDeg, 42, true);
+        return;
+    }
+    const startTime = performance.now();
+    function step(now) {
+        const t = Math.min(1, (now - startTime) / durationMs);
+        const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+        const curDeg = ((fromDeg + diff * ease) % 360 + 360) % 360;
+        _setMoonPhaseDOMAtAngle(curDeg, 42, true);
+        if (t < 1) {
+            _moonAnimFrameId = requestAnimationFrame(step);
+        } else {
+            _moonAnimFrameId = null;
+            _setMoonPhaseDOMAtAngle(toDeg, 42, true);
+        }
+    }
+    _moonAnimFrameId = requestAnimationFrame(step);
+}
+
+function replayMoonPhaseAnimation() {
+    const target = _currentTargetMoonDeg || 0;
+    // Sweep a full 360° lunar cycle and settle on the current day's exact elongation
+    animateMoonPhaseTransition(target, target + 360, 1250);
+}
+
 function updateMoonPhaseDisplay(p) {
-    const deg = (p && p.elongation !== undefined) ? p.elongation : 0;
+    const deg = (p && p.elongation !== undefined) ? ((p.elongation % 360) + 360) % 360 : 0;
+    _currentTargetMoonDeg = deg;
     const rad = deg * Math.PI / 180;
     const illum = ((1 - Math.cos(rad)) / 2 * 100).toFixed(0);
     const isWaxing = deg < 180;
@@ -4908,14 +5041,15 @@ function updateMoonPhaseDisplay(p) {
     const nameEl = document.getElementById('moonPhaseName');
     const illumEl = document.getElementById('moonPhaseIllum');
     
+    // Render target SVG immediately so synchronous DOM reads always have valid SVG
     if (svgEl) svgEl.innerHTML = renderMoonPhaseSVG(deg, 42);
     
     let phaseNameEn = '';
     let phaseNameKn = '';
-    if (p.tithi && p.tithi.no === 15) {
+    if (p && p.tithi && p.tithi.no === 15) {
         phaseNameEn = 'Pournami';
         phaseNameKn = 'ಹುಣ್ಣಿಮೆ';
-    } else if (p.tithi && p.tithi.no === 30) {
+    } else if (p && p.tithi && p.tithi.no === 30) {
         phaseNameEn = 'Amavasya';
         phaseNameKn = 'ಅಮಾವಾಸ್ಯೆ';
     } else if (isWaxing) {
@@ -4927,7 +5061,14 @@ function updateMoonPhaseDisplay(p) {
     }
     
     if (nameEl) nameEl.textContent = `${phaseNameEn} (${phaseNameKn})`;
-    if (illumEl) illumEl.textContent = `🌖 ${illum}% Illumination`;
+    if (illumEl) illumEl.textContent = `${getMoonPhaseEmoji(deg)} ${illum}% Illumination`;
+
+    // Smoothly animate terminator transition in browser when changing dates or on first load
+    const startDeg = (_prevMoonDeg === null) ? ((deg - 65 + 360) % 360) : _prevMoonDeg;
+    _prevMoonDeg = deg;
+    if (Math.abs(startDeg - deg) > 0.5) {
+        animateMoonPhaseTransition(startDeg, deg, 520);
+    }
 }
 
 function getTodayStr() {
