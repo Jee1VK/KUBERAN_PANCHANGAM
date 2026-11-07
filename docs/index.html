@@ -2650,6 +2650,44 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
 }
 
 // ============================================================
+//  LIVE LIMBS AT ANY EXACT JULIAN DAY (FOR REAL-TIME TODAY VIEW)
+// ============================================================
+function getLimbsAtJD(jd) {
+    const e = elongation(jd);
+    const m = siderealMoon(jd);
+    const ya = yogaAngle(jd);
+
+    const tithiNo = Math.floor(e / 12) + 1; // 1-30
+    const paksha = tithiNo <= 15 ? "Shukla" : "Krishna";
+    const pakshaKn = tithiNo <= 15 ? "ಶುಕ್ಲ ಪಕ್ಷ" : "ಕೃಷ್ಣ ಪಕ್ಷ";
+    let tithiName, tithiNameKn;
+    if (tithiNo === 15) { tithiName = "Purnima"; tithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
+    else if (tithiNo === 30) { tithiName = "Amavasya"; tithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
+    else { const idx = (tithiNo - 1) % 15; tithiName = TITHI_EN[idx]; tithiNameKn = TITHI_KN[idx]; }
+    const tithiStart = prevBoundary(jd, elongation, 12);
+    const tithiEnd = nextBoundary(jd, elongation, 12);
+
+    const nakIdx = Math.floor(m / (360 / 27));
+    const pada = Math.min(4, Math.floor((m % (360 / 27)) / (360 / 108)) + 1);
+    const nakStart = prevBoundary(jd, siderealMoon, 360 / 27);
+    const nakEnd = nextBoundary(jd, siderealMoon, 360 / 27);
+
+    const yogaIdx = Math.floor(ya / (360 / 27));
+    const yogaEnd = nextBoundary(jd, yogaAngle, 360 / 27);
+
+    const kNo = Math.floor(e / 6) + 1;
+    const karanaEnd = nextBoundary(jd, elongation, 6);
+
+    return {
+        elongation: e,
+        tithi: { no: tithiNo, name: tithiName, nameKn: tithiNameKn, paksha, pakshaKn, startJD: tithiStart, endJD: tithiEnd },
+        nakshatra: { idx: nakIdx, name: NAK_EN[nakIdx], nameKn: NAK_KN[nakIdx], pada, startJD: nakStart, endJD: nakEnd },
+        yoga: { idx: yogaIdx, name: YOGA_EN[yogaIdx], endJD: yogaEnd, inauspicious: INAUSPICIOUS_YOGAS.includes(yogaIdx) },
+        karana: { name: karanaName(kNo), endJD: karanaEnd, isVishti: karanaName(kNo) === "Vishti" }
+    };
+}
+
+// ============================================================
 //  UI RENDERING
 // ============================================================
 function renderPanchanga(p) {
@@ -2670,30 +2708,57 @@ function renderPanchanga(p) {
         return timeStr;
     };
 
+    // If viewing TODAY, evaluate Tithi, Nakshatra, Yoga, Karana & Moon Phase at the EXACT current time (Date.now())
+    // so completed morning Tithis are replaced by the currently active Tithi right now.
+    const nowDt = new Date();
+    const isViewingToday = (p.year === nowDt.getFullYear() && p.month === (nowDt.getMonth() + 1) && p.day === nowDt.getDate());
+    const nowJD = (Date.now() / 86400000) + 2440587.5;
+    const liveLimbs = isViewingToday ? getLimbsAtJD(nowJD) : null;
+    const activeTithi = liveLimbs ? liveLimbs.tithi : p.tithi;
+    const activeNak = liveLimbs ? liveLimbs.nakshatra : p.nakshatra;
+    const activeYoga = liveLimbs ? liveLimbs.yoga : p.yoga;
+    const activeKarana = liveLimbs ? liveLimbs.karana : p.karana;
+    const activeElong = liveLimbs ? liveLimbs.elongation : p.elongation;
+
+    if (isViewingToday) {
+        window._activeLimbEndJD = Math.min(
+            activeTithi.endJD || Infinity,
+            activeNak.endJD || Infinity,
+            activeYoga.endJD || Infinity,
+            activeKarana.endJD || Infinity
+        );
+    } else {
+        window._activeLimbEndJD = null;
+    }
+
     // Header
     document.getElementById('hdrSamvatsara').textContent = `${p.samvatsara.name} ನಾಮ ಸಂವತ್ಸರ`;
-    document.getElementById('hdrContext').textContent = `${p.ayana.en} · ${p.ritu} Ritu · ${p.masa.en} Masa · ${p.tithi.paksha} Paksha · Shaka ${p.samvatsara.shaka}`;
+    document.getElementById('hdrContext').textContent = `${p.ayana.en} · ${p.ritu} Ritu · ${p.masa.en} Masa · ${activeTithi.paksha} Paksha · Shaka ${p.samvatsara.shaka}`;
     const dateObj = new Date(p.year, p.month - 1, p.day);
     document.getElementById('hdrDate').textContent = dateObj.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('hdrWeekday').textContent = `${p.vara.kn} · ${p.tithi.pakshaKn} · ${p.tithi.nameKn}`;
+    document.getElementById('hdrWeekday').textContent = `${p.vara.kn} · ${activeTithi.pakshaKn} · ${activeTithi.nameKn}`;
 
     // Glance Card
     const isKn = document.body.dataset.lang === 'kn';
-    const tithiStartStr = fmtWithDay(p.tithi.startJD);
-    const tithiEndStr = fmtWithDay(p.tithi.endJD);
-    document.getElementById('glTithi').innerHTML = `<div>${isKn ? p.tithi.pakshaKn + ' ' + p.tithi.nameKn : p.tithi.paksha + ' ' + p.tithi.name}</div><div style="font-size:0.7rem;color:var(--text-dim);font-weight:normal;margin-top:3px;line-height:1.4;">🟢 ${isKn ? 'ಪ್ರಾರಂಭ' : 'Start'}: <span style="color:var(--text);font-weight:500;">${tithiStartStr}</span><br>🔴 ${isKn ? 'ಅಂತ್ಯ' : 'End'}: <span style="color:var(--text);font-weight:500;">${tithiEndStr}</span></div>`;
+    const tithiStartStr = fmtWithDay(activeTithi.startJD);
+    const tithiEndStr = fmtWithDay(activeTithi.endJD);
+    let udayaNoteHtml = '';
+    if (isViewingToday && p.tithi.no !== activeTithi.no) {
+        udayaNoteHtml = `<div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px;opacity:0.85;">☀️ ${isKn ? 'ಉದಯ ತಿಥಿ (ಮುಕ್ತಾಯ)' : 'Sunrise Tithi (Completed)'}: ${isKn ? p.tithi.nameKn : p.tithi.name} (${fmtWithDay(p.tithi.endJD)})</div>`;
+    }
+    document.getElementById('glTithi').innerHTML = `<div>${isKn ? activeTithi.pakshaKn + ' ' + activeTithi.nameKn : activeTithi.paksha + ' ' + activeTithi.name}</div><div style="font-size:0.7rem;color:var(--text-dim);font-weight:normal;margin-top:3px;line-height:1.4;">🟢 ${isKn ? 'ಪ್ರಾರಂಭ' : 'Start'}: <span style="color:var(--text);font-weight:500;">${tithiStartStr}</span><br>🔴 ${isKn ? 'ಅಂತ್ಯ' : 'End'}: <span style="color:var(--text);font-weight:500;">${tithiEndStr}</span>${udayaNoteHtml}</div>`;
     
-    const syllable = NAK_SYLLABLES[p.nakshatra.idx][p.nakshatra.pada - 1];
-    document.getElementById('glNak').innerHTML = `${isKn ? p.nakshatra.nameKn : p.nakshatra.name} <span style="font-size:0.75rem;color:var(--gold);">P${p.nakshatra.pada} (${syllable})</span>`;
-    document.getElementById('glYoga').textContent = (isKn ? p.yoga.name : p.yoga.name) + (p.yoga.inauspicious ? ' ⚠️' : ' ✓');
-    document.getElementById('glKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️' : ' ✓');
+    const syllable = NAK_SYLLABLES[activeNak.idx][activeNak.pada - 1];
+    document.getElementById('glNak').innerHTML = `${isKn ? activeNak.nameKn : activeNak.name} <span style="font-size:0.75rem;color:var(--gold);">P${activeNak.pada} (${syllable})</span>`;
+    document.getElementById('glYoga').textContent = (isKn ? activeYoga.name : activeYoga.name) + (activeYoga.inauspicious ? ' ⚠️' : ' ✓');
+    document.getElementById('glKarana').textContent = activeKarana.name + (activeKarana.isVishti ? ' ⚠️' : ' ✓');
     // Quick verdict
     let vScore = 0;
-    const tInPaksha = p.tithi.no <= 15 ? p.tithi.no : p.tithi.no - 15;
-    if (![4,8,9,14].includes(tInPaksha) && p.tithi.no !== 30) vScore++; // FIXED: check within-paksha
-    if (GOOD_NAK.includes(p.nakshatra.idx)) vScore++;
-    if (!INAUSPICIOUS_YOGAS.includes(p.yoga.idx)) vScore++;
-    if (!p.karana.isVishti) vScore++;
+    const tInPaksha = activeTithi.no <= 15 ? activeTithi.no : activeTithi.no - 15;
+    if (![4,8,9,14].includes(tInPaksha) && activeTithi.no !== 30) vScore++; // FIXED: check within-paksha
+    if (GOOD_NAK.includes(activeNak.idx)) vScore++;
+    if (!INAUSPICIOUS_YOGAS.includes(activeYoga.idx)) vScore++;
+    if (!activeKarana.isVishti) vScore++;
     if ([1,3,4,5].includes(p.wd)) vScore++;
     const vEl = document.getElementById('glVerdict');
     if (vScore >= 4) { vEl.textContent = '✅ Highly Auspicious Day'; vEl.style.background = 'rgba(34,197,94,0.15)'; vEl.style.color = 'var(--green)'; }
@@ -2715,19 +2780,19 @@ function renderPanchanga(p) {
     document.getElementById('valMoonRashi').textContent = `${p.moonRashi.en} · ${p.moonRashi.kn}`;
 
     // Five Limbs
-    document.getElementById('valTithi').textContent = `${p.tithi.paksha} ${p.tithi.name}`;
-    document.getElementById('valTithiKn').textContent = `${p.tithi.pakshaKn} ${p.tithi.nameKn}`;
+    document.getElementById('valTithi').textContent = `${activeTithi.paksha} ${activeTithi.name}`;
+    document.getElementById('valTithiKn').textContent = `${activeTithi.pakshaKn} ${activeTithi.nameKn}`;
     document.getElementById('valTithiTime').textContent = `Starts: ${tithiStartStr} · Ends: ${tithiEndStr}`;
 
-    document.getElementById('valNak').textContent = `${p.nakshatra.name} (Pada ${p.nakshatra.pada})`;
-    document.getElementById('valNakKn').textContent = p.nakshatra.nameKn;
-    document.getElementById('valNakTime').textContent = `Ends: ${fmt(p.nakshatra.endJD)}`;
+    document.getElementById('valNak').textContent = `${activeNak.name} (Pada ${activeNak.pada})`;
+    document.getElementById('valNakKn').textContent = activeNak.nameKn;
+    document.getElementById('valNakTime').textContent = `Ends: ${fmtWithDay(activeNak.endJD)}`;
 
-    document.getElementById('valYoga').textContent = p.yoga.name + (p.yoga.inauspicious ? ' ⚠️' : '');
-    document.getElementById('valYogaTime').textContent = `Ends: ${fmt(p.yoga.endJD)}`;
+    document.getElementById('valYoga').textContent = activeYoga.name + (activeYoga.inauspicious ? ' ⚠️' : '');
+    document.getElementById('valYogaTime').textContent = `Ends: ${fmtWithDay(activeYoga.endJD)}`;
 
-    document.getElementById('valKarana').textContent = p.karana.name + (p.karana.isVishti ? ' ⚠️ Bhadra' : '');
-    document.getElementById('valKaranaTime').textContent = `Ends: ${fmt(p.karana.endJD)}`;
+    document.getElementById('valKarana').textContent = activeKarana.name + (activeKarana.isVishti ? ' ⚠️ Bhadra' : '');
+    document.getElementById('valKaranaTime').textContent = `Ends: ${fmtWithDay(activeKarana.endJD)}`;
 
     document.getElementById('valVara').textContent = p.vara.en;
     document.getElementById('valVaraKn').textContent = p.vara.kn;
@@ -3199,7 +3264,7 @@ function renderPanchanga(p) {
     generateRashifal(rashiToUse, grahas, p);
 
     // --- MOON PHASE & LIVE STATUS ---
-    updateMoonPhaseDisplay(p);
+    updateMoonPhaseDisplay({ ...p, tithi: activeTithi, elongation: activeElong });
     updateLiveMuhurthaBanner();
 
     // --- RESTORE SAVED VIEW ---
@@ -4799,6 +4864,13 @@ let cachedVarjyamData = null;
 
 function updateLiveNowIndicators() {
     const nowJD = (Date.now() / 86400000) + 2440587.5;
+
+    // Auto-refresh Today's Panchanga if the active Tithi/Nakshatra/Yoga/Karana boundary has just crossed
+    if (window._activeLimbEndJD && nowJD >= window._activeLimbEndJD && typeof lastPanchanga !== 'undefined' && lastPanchanga) {
+        window._activeLimbEndJD = null;
+        renderPanchanga(lastPanchanga);
+        return;
+    }
 
     // --- HORA ---
     let horaDataCache = [];
