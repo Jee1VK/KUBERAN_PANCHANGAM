@@ -2507,6 +2507,7 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
     if (tithiNo === 15) { tithiName = "Purnima"; tithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
     else if (tithiNo === 30) { tithiName = "Amavasya"; tithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
     else { const idx = (tithiNo - 1) % 15; tithiName = TITHI_EN[idx]; tithiNameKn = TITHI_KN[idx]; }
+    const tithiStart = isFast ? null : prevBoundary(riseJD, elongation, 12);
     const tithiEnd = isFast ? null : nextBoundary(riseJD, elongation, 12);
 
     // Nakshatra
@@ -2623,7 +2624,7 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
 
     return {
         sunrise: riseJD, sunset: setJD, tzOff,
-        tithi: { no: tithiNo, name: tithiName, nameKn: tithiNameKn, paksha, pakshaKn, endJD: tithiEnd },
+        tithi: { no: tithiNo, name: tithiName, nameKn: tithiNameKn, paksha, pakshaKn, startJD: tithiStart, endJD: tithiEnd },
         nakshatra: { idx: nakIdx, name: NAK_EN[nakIdx], nameKn: NAK_KN[nakIdx], pada, endJD: nakEnd },
         yoga: { idx: yogaIdx, name: YOGA_EN[yogaIdx], endJD: yogaEnd, inauspicious: INAUSPICIOUS_YOGAS.includes(yogaIdx) },
         karana: { name: karanaName(kNo), endJD: karanaEnd, isVishti: karanaName(kNo) === "Vishti" },
@@ -2655,6 +2656,19 @@ function renderPanchanga(p) {
     if (!p) return;
     const tz = p.tzOff;
     const fmt = (jd) => jdToLocalTimeStr(jd, tz);
+    const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const fmtWithDay = (jd) => {
+        if (!jd) return '—';
+        const tzVal = (typeof tz === 'string') ? getTzOffset(tz) : (typeof tz === 'number' && !isNaN(tz) ? tz : 5.5);
+        const locDt = jdToDate(jd + tzVal / 24);
+        const ampm = locDt.hour >= 12 ? 'PM' : 'AM';
+        const h12 = locDt.hour === 0 ? 12 : (locDt.hour > 12 ? locDt.hour - 12 : locDt.hour);
+        const timeStr = `${pad2(h12)}:${pad2(locDt.minute)} ${ampm}`;
+        if (locDt.year !== p.year || locDt.month !== p.month || locDt.day !== p.day) {
+            return `${timeStr} (${SHORT_MONTHS[(locDt.month - 1 + 12) % 12]} ${locDt.day})`;
+        }
+        return timeStr;
+    };
 
     // Header
     document.getElementById('hdrSamvatsara').textContent = `${p.samvatsara.name} ನಾಮ ಸಂವತ್ಸರ`;
@@ -2665,7 +2679,9 @@ function renderPanchanga(p) {
 
     // Glance Card
     const isKn = document.body.dataset.lang === 'kn';
-    document.getElementById('glTithi').innerHTML = `${isKn ? p.tithi.pakshaKn+' '+p.tithi.nameKn : p.tithi.paksha+' '+p.tithi.name} <span style="font-size:0.7rem;color:var(--text-dim);">till ${fmt(p.tithi.endJD)}</span>`;
+    const tithiStartStr = fmtWithDay(p.tithi.startJD);
+    const tithiEndStr = fmtWithDay(p.tithi.endJD);
+    document.getElementById('glTithi').innerHTML = `<div>${isKn ? p.tithi.pakshaKn + ' ' + p.tithi.nameKn : p.tithi.paksha + ' ' + p.tithi.name}</div><div style="font-size:0.7rem;color:var(--text-dim);font-weight:normal;margin-top:3px;line-height:1.4;">🟢 ${isKn ? 'ಪ್ರಾರಂಭ' : 'Start'}: <span style="color:var(--text);font-weight:500;">${tithiStartStr}</span><br>🔴 ${isKn ? 'ಅಂತ್ಯ' : 'End'}: <span style="color:var(--text);font-weight:500;">${tithiEndStr}</span></div>`;
     
     const syllable = NAK_SYLLABLES[p.nakshatra.idx][p.nakshatra.pada - 1];
     document.getElementById('glNak').innerHTML = `${isKn ? p.nakshatra.nameKn : p.nakshatra.name} <span style="font-size:0.75rem;color:var(--gold);">P${p.nakshatra.pada} (${syllable})</span>`;
@@ -2701,7 +2717,7 @@ function renderPanchanga(p) {
     // Five Limbs
     document.getElementById('valTithi').textContent = `${p.tithi.paksha} ${p.tithi.name}`;
     document.getElementById('valTithiKn').textContent = `${p.tithi.pakshaKn} ${p.tithi.nameKn}`;
-    document.getElementById('valTithiTime').textContent = `Ends: ${fmt(p.tithi.endJD)}`;
+    document.getElementById('valTithiTime').textContent = `Starts: ${tithiStartStr} · Ends: ${tithiEndStr}`;
 
     document.getElementById('valNak').textContent = `${p.nakshatra.name} (Pada ${p.nakshatra.pada})`;
     document.getElementById('valNakKn').textContent = p.nakshatra.nameKn;
