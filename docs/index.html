@@ -3145,21 +3145,31 @@ function renderPanchanga(p) {
     }).join('');
 
     // --- GOCHARA (Transit Analysis) ---
-    // Check if user has generated a Jathaka to get their birth Moon Rashi
+    // Check if user has generated a Jathaka or saved a Family Profile to get their birth Moon Rashi
     const gocharaCard = document.getElementById('gocharaCard');
     const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    const savedFamProfiles = (typeof getFamilyProfiles === 'function') ? getFamilyProfiles() : [];
+    let gocharaPersonName = null;
+    let birthMoonRashiIdx = null;
     if (history.length > 0) {
-        // Use the most recent Jathaka's birth data to determine natal Moon
         const latest = history[0];
         const birthDob = new Date(latest.dobStrRaw);
-        const bJd = julianDay(birthDob.getFullYear(), birthDob.getMonth() + 1, birthDob.getDate(),
-            birthDob.getHours() + birthDob.getMinutes() / 60 + (birthDob.getTimezoneOffset() / 60));
+        const y = birthDob.getFullYear(), m = birthDob.getMonth() + 1, day = birthDob.getDate();
+        const hours = birthDob.getHours() + birthDob.getMinutes() / 60;
+        const tzOffHrs = getTzOffset(latest.tz || 'Asia/Kolkata', y, m, day);
+        const bJd = julianDay(y, m, day, hours - tzOffHrs);
         const birthMoonLon = siderealMoon(bJd);
-        const birthMoonRashiIdx = Math.floor(birthMoonLon / 30);
-
+        birthMoonRashiIdx = Math.floor(birthMoonLon / 30);
+        gocharaPersonName = latest.name;
+    } else if (savedFamProfiles.length > 0) {
+        const firstProf = savedFamProfiles[0];
+        birthMoonRashiIdx = Math.max(0, Math.min(11, parseInt(firstProf.rashi, 10) || 0));
+        gocharaPersonName = firstProf.name;
+    }
+    if (gocharaPersonName !== null && birthMoonRashiIdx !== null) {
         gocharaCard.style.display = 'block';
         document.getElementById('gocharaBirthInfo').textContent =
-            `(${latest.name} — Janma Rashi: ${RASHI_EN[birthMoonRashiIdx]})`;
+            `(${gocharaPersonName} — Janma Rashi: ${RASHI_EN[birthMoonRashiIdx]})`;
 
         // Gochara favourability table
         const GOCHARA_FAV = {
@@ -3560,19 +3570,7 @@ function matchFestivals(p, pYesterday) {
 let lastPanchanga = null;
 
 function shareDailyPanchangam() {
-    if (!lastPanchanga) { alert("Compute today's panchangam first."); return; }
-    const p = lastPanchanga;
-    const tz = p.tzOff;
-    const fmt = (jd) => jdToLocalTimeStr(jd, tz);
-    const dateStr = `${p.day}/${p.month}/${p.year}`;
-    const amritStr = (p.amritKalam && p.amritKalam.length > 0) ? p.amritKalam.map(w => fmt(w.start) + '–' + fmt(w.end)).join(', ') : 'N/A';
-    const text = `*Kuberan Panchangam*\n📅 ${dateStr}\n${p.samvatsara.name} · ${p.masa.en} ${p.tithi.paksha} · ${p.ritu}\n\n☀️ Sunrise: ${fmt(p.sunrise)} | Sunset: ${fmt(p.sunset)}\n\n🔸 Tithi: ${p.tithi.paksha} ${p.tithi.name} (until ${fmt(p.tithi.endJD)})\n⭐ Nakshatra: ${p.nakshatra.name} (until ${fmt(p.nakshatra.endJD)})\n🔹 Yoga: ${p.yoga.name} (until ${fmt(p.yoga.endJD)})\n📐 Karana: ${p.karana.name}\n📆 Vara: ${p.vara.en}\n\n⚠️ Rahu Kala: ${fmt(p.rahu.start)}–${fmt(p.rahu.end)}\n⚠️ Yamaganda: ${fmt(p.yama.start)}–${fmt(p.yama.end)}\n✅ Abhijit: ${fmt(p.abhijit.start)}–${fmt(p.abhijit.end)}\n🍯 Amrit Kalam: ${amritStr}\n\nhttps://jee1vk.github.io/KUBERAN_PANCHANGAM/`;
-
-    if (navigator.share) {
-        navigator.share({ title: `Panchangam ${dateStr}`, text }).catch(() => {});
-    } else {
-        navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
-    }
+    shareTodayPanchanga();
 }
 
 // ============================================================
@@ -3978,6 +3976,9 @@ function loadJathakaFromHistory(idx) {
         document.getElementById('jLat').value = history[idx].lat;
         document.getElementById('jLon').value = history[idx].lon;
         document.getElementById('jTz').value = history[idx].tz;
+        if (history[idx].cityName && document.getElementById('jCityName')) {
+            document.getElementById('jCityName').textContent = history[idx].cityName;
+        }
         generateJathaka();
     }
 }
@@ -4787,9 +4788,10 @@ function generateJathaka() {
             let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
             // Remove exact duplicate if re-generating
             history = history.filter(h => !(h.name === name && h.dobStrRaw === dobStrRaw));
+            const cityName = document.getElementById('jCityName')?.textContent || 'Bengaluru, India';
             history.unshift({
                 timestamp: Date.now(),
-                name, dobStrRaw, dobStr: dobLocaleStr, lat, lon, tz, nakName, pada
+                name, dobStrRaw, dobStr: dobLocaleStr, lat, lon, tz, cityName, nakName, pada
             });
             // Keep max 20
             if(history.length > 20) history.pop();
@@ -5245,7 +5247,8 @@ function switchDailyView(mode) {
     document.querySelectorAll('.detailed-only').forEach(el => {
         if (el.id === 'gocharaCard') {
             const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
-            el.style.display = (isDetailed && history.length > 0) ? 'block' : 'none';
+            const fam = (typeof getFamilyProfiles === 'function') ? getFamilyProfiles() : [];
+            el.style.display = (isDetailed && (history.length > 0 || fam.length > 0)) ? 'block' : 'none';
         } else {
             el.style.display = isDetailed ? '' : 'none';
         }
@@ -5372,15 +5375,25 @@ function shareTodayPanchanga() {
     const fmt = (jd) => jdToLocalTimeStr(jd, p.tzOff);
     const dateObj = new Date(p.year, p.month - 1, p.day);
     const dateStr = dateObj.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    const nowInit = new Date();
+    const isViewingToday = (p.year === nowInit.getFullYear() && p.month === (nowInit.getMonth() + 1) && p.day === nowInit.getDate());
+    const nowJD = (Date.now() / 86400000) + 2440587.5;
+    const liveLimbs = (isViewingToday && typeof getLimbsAtJD === 'function') ? getLimbsAtJD(nowJD) : null;
+    const activeTithi = liveLimbs ? liveLimbs.tithi : p.tithi;
+    const activeNak = liveLimbs ? liveLimbs.nakshatra : p.nakshatra;
+    const activeYoga = liveLimbs ? liveLimbs.yoga : p.yoga;
+    const activeKarana = liveLimbs ? liveLimbs.karana : p.karana;
+    const tithiSpanStr = activeTithi.startJD ? `(${fmt(activeTithi.startJD)} to ${fmt(activeTithi.endJD)})` : `till ${fmt(activeTithi.endJD)}`;
     
     const text = `🕉️ *KUBERAN PANCHANGAM* 🕉️\n` +
         `📅 *${dateStr}*` +
         `\n🏛️ *${p.samvatsara.name} ನಾಮ ಸಂವತ್ಸರ* · ${p.ayana.en} · ${p.masa.en} (${p.masa.kn})\n\n` +
         `✨ *Five Limbs of the Day (ಪಂಚಾಂಗ):*\n` +
-        `• *Tithi:* ${p.tithi.paksha} ${p.tithi.name} (${p.tithi.nameKn}) till ${fmt(p.tithi.endJD)}\n` +
-        `• *Nakshatra:* ${p.nakshatra.name} (${p.nakshatra.nameKn}) Pada ${p.nakshatra.pada}\n` +
-        `• *Yoga:* ${p.yoga.name}\n` +
-        `• *Karana:* ${p.karana.name}\n\n` +
+        `• *Tithi:* ${activeTithi.paksha} ${activeTithi.name} (${activeTithi.nameKn}) ${tithiSpanStr}\n` +
+        `• *Nakshatra:* ${activeNak.name} (${activeNak.nameKn}) Pada ${activeNak.pada} till ${fmt(activeNak.endJD)}\n` +
+        `• *Yoga:* ${activeYoga.name} till ${fmt(activeYoga.endJD)}\n` +
+        `• *Karana:* ${activeKarana.name} till ${fmt(activeKarana.endJD)}\n\n` +
         `⏱️ *Auspicious Windows (ಶುಭ ಮುಹೂರ್ತ):*\n` +
         `• *Abhijit Muhurtha:* ${fmt(p.abhijit.start)} – ${fmt(p.abhijit.end)}\n` +
         (p.amritKalam && p.amritKalam[0] ? `• *Amrit Kalam:* ${fmt(p.amritKalam[0].start)} – ${fmt(p.amritKalam[0].end)}\n` : '') +
@@ -6282,31 +6295,43 @@ function scanDates() {
 // ============================================================
 function updateMuhurthaPersonalized() {
     const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
-    if (history.length === 0) return;
+    const savedFam = (typeof getFamilyProfiles === 'function') ? getFamilyProfiles() : [];
+    if (history.length === 0 && savedFam.length === 0) return;
+    if (history.length === 0 && savedFam.length > 0) {
+        evaluateFamilyMemberToday(savedFam[0].id);
+        return;
+    }
     const latest = history[0];
     const loc = getLocation();
     const now = new Date();
     const p = computePanchanga(now.getFullYear(), now.getMonth() + 1, now.getDate(), loc.lat, loc.lon, loc.tz);
     if (!p) return;
     const birthDob = new Date(latest.dobStrRaw);
-    const bJd = julianDay(birthDob.getFullYear(), birthDob.getMonth() + 1, birthDob.getDate(),
-        birthDob.getHours() + birthDob.getMinutes() / 60 + (birthDob.getTimezoneOffset() / 60));
+    const y = birthDob.getFullYear(), m = birthDob.getMonth() + 1, day = birthDob.getDate();
+    const hours = birthDob.getHours() + birthDob.getMinutes() / 60;
+    const tzOffHrs = getTzOffset(latest.tz || 'Asia/Kolkata', y, m, day);
+    const bJd = julianDay(y, m, day, hours - tzOffHrs);
     const birthMoonLon = siderealMoon(bJd);
     const birthNakIdx = Math.floor(birthMoonLon / (360 / 27));
     const birthMoonRashiIdx = Math.floor(birthMoonLon / 30);
+
+    const nowJD = (Date.now() / 86400000) + 2440587.5;
+    const liveLimbs = (typeof getLimbsAtJD === 'function') ? getLimbsAtJD(nowJD) : null;
+    const activeNak = liveLimbs ? liveLimbs.nakshatra : p.nakshatra;
+
     // Tarabalam
-    const todayNakIdx = p.nakshatra.idx;
+    const todayNakIdx = activeNak.idx;
     const taraCycle = ((todayNakIdx - birthNakIdx + 27) % 27) % 9;
     const TARA_FULL = ['Janma (Birth)','Sampat (Wealth)','Vipat (Danger)','Kshema (Prosperity)','Pratyak (Obstacle)','Sadhaka (Achievement)','Nidhana (Death)','Mitra (Friend)','Parama Mitra (Best Friend)'];
     const isGoodTara = [1,3,5,7,8].includes(taraCycle);
     document.getElementById('tarabalamCard').style.display = 'block';
-    document.getElementById('tarabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodTara?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodTara?'✅':'⚠️'}</div><div><div style="font-weight:700;">${TARA_FULL[taraCycle]}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${NAK_EN[birthNakIdx]} → Today: ${p.nakshatra.name} (Tara ${taraCycle+1}/9)</div><div style="font-size:0.8rem;margin-top:4px;${isGoodTara?'color:var(--green);':'color:var(--red);'}">${isGoodTara?'Favourable for activities':'Avoid starting important work'}</div></div></div>`;
+    document.getElementById('tarabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodTara?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodTara?'✅':'⚠️'}</div><div><div style="font-weight:700;">${latest.name} — ${TARA_FULL[taraCycle]}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${NAK_EN[birthNakIdx]} → Active Now: ${activeNak.name} (Tara ${taraCycle+1}/9)</div><div style="font-size:0.8rem;margin-top:4px;${isGoodTara?'color:var(--green);':'color:var(--red);'}">${isGoodTara?'Favourable for activities':'Avoid starting important work'}</div></div></div>`;
     // Chandrabalam
-    const todayMoonRashiIdx = Math.floor(siderealMoon(p.sunrise) / 30);
+    const todayMoonRashiIdx = Math.floor(siderealMoon(nowJD) / 30);
     const chandraHouse = ((todayMoonRashiIdx - birthMoonRashiIdx + 12) % 12) + 1;
     const isGoodChandra = [1,3,6,7,10,11].includes(chandraHouse);
     document.getElementById('chandrabalamCard').style.display = 'block';
-    document.getElementById('chandrabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodChandra?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodChandra?'🌙':'🌑'}</div><div><div style="font-weight:700;">Moon in House ${chandraHouse}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${RASHI_EN[birthMoonRashiIdx]} → Today: ${RASHI_EN[todayMoonRashiIdx]}</div><div style="font-size:0.8rem;margin-top:4px;${isGoodChandra?'color:var(--green);':'color:var(--red);'}">${isGoodChandra?'Chandrabalam strong — auspicious':'Chandrabalam weak — caution'}</div></div></div>`;
+    document.getElementById('chandrabalamResult').innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;${isGoodChandra?'background:rgba(34,197,94,0.15);border:1px solid var(--green);':'background:rgba(239,68,68,0.15);border:1px solid var(--red);'}"><div style="font-size:2rem;">${isGoodChandra?'🌙':'🌑'}</div><div><div style="font-weight:700;">${latest.name} — Moon in House ${chandraHouse}</div><div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${RASHI_EN[birthMoonRashiIdx]} → Active Now: ${RASHI_EN[todayMoonRashiIdx]}</div><div style="font-size:0.8rem;margin-top:4px;${isGoodChandra?'color:var(--green);':'color:var(--red);'}">${isGoodChandra?'Chandrabalam strong — auspicious':'Chandrabalam weak — caution'}</div></div></div>`;
 }
 
 // ============================================================
@@ -7189,8 +7214,8 @@ function drawKuberanCardFrame(ctx, W, H, subtitleEn, subtitleKn) {
 function shareOrDownloadCanvas(canvas, filename, titleText) {
     canvas.toBlob(async (blob) => {
         if (!blob) return;
-        const file = new File([blob], filename, { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        const file = (typeof File !== 'undefined') ? new File([blob], filename, { type: 'image/png' }) : null;
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
                     title: titleText,
@@ -7228,8 +7253,24 @@ function exportPanchangaImageCard() {
 
     const dateInputVal = document.getElementById('dateInput')?.value || '';
     const locName = document.getElementById('locationName')?.textContent || 'Bengaluru, India';
-    const samvatsaraStr = `${p.samvatsara.name} Samvatsara • ${p.ayana.name} • ${p.ritu.name}`;
-    const samvatsaraKn = `${p.samvatsara.nameKn} ಸಂವತ್ಸರ • ${p.ayana.nameKn} • ${p.masa.nameKn} ಮಾಸ`;
+    const nowInit = new Date();
+    const isViewingToday = (p.year === nowInit.getFullYear() && p.month === (nowInit.getMonth() + 1) && p.day === nowInit.getDate());
+    const nowJD = (Date.now() / 86400000) + 2440587.5;
+    const liveLimbs = (isViewingToday && typeof getLimbsAtJD === 'function') ? getLimbsAtJD(nowJD) : null;
+    const activeTithi = liveLimbs ? liveLimbs.tithi : p.tithi;
+    const activeNak = liveLimbs ? liveLimbs.nakshatra : p.nakshatra;
+    const activeYoga = liveLimbs ? liveLimbs.yoga : p.yoga;
+    const activeKarana = liveLimbs ? liveLimbs.karana : p.karana;
+
+    const ayanaEn = p.ayana.en || p.ayana.name || '';
+    const ayanaKn = p.ayana.kn || p.ayana.nameKn || '';
+    const rituEn = (typeof p.ritu === 'string') ? p.ritu : (p.ritu?.en || p.ritu?.name || '');
+    const masaEn = p.masa.en || p.masa.name || '';
+    const masaKn = p.masa.kn || p.masa.nameKn || '';
+    const varaEn = p.vara.en || p.vara.name || '';
+    const varaKn = p.vara.kn || p.vara.nameKn || '';
+    const samvatsaraStr = `${p.samvatsara.name} Samvatsara • ${ayanaEn} • ${rituEn} Ritu`;
+    const samvatsaraKn = `${p.samvatsara.name} ನಾಮ ಸಂವತ್ಸರ • ${ayanaKn} • ${masaKn} ಮಾಸ`;
 
     drawKuberanCardFrame(ctx, W, H, `${dateInputVal}  |  ${locName}`, samvatsaraKn);
 
@@ -7240,16 +7281,20 @@ function exportPanchangaImageCard() {
     ctx.strokeRect(60, 206, W - 120, 64);
     ctx.textAlign = 'center';
     ctx.fillStyle = '#f5c842';
-    ctx.font = 'bold 22px Inter, Segoe UI, sans-serif';
-    ctx.fillText(`${samvatsaraStr} • ${p.masa.isAdhika ? 'Adhika ' : ''}${p.masa.name} Masa`, W / 2, 246);
+    ctx.font = 'bold 21px Inter, Segoe UI, sans-serif';
+    ctx.fillText(`${samvatsaraStr} • ${masaEn} Masa`, W / 2, 246);
+
+    const tithiTimeSpan = activeTithi.startJD
+        ? `${jdToLocalTimeStr(activeTithi.startJD, p.tzOff)} – ${jdToLocalTimeStr(activeTithi.endJD, p.tzOff)}`
+        : `till ${jdToLocalTimeStr(activeTithi.endJD, p.tzOff)}`;
 
     // Panchanga 5 Limbs Rows
     const rows = [
-        ['📅 Vara (Weekday / ವಾರ)', `${p.vara.name} (${p.vara.nameKn})`],
-        ['🌙 Tithi (Lunar Day / ತಿಥಿ)', `${p.tithi.paksha} ${p.tithi.name} (${p.tithi.nameKn})`],
-        ['⭐ Nakshatra (Star / ನಕ್ಷತ್ರ)', `${p.nakshatra.name} (${p.nakshatra.nameKn}) — Pada ${p.nakshatra.pada}`],
-        ['🧘 Yoga (ಯೋಗ)', `${p.yoga.name} (${p.yoga.nameKn})`],
-        ['⚡ Karana (ಕರಣ)', `${p.karana.name} (${p.karana.nameKn})`],
+        ['📅 Vara (Weekday / ವಾರ)', `${varaEn} (${varaKn})`],
+        ['🌙 Tithi (Lunar Day / ತಿಥಿ)', `${activeTithi.paksha} ${activeTithi.name} (${activeTithi.nameKn}) • ${tithiTimeSpan}`],
+        ['⭐ Nakshatra (Star / ನಕ್ಷತ್ರ)', `${activeNak.name} (${activeNak.nameKn}) — Pada ${activeNak.pada}`],
+        ['🧘 Yoga (ಯೋಗ)', `${activeYoga.name} (till ${jdToLocalTimeStr(activeYoga.endJD, p.tzOff)})`],
+        ['⚡ Karana (ಕರಣ)', `${activeKarana.name} (till ${jdToLocalTimeStr(activeKarana.endJD, p.tzOff)})`],
         ['🌅 Sunrise & Sunset', `☀️ ${jdToLocalTimeStr(p.sunrise, p.tzOff)}   |   🌇 ${jdToLocalTimeStr(p.sunset, p.tzOff)}`],
         ['✨ Abhijit Muhurtha (ಶುಭ ಸಮಯ)', `${jdToLocalTimeStr(p.abhijit.start, p.tzOff)} – ${jdToLocalTimeStr(p.abhijit.end, p.tzOff)}`],
         ['⛔ Rahu Kala (ರಾಹು ಕಾಲ)', `${jdToLocalTimeStr(p.rahu.start, p.tzOff)} – ${jdToLocalTimeStr(p.rahu.end, p.tzOff)}`],
@@ -7748,10 +7793,16 @@ function evaluateFamilyMemberToday(profileId) {
     const p = lastPanchanga || computePanchanga(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), currentLocation.lat, currentLocation.lon, currentLocation.tz);
     if (!p) return;
 
+    const nowInit = new Date();
+    const isViewingToday = (p.year === nowInit.getFullYear() && p.month === (nowInit.getMonth() + 1) && p.day === nowInit.getDate());
+    const evalJD = isViewingToday ? ((Date.now() / 86400000) + 2440587.5) : p.sunrise;
+    const liveLimbs = (isViewingToday && typeof getLimbsAtJD === 'function') ? getLimbsAtJD(evalJD) : null;
+    const activeNak = liveLimbs ? liveLimbs.nakshatra : p.nakshatra;
+
     const birthNak1 = parseInt(prof.nakshatra, 10) || 1;
     const birthRashi0 = parseInt(prof.rashi, 10) || 0;
-    const todayNak1 = p.nakshatra.idx + 1;
-    const todayMoonRashi0 = Math.floor(siderealMoon(p.sunrise) / 30);
+    const todayNak1 = activeNak.idx + 1;
+    const todayMoonRashi0 = Math.floor(siderealMoon(evalJD) / 30);
 
     const taraRes = (typeof calculateTarabala === 'function')
         ? calculateTarabala(birthNak1, todayNak1)
@@ -7768,7 +7819,7 @@ function evaluateFamilyMemberToday(profileId) {
             <div style="font-size:2rem;">${taraRes.auspicious?'✅':'⚠️'}</div>
             <div>
                 <div style="font-weight:700;">${prof.name} (${prof.relation}) — ${taraRes.name} Tara</div>
-                <div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${NAK_EN[birthNak1 - 1]} (${NAK_KN[birthNak1 - 1]}) → Today: ${p.nakshatra.name}</div>
+                <div style="font-size:0.8rem;color:var(--text-dim);">Birth: ${NAK_EN[birthNak1 - 1]} (${NAK_KN[birthNak1 - 1]}) → Active: ${activeNak.name}</div>
                 <div style="font-size:0.8rem;margin-top:4px;${taraRes.auspicious?'color:var(--green);':'color:var(--red);'}">${taraRes.effect}</div>
             </div>
         </div>`;
@@ -7913,7 +7964,17 @@ function renderSavedFamilyProfiles() {
 
     loadJathakaHistory();
     const now = new Date();
-    document.getElementById('dateInput').value = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    const todayYMD = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    document.getElementById('dateInput').value = todayYMD;
+    const scanFromEl = document.getElementById('scanFrom');
+    const scanToEl = document.getElementById('scanTo');
+    const targetDateEl = document.getElementById('targetDate');
+    if (scanFromEl && !scanFromEl.value) scanFromEl.value = todayYMD;
+    if (scanToEl && !scanToEl.value) {
+        const plus30 = new Date(now.getTime() + 30 * 86400000);
+        scanToEl.value = `${plus30.getFullYear()}-${pad2(plus30.getMonth() + 1)}-${pad2(plus30.getDate())}`;
+    }
+    if (targetDateEl && !targetDateEl.value) targetDateEl.value = todayYMD;
     // Try auto-detect silently, then recalculate
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
