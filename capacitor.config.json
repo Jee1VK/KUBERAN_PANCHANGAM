@@ -1,0 +1,16 @@
+{
+  "appId": "com.kuberansilks.panchangam",
+  "appName": "Kuberan Panchangam",
+  "webDir": "docs",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#7b1e2d",
+      "showSpinner": false
+    }
+  }
+}

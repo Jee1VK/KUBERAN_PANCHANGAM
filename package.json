@@ -1,0 +1,30 @@
+{
+  "name": "kuberan_panchangam",
+  "version": "1.0.0",
+  "description": "A comprehensive, offline-first Progressive Web App (PWA) for accurate Vedic astrology and Panchangam calculations. Built entirely in JavaScript with a pure astronomical engine (Meeus/VSOP87 derivatives), it requires no external API calls for calculations.",
+  "main": "bump.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jee1VK/KUBERAN_PANCHANGAM.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jee1VK/KUBERAN_PANCHANGAM/issues"
+  },
+  "homepage": "https://github.com/Jee1VK/KUBERAN_PANCHANGAM#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "^8.6.0"
+  }
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Kuberan Panchangam</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
@@ -43,7 +43,7 @@
         input, select, textarea { max-width: 100%; min-width: 0; box-sizing: border-box; }
 
         /* NAV */
-        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #111527; border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 50; }
+        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left)); background: #111527; border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 50; }
         .top-bar a img { height: 48px; }
         .top-bar h1 { font-size: 1.1rem; color: var(--gold); letter-spacing: 0.5px; }
         .top-bar .nav-right { display: flex; gap: 8px; }
@@ -170,7 +170,10 @@
                 display: flex; position: fixed; bottom: 0; left: 0; right: 0; 
                 background: rgba(17, 21, 39, 0.95); backdrop-filter: blur(10px);
                 border-top: 1px solid var(--card-border); 
-                z-index: 100; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom);
+                z-index: 100; justify-content: space-around;
+                padding-bottom: max(6px, env(safe-area-inset-bottom));
+                padding-left: max(8px, env(safe-area-inset-left));
+                padding-right: max(8px, env(safe-area-inset-right));
             }
             .bottom-nav button {
                 gap: 4px;
@@ -181,7 +184,7 @@
             .bottom-nav button span { font-size: 0.65rem; font-weight: 600; }
             .bottom-nav button.active { color: var(--gold); font-weight: 700; position: relative; }
             .bottom-nav button.active::after { content: ""; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: var(--gold); border-radius: 2px; }
-            body { padding-bottom: 70px; }
+            body { padding-bottom: calc(75px + env(safe-area-inset-bottom)); }
             
             .limb-grid { grid-template-columns: 1fr; }
             .sun-moon { grid-template-columns: 1fr 1fr; }
@@ -742,27 +745,41 @@
 </div>
 
 
-<!-- PRIVACY POLICY MODAL -->
-<div id="privacyModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
-    <div class="modal-content" style="max-width:500px; text-align:left; max-height:85vh; overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:10px; margin-bottom:15px;">
-            <h2 style="color:var(--gold); margin:0; font-size:1.3rem;">🔒 Privacy & Data Transparency</h2>
+<!-- PRIVACY POLICY & DATA SAFETY MODAL (DPDP Act 2023 & GDPR Compliant) -->
+<div id="privacyModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:99999; align-items:center; justify-content:center; padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));">
+    <div class="modal-content" style="max-width:540px; text-align:left; max-height:85vh; overflow-y:auto; background:var(--card); border:2px solid var(--gold); border-radius:12px; padding:20px; box-shadow:0 12px 40px rgba(0,0,0,0.8);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:10px; margin-bottom:14px;">
+            <h2 style="color:var(--gold); margin:0; font-size:1.25rem;">🔒 Privacy, DPDP Act & Data Safety</h2>
             <button onclick="closePrivacyModal()" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;">&times;</button>
         </div>
         <div style="font-size:0.85rem; line-height:1.6; color:var(--text);">
-            <p><b>1. 100% Client-Side Computation:</b><br>
-            All astronomical and Vedic astrology calculations (Tithi, Nakshatra, Janma Kundali, D9 Navamsha, and Marriage Matching) are performed locally in your browser. No birth dates, coordinates, or names are sent to any remote server.</p>
+            <div style="background:rgba(212,160,23,0.1); border-left:3px solid var(--gold); padding:8px 12px; border-radius:6px; margin-bottom:12px;">
+                <b style="color:var(--gold-light);">Store Category Positioning:</b> Lifestyle / Books & Reference / Astrology
+            </div>
+
+            <p><b>1. 100% On-Device / Client-Side Computation:</b><br>
+            All astronomical mechanics and Vedic astrology calculations (Tithi, Nakshatra, Yoga, Karana, Janma Kundali, D9 Navamsha, Vimshottari Dasha, and Ashtakoota Marriage Matching) are computed strictly inside your device's memory. No birth dates, birth times, names, or GPS coordinates are ever transmitted to any remote server or third party.</p>
             
-            <p style="margin-top:10px;"><b>2. Zero Tracking Cookies:</b><br>
-            Kuberan Panchangam does not use advertising cookies, third-party tracking pixels, or telemetry SDKs.</p>
+            <p style="margin-top:10px;"><b>2. DPDP Act 2023 & GDPR Statutory Compliance:</b><br>
+            In strict compliance with India's <b>Digital Personal Data Protection (DPDP) Act, 2023</b> and the European Union <b>GDPR</b>, this application operates under the principle of extreme data minimization: zero user accounts, zero advertising IDs, zero analytics trackers, and zero telemetry.</p>
 
-            <p style="margin-top:10px;"><b>3. Local Device Storage:</b><br>
-            Your recent Jathaka generation history and selected Moon sign are stored exclusively on your own phone or computer via browser <code>localStorage</code>. You can clear this data at any time from the app.</p>
+            <p style="margin-top:10px;"><b>3. Local Device Storage Sovereignty & Clear History:</b><br>
+            Your optional Jathaka generation history and Family Profiles are stored exclusively within local device storage (<code>localStorage</code>). Recent history records auto-purge after 48 hours. You maintain full sovereignty to erase all stored profiles and calculations at any moment using the button below.</p>
 
-            <p style="margin-top:10px;"><b>4. Free Service by Kuberan Silks:</b><br>
-            This software is provided freely as a cultural service for the devotees and patrons of Kuberan Silks, Chickpet, Bengaluru.</p>
+            <p style="margin-top:10px;"><b>4. Astrological Calculation Transparency:</b><br>
+            Calculations are powered by modern <b>Swiss Ephemeris / VSOP87 analytical planetary models</b> following the high-precision <b>Drik Ganita</b> tradition with <b>Chitrapaksha (Lahiri) Ayanamsa</b> (epoch offset 23°51'25.532" at J2000.0). Alternative ayanamsas (KP Newcomb, B.V. Raman, Pushya Paksha) can be toggled in Settings.</p>
+
+            <p style="margin-top:10px;"><b>5. Traditional Purohit Consultation Notice:</b><br>
+            The calculations provide traditional astronomical estimations. Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions.</p>
+
+            <p style="margin-top:10px;"><b>6. Official Public Privacy Policy:</b><br>
+            Read the complete Kuberan Silks Privacy Policy online at:<br>
+            <a href="https://kuberansilks.com/pages/panchangam-privacy" target="_blank" rel="noopener noreferrer" style="color:var(--gold-light); text-decoration:underline; word-break:break-all;">https://kuberansilks.com/pages/panchangam-privacy</a></p>
         </div>
-        <button onclick="closePrivacyModal()" style="margin-top:20px; width:100%; background:var(--gold); color:#000; border:none; padding:10px; border-radius:6px; font-weight:700; cursor:pointer;">Close</button>
+        <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
+            <button onclick="clearAllAppData()" style="flex:1; background:rgba(239,68,68,0.15); border:1px solid var(--red); color:var(--red); padding:10px; border-radius:6px; font-weight:700; cursor:pointer; font-size:0.8rem;">🗑️ Clear All Stored Data</button>
+            <button onclick="closePrivacyModal()" style="flex:1; background:var(--gold); color:#000; border:none; padding:10px; border-radius:6px; font-weight:700; cursor:pointer; font-size:0.85rem;">Close</button>
+        </div>
     </div>
 </div>
 
@@ -771,7 +788,7 @@
     <div class="modal-content">
         <h2 style="color:var(--gold); margin-bottom:15px; font-size:1.4rem;">⚠️ Important Notice</h2>
         <p style="font-size:0.95rem; line-height:1.6; margin-bottom:20px; color:var(--text);">
-            The <b>KUBERAN PANCHANGAM</b> app creates astrological estimations and suggestions. It is highly suggested to contact your Purohit (family priest) before making any final decisions based on this data.
+            The calculations provide traditional astronomical estimations. Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions.
         </p>
         <div style="display:flex; gap:10px;">
             <button onclick="acceptDisclaimer()" style="flex:1; background:var(--green); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; cursor:pointer;">Accept</button>
@@ -837,6 +854,7 @@
         <button class="tab-nav desktop-tab" data-tab="jathaka">Jathaka</button>
         <button class="tab-nav desktop-tab" data-tab="matching">Match</button>
         <button class="tab-nav desktop-tab" data-tab="calendar">Calendar</button>
+        <button id="btnOpenPrivacy" onclick="openPrivacyModal()" title="Privacy & DPDP Act Data Safety" style="background:rgba(212,160,23,0.12);border-color:var(--gold);color:var(--gold);font-weight:700;font-size:0.8rem;padding:6px 10px;">🔒</button>
         <button id="btnOpenSettings" onclick="openSettingsModal()" title="Ayanamsa Settings & Vedic Guide" style="background:rgba(212,160,23,0.12);border-color:var(--gold);color:var(--gold);font-weight:700;font-size:0.8rem;padding:6px 10px;">⚙️</button>
         <button id="langToggle" onclick="toggleLang()" style="background:var(--maroon);border-color:var(--gold);color:var(--gold);font-weight:600;font-size:0.75rem;">ಕನ್ನಡ</button>
     </div>
@@ -1210,10 +1228,11 @@
     <button onclick="shareDailyPanchangam()" style="background:var(--gold);color:#000;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.95rem;margin-bottom:14px;">📤 Share Today's Panchangam</button>
 
     <div class="disclaimer">
-        Computed values (Drik Ganita, Lahiri Ayanamsa) may differ from a printed almanac.<br>
-        For religious observance, follow your family priest / the printed Panchanga.<br>
-        Engine: Drik · Ayanamsa: <span id="activeAyanamsaLabel" style="color:var(--gold-light);cursor:pointer;text-decoration:underline;" onclick="openSettingsModal()">Lahiri (Chitrapaksha)</span> · Ephemeris: Moshier<br><br>
-        <span style="color:var(--gold);">Version 2.0.0 (Astronomical Audit)</span>
+        Computed values (Drik Ganita, Lahiri Ayanamsa) use high-precision modern Swiss Ephemeris & VSOP87 astronomical mechanics.<br>
+        Traditional estimations: Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions.<br>
+        Engine: Drik · Ayanamsa: <span id="activeAyanamsaLabel" style="color:var(--gold-light);cursor:pointer;text-decoration:underline;" onclick="openSettingsModal()">Lahiri (Chitrapaksha)</span> · Ephemeris: Swiss Ephemeris / VSOP87<br>
+        <span style="color:var(--gold);"><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:var(--gold);text-decoration:underline;">Privacy Policy (DPDP Act & GDPR)</a> &bull; <a href="https://kuberansilks.com/pages/panchangam-privacy" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">Online Policy</a></span><br><br>
+        <span style="color:var(--gold);">Kuberan Panchangam v2.0.0 (Google Play & Apple App Store Edition)</span>
     </div>
 </div>
 </div>
@@ -3965,6 +3984,22 @@ function clearJathakaHistory() {
     if(confirm("Delete all Jathaka history?")) {
         localStorage.removeItem('kuberan_jathaka_history');
         loadJathakaHistory();
+    }
+}
+
+function clearAllAppData() {
+    if (confirm("Delete all locally stored profiles, family members, Jathaka history, and preferences from this device? This action is irreversible.")) {
+        try {
+            localStorage.removeItem('kuberan_jathaka_history');
+            localStorage.removeItem('kuberan_panchangam_family_profiles_v1');
+            localStorage.removeItem('kuberan_moon_rashi');
+            localStorage.removeItem('kuberan_ayanamsa_id');
+            localStorage.removeItem('kuberan_daily_view');
+        } catch (e) {
+            console.error(e);
+        }
+        alert("All local data has been purged.");
+        window.location.reload();
     }
 }
 

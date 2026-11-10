@@ -95,7 +95,7 @@ const elements = {};
 function makeEl(id) {
     return {
         id,
-        value: id === 'dateInput' ? '2026-10-25' : (id === 'latInput' ? '12.9716' : (id === 'lonInput' ? '77.5946' : (id === 'tzInput' ? 'Asia/Kolkata' : '1'))),
+        value: id === 'dateInput' ? '2026-10-25' : (id === 'latInput' ? '12.9716' : (id === 'lonInput' ? '77.5946' : (id === 'tzInput' ? 'Asia/Kolkata' : (['scanFrom', 'scanTo', 'targetDate'].includes(id) ? '' : '1')))),
         innerHTML: '',
         textContent: '',
         style: { display: 'none' },
@@ -174,7 +174,31 @@ const sandbox = {
         getElementById: (id) => getEl(id),
         querySelector: (sel) => getEl(sel),
         querySelectorAll: () => [],
-        createElement: (tag) => makeEl('el_' + tag + '_' + Math.random()),
+        createElement: (tag) => {
+            const el = makeEl('el_' + tag + '_' + Math.random());
+            if (tag === 'canvas') {
+                el.getContext = () => ({
+                    fillStyle: '',
+                    strokeStyle: '',
+                    font: '',
+                    textAlign: '',
+                    lineWidth: 1,
+                    createLinearGradient: () => ({ addColorStop: () => {} }),
+                    fillRect: () => {},
+                    strokeRect: () => {},
+                    beginPath: () => {},
+                    moveTo: () => {},
+                    lineTo: () => {},
+                    stroke: () => {},
+                    fillText: (txt) => {
+                        if (!sandbox._canvasTexts) sandbox._canvasTexts = [];
+                        sandbox._canvasTexts.push(String(txt));
+                    }
+                });
+                el.toBlob = (cb) => cb(new sandbox.Blob(['png'], { type: 'image/png' }));
+            }
+            return el;
+        },
         addEventListener: () => {}
     },
     window: null
@@ -280,4 +304,136 @@ getEl('matchGirlPada').value = '2';
 sandbox.doMarriageMatch();
 assert(getEl('matchKuberanBridalBanner').innerHTML.includes('https://kuberansilks.com/'), 'Marriage Matching displays Kuberan Silks bridal link');
 
-console.log('🎉 ALL UNIT & INTEGRATION TESTS PASSED!');
+// Verify Moon Phase Bezier SVG & Phase Display across all angles (0..360)
+const testAngles = [0, 1, 45, 90, 135, 179, 180, 181, 216, 270, 315, 359];
+for (const deg of testAngles) {
+    const svg = sandbox.renderMoonPhaseSVG(deg, 42);
+    assert(svg.includes('moon-phase-svg'), `Moon SVG rendered at ${deg}°`);
+    assert(!svg.includes('NaN'), `No NaN in Moon SVG at ${deg}°`);
+    const pathD = sandbox.computeMoonTerminatorPath(deg, 21, 21, 18);
+    if (deg === 0 || deg === 1 || deg === 359) {
+        assert.strictEqual(pathD, '', `New Moon (${deg}°) has empty lit path`);
+    } else {
+        assert(pathD.startsWith('M 21 3 C') && pathD.endsWith('Z'), `Valid cubic Bezier terminator path at ${deg}°`);
+    }
+}
+assert.strictEqual(sandbox.getMoonPhaseEmoji(0), '🌑', 'New moon emoji at 0°');
+assert.strictEqual(sandbox.getMoonPhaseEmoji(60), '🌒', 'Waxing crescent emoji at 60°');
+assert.strictEqual(sandbox.getMoonPhaseEmoji(90), '🌓', 'First quarter emoji at 90°');
+assert.strictEqual(sandbox.getMoonPhaseEmoji(180), '🌕', 'Full moon emoji at 180°');
+assert.strictEqual(sandbox.getMoonPhaseEmoji(216), '🌖', 'Waning gibbous emoji at 216°');
+assert.strictEqual(sandbox.getMoonPhaseEmoji(270), '🌗', 'Last quarter emoji at 270°');
+assert.strictEqual(sandbox.getMoonPhaseEmoji(315), '🌘', 'Waning crescent emoji at 315°');
+
+sandbox.updateMoonPhaseDisplay({ elongation: 169, tithi: { no: 15 } });
+assert(getEl('moonPhaseName').textContent.includes('Pournami'), 'Pournami label set at tithi 15');
+assert(getEl('moonPhaseIllum').textContent.includes('🌕 100% Illumination'), 'Full moon 100% illumination set on Pournami even when sunrise elongation is 169°');
+
+sandbox.updateMoonPhaseDisplay({ elongation: 350, tithi: { no: 30 } });
+assert(getEl('moonPhaseName').textContent.includes('Amavasya'), 'Amavasya label set at tithi 30');
+assert(getEl('moonPhaseIllum').textContent.includes('🌑 0% Illumination'), 'New moon 0% illumination set on Amavasya even when sunrise elongation is 350°');
+
+sandbox.updateMoonPhaseDisplay({ elongation: 2, tithi: { no: 1 } });
+assert(getEl('moonPhaseName').textContent.includes('Shukla Paksha'), 'Shukla Paksha label set at tithi 1');
+assert(getEl('moonPhaseIllum').textContent.startsWith('🌒 '), 'Shukla Prathama (tithi 1) at 2° shows Waxing Crescent 🌒 (not New Moon 🌑)');
+
+sandbox.updateMoonPhaseDisplay({ elongation: 182, tithi: { no: 16 } });
+assert(getEl('moonPhaseName').textContent.includes('Krishna Paksha'), 'Krishna Paksha label set at tithi 16');
+assert(getEl('moonPhaseIllum').textContent.startsWith('🌖 '), 'Krishna Prathama (tithi 16) at 182° shows Waning Gibbous 🌖 (not Full Moon 🌕)');
+
+const todayP = sandbox.computePanchanga(2026, 10, 29, 12.9716, 77.5946, 'Asia/Kolkata');
+sandbox.renderPanchanga(todayP);
+assert(todayP.tithi.startJD && todayP.tithi.startJD < todayP.sunrise, 'tithi.startJD computed before sunrise');
+assert(todayP.tithi.endJD && todayP.tithi.endJD > todayP.sunrise, 'tithi.endJD computed after sunrise');
+assert(getEl('glTithi').innerHTML.includes('Start:') && getEl('glTithi').innerHTML.includes('End:'), 'Today at a Glance Tithi displays both Start and End times');
+assert(getEl('valTithiTime').textContent.includes('Starts:') && getEl('valTithiTime').textContent.includes('Ends:'), 'Five Limbs Tithi displays both Starts and Ends times');
+assert(getEl('moonPhaseName').textContent.includes('Krishna Paksha'), '2026-10-29 shows Krishna Paksha');
+assert(getEl('moonPhaseIllum').textContent.startsWith('🌖 '), '2026-10-29 (Krishna Chaturthi) shows Waning Gibbous 🌖');
+
+// Verify getLimbsAtJD evaluates exact live moment (e.g. Nov 7, 2026 18:15 IST after Sunrise Trayodashi ended)
+const nov7EveningJD = sandbox.julianDay(2026, 11, 7, 18.25 - 5.5);
+const liveNov7 = sandbox.getLimbsAtJD(nov7EveningJD);
+assert.strictEqual(liveNov7.tithi.name, 'Chaturdashi', 'At 6:15 PM IST on Nov 7, 2026, live Tithi is Krishna Chaturdashi (not completed Trayodashi)');
+assert(liveNov7.tithi.startJD < nov7EveningJD && liveNov7.tithi.endJD > nov7EveningJD, 'Live Tithi startJD/endJD bracket the exact viewing time');
+
+// Verify exportPanchangaImageCard() draws zero "undefined" texts on the PNG canvas
+sandbox._canvasTexts = [];
+sandbox.exportPanchangaImageCard();
+assert(sandbox._canvasTexts.length > 10, 'exportPanchangaImageCard rendered text rows onto canvas');
+for (const t of sandbox._canvasTexts) {
+    assert(!t.includes('undefined'), `Canvas text must not contain "undefined", got: "${t}"`);
+}
+
+// Verify shareTodayPanchanga() & shareDailyPanchangam() include start/end Tithi span and zero "undefined"
+sandbox._lastOpenedUrl = '';
+sandbox.shareDailyPanchangam();
+assert(sandbox._lastOpenedUrl.includes('api.whatsapp.com/send'), 'shareDailyPanchangam delegates to shareTodayPanchanga');
+const decodedShare = decodeURIComponent(sandbox._lastOpenedUrl.split('text=')[1] || '');
+assert(!decodedShare.includes('undefined'), 'Shared Panchangam text has zero "undefined"');
+assert(decodedShare.includes('Tithi:') && decodedShare.includes(' to '), 'Shared Panchangam includes Tithi start-to-end time range');
+
+// Verify Muhurtha default dates (#scanFrom, #scanTo, #targetDate) are pre-filled on init
+assert(getEl('scanFrom').value.length === 10, '#scanFrom pre-filled on init');
+assert(getEl('scanTo').value.length === 10, '#scanTo pre-filled on init');
+assert(getEl('targetDate').value.length === 10, '#targetDate pre-filled on init');
+
+// Verify updateMuhurthaPersonalized() falls back to saved Family Profiles when Jathaka history is empty
+localStorageMock.removeItem('kuberan_jathaka_history');
+getEl('tarabalamCard').style.display = 'none';
+sandbox.updateMuhurthaPersonalized();
+assert.strictEqual(getEl('tarabalamCard').style.display, 'block', 'updateMuhurthaPersonalized falls back to saved Family Profiles when history is empty');
+
+// Verify Mobile App Store & Google Play Store Publishing Compliance
+console.log('--- 5. Verifying Mobile App Store Publishing Requirements ---');
+
+// 1. Safe-area notch padding & viewport-fit
+assert(html.includes('viewport-fit=cover'), 'HTML includes viewport-fit=cover');
+assert(html.includes('safe-area-inset-top'), 'CSS includes safe-area-inset-top');
+assert(html.includes('safe-area-inset-bottom'), 'CSS includes safe-area-inset-bottom');
+
+// 2. DPDP Act 2023 & GDPR Statutory Privacy Disclosures
+assert(html.includes('DPDP Act') && html.includes('2023'), 'Privacy modal cites DPDP Act 2023');
+assert(html.includes('GDPR'), 'Privacy modal cites GDPR compliance');
+assert(html.includes('100% On-Device / Client-Side Computation'), 'Privacy modal declares 100% on-device computation');
+assert(html.includes('https://kuberansilks.com/pages/panchangam-privacy'), 'Privacy modal links to official public HTTPS privacy policy');
+
+// 3. Respectful Purohit Consultation Disclaimer
+assert(html.includes('Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions'), 'Prominent respectful Purohit consultation disclaimer present');
+
+// 4. Astrological Calculation Transparency (Swiss Ephemeris & VSOP87)
+assert(html.includes('Swiss Ephemeris & VSOP87') || html.includes('Swiss Ephemeris / VSOP87'), 'Calculation transparency declares Swiss Ephemeris / VSOP87');
+
+// 5. In-App Data Erasure Method
+assert(typeof sandbox.clearAllAppData === 'function', 'clearAllAppData function is defined in global scope');
+
+// 6. Native Capacitor Configuration Verification
+const capConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'capacitor.config.json'), 'utf8'));
+assert.strictEqual(capConfig.appId, 'com.kuberansilks.panchangam', 'Capacitor appId matches com.kuberansilks.panchangam');
+assert.strictEqual(capConfig.appName, 'Kuberan Panchangam', 'Capacitor appName matches Kuberan Panchangam');
+assert.strictEqual(capConfig.webDir, 'docs', 'Capacitor webDir points to docs');
+
+// 7. Android Manifest Permissions Verification
+const androidManifest = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'src', 'main', 'AndroidManifest.xml'), 'utf8');
+assert(androidManifest.includes('android.permission.ACCESS_COARSE_LOCATION'), 'AndroidManifest includes ACCESS_COARSE_LOCATION');
+assert(androidManifest.includes('android.permission.ACCESS_FINE_LOCATION'), 'AndroidManifest includes ACCESS_FINE_LOCATION');
+
+// 8. iOS Info.plist & PrivacyInfo.xcprivacy Verification
+const iOSPlist = fs.readFileSync(path.join(__dirname, '..', 'ios', 'App', 'App', 'Info.plist'), 'utf8');
+assert(iOSPlist.includes('NSLocationWhenInUseUsageDescription'), 'Info.plist includes NSLocationWhenInUseUsageDescription');
+assert(iOSPlist.includes('Required to calculate exact local sunrise, sunset, Tithi end-times, and Lagna for your city'), 'Info.plist includes exact location description');
+
+const iOSPrivacy = fs.readFileSync(path.join(__dirname, '..', 'ios', 'App', 'App', 'PrivacyInfo.xcprivacy'), 'utf8');
+assert(iOSPrivacy.includes('NSPrivacyAccessedAPITypeUserDefaults'), 'PrivacyInfo.xcprivacy declares UserDefaults API');
+assert(iOSPrivacy.includes('CA92.1'), 'PrivacyInfo.xcprivacy declares reason CA92.1');
+
+// 9. Store Visual Assets Existence
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'ios', 'icon_1024.png')), 'iOS 1024x1024 icon exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'android', 'icon_512.png')), 'Android 512x512 icon exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'android', 'feature_graphic_1024x500.png')), 'Google Play 1024x500 feature graphic exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'screenshots', 'screenshot_1_daily_panchangam.png')), 'Screenshot 1 exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'screenshots', 'screenshot_2_kundli_jathaka.png')), 'Screenshot 2 exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'screenshots', 'screenshot_3_gowri_choghadiya.png')), 'Screenshot 3 exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'screenshots', 'screenshot_4_karnataka_calendar.png')), 'Screenshot 4 exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'metadata', 'ASO_LISTING_METADATA.md')), 'ASO metadata document exists');
+
+console.log('🎉 ALL UNIT, INTEGRATION & STORE PUBLISHING TESTS PASSED!');

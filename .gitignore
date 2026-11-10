@@ -25,3 +25,15 @@ ENV/
 env.bak/
 venv.bak/
 dist.zip
+node_modules/
+scratch/chrome_profile/
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+android/local.properties
+ios/DerivedData/
+*.p12
+*.keystore
+
