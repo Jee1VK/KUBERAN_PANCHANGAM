@@ -4,7 +4,6 @@
 - **Publisher / Developer:** Kuberan Silks, 226, OTC Rd, Chickpet, Bengaluru, Karnataka - 560053, India
 - **Primary Category:** Lifestyle / Books & Reference / Astrology
 - **Dedicated Support Email:** `online@kuberansilks.in`
-- **Support Phone:** `+91 9902579292` (Mon–Sat, 10:30 AM – 7:30 PM IST)
 - **Public HTTPS Privacy Policy URL:** `https://kuberansilks.com/pages/panchangam-privacy`
 - **In-App Offline Privacy Route:** `./privacy.html`
 - **Support Website URL:** `https://kuberansilks.com/pages/contact-us`

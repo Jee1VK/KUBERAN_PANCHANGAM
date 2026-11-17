@@ -36,6 +36,7 @@ android/.idea/
 android/local.properties
 ios/DerivedData/
 *.p12
+*.jks
 *.keystore
 keystore.properties
 android/keystore.properties

@@ -507,6 +507,10 @@ assert(!fs.existsSync(path.join(__dirname, '..', 'dist', 'KuberanPanchangam.spec
 assert(fs.existsSync(path.join(__dirname, '..', 'store-assets', 'android', 'icon-512x512.png')), 'store-assets Android 512 icon exists');
 assert(fs.existsSync(path.join(__dirname, '..', 'store-assets', 'ios', 'icon-1024x1024.png')), 'store-assets iOS 1024 icon exists');
 assert(fs.existsSync(path.join(__dirname, '..', 'store-assets', 'android', 'feature-graphic-1024x500.png')), 'store-assets feature graphic exists');
-assert(fs.existsSync(path.join(__dirname, '..', 'STORE_METADATA.md')), 'STORE_METADATA.md exists at root');
+const storeMeta = fs.readFileSync(path.join(__dirname, '..', 'STORE_METADATA.md'), 'utf8');
+assert(storeMeta.includes('online@kuberansilks.in') && !storeMeta.includes('9902579292'), 'STORE_METADATA.md uses dedicated support email and excludes retail showroom phone numbers');
+assert(!privacyHtml.includes('9902579292'), 'privacy.html excludes retail showroom phone numbers');
+const gitignoreContent = fs.readFileSync(path.join(__dirname, '..', '.gitignore'), 'utf8');
+assert(gitignoreContent.includes('*.p12') && gitignoreContent.includes('*.jks') && gitignoreContent.includes('*.keystore'), '.gitignore excludes *.p12, *.jks, *.keystore');
 
 console.log('🎉 ALL UNIT, INTEGRATION & STORE PUBLISHING TESTS PASSED!');
