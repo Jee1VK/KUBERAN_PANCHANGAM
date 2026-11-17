@@ -219,7 +219,9 @@ const scriptsOrder = [
     'docs/js/cities.js',
     'docs/js/familyStore.js',
     'docs/js/muhurthaEngine.js',
-    'docs/js/exportUtils.js'
+    'docs/js/ephemeris.js',
+    'docs/js/exportUtils.js',
+    'docs/js/app.js'
 ];
 for (const relPath of scriptsOrder) {
     const code = fs.readFileSync(path.join(__dirname, '..', relPath), 'utf8');
@@ -435,5 +437,57 @@ assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'screenshots', '
 assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'screenshots', 'screenshot_3_gowri_choghadiya.png')), 'Screenshot 3 exists');
 assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'screenshots', 'screenshot_4_karnataka_calendar.png')), 'Screenshot 4 exists');
 assert(fs.existsSync(path.join(__dirname, '..', 'store_assets', 'metadata', 'ASO_LISTING_METADATA.md')), 'ASO metadata document exists');
+
+console.log('--- 6. Verifying Astronomical Root-Finding, Kshaya/Adhika Tithi, Coordinate/Timezone Hardening & Memoization Cache ---');
+
+// 6.1 Coordinate Validation & Fallback (Bengaluru: 12.9716° N, 77.5946° E)
+const validCoord = sandbox.validateCoordinates(15.3647, 75.1240);
+assert.strictEqual(validCoord.valid, true, 'Valid coordinates accepted');
+assert.strictEqual(validCoord.lat, 15.3647);
+const outOfBoundsLat = sandbox.validateCoordinates(95.0, 77.5946);
+assert.strictEqual(outOfBoundsLat.valid, false, 'Latitude > 90 rejected');
+assert.strictEqual(outOfBoundsLat.lat, 12.9716, 'Fallback to Bengaluru lat 12.9716');
+assert.strictEqual(outOfBoundsLat.lon, 77.5946, 'Fallback to Bengaluru lon 77.5946');
+const outOfBoundsLon = sandbox.validateCoordinates(12.9716, -195.0);
+assert.strictEqual(outOfBoundsLon.valid, false, 'Longitude < -180 rejected');
+assert.strictEqual(outOfBoundsLon.lat, 12.9716);
+
+// 6.2 Dynamic IANA Timezone Resolution from Coordinates
+assert.strictEqual(sandbox.resolveTimezoneFromCoords(12.9716, 77.5946), 'Asia/Kolkata', 'Bengaluru resolves to Asia/Kolkata');
+assert.strictEqual(sandbox.resolveTimezoneFromCoords(40.0583, -74.4057), 'America/New_York', 'New Jersey resolves to America/New_York');
+assert.strictEqual(sandbox.resolveTimezoneFromCoords(51.5074, -0.1278), 'Europe/London', 'London resolves to Europe/London');
+assert.strictEqual(sandbox.resolveTimezoneFromCoords(25.2048, 55.2708), 'Asia/Dubai', 'Dubai resolves to Asia/Dubai');
+assert.strictEqual(sandbox.resolveTimezoneFromCoords(1.3521, 103.8198), 'Asia/Singapore', 'Singapore resolves to Asia/Singapore');
+assert.strictEqual(sandbox.resolveTimezoneFromCoords(-33.8688, 151.2093), 'Australia/Sydney', 'Sydney resolves to Australia/Sydney');
+
+// 6.3 Continuous Root-Finding Accuracy on Tithi Boundaries (12° multiples)
+const testBoundaryJD = sandbox.findExactBoundaryJD(jdTest, sandbox.elongation, 12, 1, 26);
+const elongAtBoundary = sandbox.elongation(testBoundaryJD);
+const rem12 = Math.min(elongAtBoundary % 12, 12 - (elongAtBoundary % 12));
+assert(rem12 < 1e-4, `Continuous root-finding hits exact 12° Tithi multiple (residual=${rem12}°)`);
+
+// 6.4 Kshaya Tithi & Adhika (Vriddhi) Tithi Synthetic & Real Detection
+// Synthetic fast-moon test for Kshaya Tithi (Tithi 2 starts after rise0 and ends before rise1)
+const synthElongKshaya = (jd) => ((12.0 + (jd - 2460000.0) * 16.0) % 360 + 360) % 360;
+const kaKshaya = sandbox.detectKshayaAndAdhikaTithi(2460000.0 - 0.1, 2460000.0 + 0.9, synthElongKshaya, sandbox.TITHI_EN, sandbox.TITHI_KN);
+assert.strictEqual(kaKshaya.isKshaya, true, 'Kshaya Tithi accurately detected when a Tithi begins and ends between two consecutive sunrises');
+assert(kaKshaya.kshayaTithi && kaKshaya.kshayaTithi.startJD > 2459999.9 && kaKshaya.kshayaTithi.endJD < 2460000.9, 'Kshaya Tithi start/end bracketed strictly between consecutive sunrises');
+
+// Synthetic slow-moon test for Adhika (Vriddhi) Tithi (single Tithi spans across two consecutive sunrises)
+const synthElongAdhika = (jd) => ((12.5 + (jd - 2460000.0) * 10.0) % 360 + 360) % 360;
+const kaAdhika = sandbox.detectKshayaAndAdhikaTithi(2460000.0, 2460001.0, synthElongAdhika, sandbox.TITHI_EN, sandbox.TITHI_KN);
+assert.strictEqual(kaAdhika.isAdhika, true, 'Adhika (Vriddhi) Tithi accurately detected when a Tithi extends across two consecutive sunrises');
+
+// 6.5 In-Memory Memoization Cache Verification
+sandbox.EphemerisCache.clear();
+const stats0 = sandbox.EphemerisCache.getStats();
+assert.strictEqual(stats0.hits, 0, 'Cache starts with 0 hits after clear()');
+const pCall1 = sandbox.computePanchanga(2026, 11, 17, 12.9716, 77.5946, 'Asia/Kolkata');
+const statsAfterMiss = sandbox.EphemerisCache.getStats();
+assert(statsAfterMiss.misses >= 1, 'First computePanchanga call populates cache');
+const pCall2 = sandbox.computePanchanga(2026, 11, 17, 12.9716, 77.5946, 'Asia/Kolkata');
+const statsAfterHit = sandbox.EphemerisCache.getStats();
+assert(statsAfterHit.hits >= 1, 'Second computePanchanga call for same (JulianDay, Lat, Lon) hits memoization cache');
+assert.strictEqual(pCall1.tithi.no, pCall2.tithi.no, 'Cached Panchanga matches computed Panchanga');
 
 console.log('🎉 ALL UNIT, INTEGRATION & STORE PUBLISHING TESTS PASSED!');

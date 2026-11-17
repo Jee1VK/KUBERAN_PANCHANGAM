@@ -2074,15 +2074,19 @@ function moonLongitude(jd) {
 // Lahiri (Chitrapaksha) Ayanamsa — IAU 2006 precession + nutation correction
 // Epoch value: 23°51'25.532" = 23.857092° at J2000.0 (Indian Astronomical Ephemeris)
 // FIXED: Was 23.853211° (13.97" too low). Now includes nutation for True Ayanamsa.
+/**
+ * Compute True Chitrapaksha (Lahiri) Ayanamsa at Julian Day `jd` using IAU 2006
+ * 4th-order general precession + nutation in longitude (Delta_psi), anchored to
+ * J2000.0 = 23°51'25.532" (23.857092°).
+ * @param {number} jd - Julian Ephemeris Day.
+ * @returns {number} Ayanamsa in degrees.
+ */
 function lahiriAyanamsa(jd) {
     const T = (jd - 2451545.0) / 36525.0;
-    // IAU 2006 general precession in longitude (arcseconds)
-    const psiArcsec = 5028.796195 * T + 1.1054348 * T*T
-                    + 0.00007964 * T*T*T - 0.000023857 * T*T*T*T;
-    // True Ayanamsa = Mean Ayanamsa + Nutation in longitude
-    // This cancels the nutation already present in apparent (true) tropical longitudes
+    const psiArcsec = 5028.796195 * T + 1.1054348 * T * T
+                    + 0.00007964 * T * T * T - 0.000023857 * T * T * T * T;
     const t = new Astronomy.AstroTime(jd - 2451545.0);
-    const nutation = Astronomy.e_tilt(t).dpsi / 3600.0; // nutation in longitude (degrees, converted from arcseconds)
+    const nutation = Astronomy.e_tilt(t).dpsi / 3600.0;
     const baseLahiri = 23.857092 + psiArcsec / 3600.0 + nutation;
     const sysId = (typeof getActiveAyanamsaId === 'function') ? getActiveAyanamsaId() : 'LAHIRI';
     if (sysId === 'KP') return baseLahiri - 0.07;
@@ -2124,12 +2128,15 @@ function siderealKetu(jd) { return (siderealRahu(jd) + 180) % 360; }
 //  LAGNA (ASCENDANT) CALCULATIONS
 // ============================================================
 function getSiderealAscendant(jd, lat, lon) {
+    const coords = (typeof validateCoordinates === 'function')
+        ? validateCoordinates(lat, lon)
+        : { lat: Number.isFinite(lat) ? lat : 12.9716, lon: Number.isFinite(lon) ? lon : 77.5946 };
     const t = new Astronomy.AstroTime(jd - 2451545.0);
-    let last = Astronomy.SiderealTime(t) + (lon / 15.0);
+    let last = Astronomy.SiderealTime(t) + (coords.lon / 15.0);
     last = ((last % 24) + 24) % 24;
     const obq = Astronomy.e_tilt(t).tobl * (Math.PI / 180);
     const lastRad = last * 15 * (Math.PI / 180);
-    const latRad = lat * (Math.PI / 180);
+    const latRad = coords.lat * (Math.PI / 180);
     
     const y = Math.cos(lastRad);
     const x = -(Math.sin(lastRad) * Math.cos(obq)) - (Math.tan(latRad) * Math.sin(obq));
@@ -2140,35 +2147,45 @@ function getSiderealAscendant(jd, lat, lon) {
 }
 
 function computeDailyLagnas(jdStart, lat, lon) {
-    const lagnas = [];
-    const step = 2 / 1440; // 2 minute scanning step
-    let currentJD = jdStart;
-    let prevLagnaIdx = Math.floor(getSiderealAscendant(currentJD, lat, lon) / 30);
-    let blockStart = currentJD;
-    
-    while (currentJD < jdStart + 1.0) {
-        const nextJD = currentJD + step;
-        let lagnaIdx = Math.floor(getSiderealAscendant(nextJD, lat, lon) / 30);
-        if (lagnaIdx !== prevLagnaIdx) {
-            // FIXED: Bisect across boundary crossing to achieve sub-second transition accuracy
-            let lo = currentJD, hi = nextJD;
-            for (let b = 0; b < 10; b++) {
-                const mid = (lo + hi) / 2;
-                if (Math.floor(getSiderealAscendant(mid, lat, lon) / 30) === prevLagnaIdx) {
-                    lo = mid;
-                } else {
-                    hi = mid;
+    const coords = (typeof validateCoordinates === 'function')
+        ? validateCoordinates(lat, lon)
+        : { lat: Number.isFinite(lat) ? lat : 12.9716, lon: Number.isFinite(lon) ? lon : 77.5946 };
+    const vLat = coords.lat, vLon = coords.lon;
+    const computeFn = () => {
+        const lagnas = [];
+        const step = 2 / 1440; // 2 minute scanning step
+        let currentJD = jdStart;
+        let prevLagnaIdx = Math.floor(getSiderealAscendant(currentJD, vLat, vLon) / 30);
+        let blockStart = currentJD;
+        
+        while (currentJD < jdStart + 1.0) {
+            const nextJD = currentJD + step;
+            let lagnaIdx = Math.floor(getSiderealAscendant(nextJD, vLat, vLon) / 30);
+            if (lagnaIdx !== prevLagnaIdx) {
+                // Continuous binary search (18 iterations -> ~0.4ms precision)
+                let lo = currentJD, hi = nextJD;
+                for (let b = 0; b < 18; b++) {
+                    const mid = (lo + hi) / 2;
+                    if (Math.floor(getSiderealAscendant(mid, vLat, vLon) / 30) === prevLagnaIdx) {
+                        lo = mid;
+                    } else {
+                        hi = mid;
+                    }
                 }
+                const exactTransition = (lo + hi) / 2;
+                lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: exactTransition });
+                blockStart = exactTransition;
+                prevLagnaIdx = lagnaIdx;
             }
-            const exactTransition = (lo + hi) / 2;
-            lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: exactTransition });
-            blockStart = exactTransition;
-            prevLagnaIdx = lagnaIdx;
+            currentJD = nextJD;
         }
-        currentJD = nextJD;
+        lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: currentJD });
+        return lagnas;
+    };
+    if (typeof EphemerisCache !== 'undefined') {
+        return EphemerisCache.getOrCompute('lagnas', jdStart, vLat, vLon, computeFn);
     }
-    lagnas.push({ idx: prevLagnaIdx, start: blockStart, end: currentJD });
-    return lagnas;
+    return computeFn();
 }
 
 const NAK_SYLLABLES = [
@@ -2190,8 +2207,9 @@ const COMBUST_LIMITS = {
     'Saturn': 15
 };
 
-// Get all 9 graha positions with Vakri (Retrograde) & Moudhya (Combustion)
+// Get all 9 graha positions at any exact Julian Day with Vakri (Retrograde), Speed & Moudhya (Combustion)
 function getAllGrahaPositions(jd) {
+    const computeFn = () => {
     const grahas = [
         { name: 'Sun', nameKn: 'ಸೂರ್ಯ', icon: '☀️', lon: siderealSun(jd), isPlanet: false },
         { name: 'Moon', nameKn: 'ಚಂದ್ರ', icon: '🌙', lon: siderealMoon(jd), isPlanet: false },
@@ -2238,6 +2256,11 @@ function getAllGrahaPositions(jd) {
         }
     });
     return grahas;
+    };
+    if (typeof EphemerisCache !== 'undefined') {
+        return EphemerisCache.getOrCompute('grahas', jd, 0, 0, computeFn);
+    }
+    return computeFn();
 }
 
 // ============================================================
@@ -2245,20 +2268,27 @@ function getAllGrahaPositions(jd) {
 // ============================================================
 const _sunriseCache = new Map();
 function computeSunrise(year, month, day, lat, lon, tzOff) {
+    const coords = (typeof validateCoordinates === 'function')
+        ? validateCoordinates(lat, lon)
+        : { lat: Number.isFinite(lat) ? lat : 12.9716, lon: Number.isFinite(lon) ? lon : 77.5946 };
+    const vLat = coords.lat, vLon = coords.lon;
+    const resolvedTzOff = (typeof tzOff === 'number' && Number.isFinite(tzOff))
+        ? tzOff
+        : getTzOffset(tzOff, year, month, day, vLat, vLon);
+
     const baseJD = julianDay(year, month, day, 0);
-    const _srKey = `${baseJD}-${lat.toFixed(2)}-${lon.toFixed(2)}`;
+    const _srKey = `${baseJD}-${vLat.toFixed(4)}-${vLon.toFixed(4)}-${resolvedTzOff.toFixed(2)}`;
     if (_sunriseCache.has(_srKey)) return _sunriseCache.get(_srKey);
-    // FIXED: Start search from LOCAL midnight (in UTC) to prevent finding next-day
-    // sunrise in eastern time zones (Tokyo, Sydney etc.)
-    const localMidnightJD = baseJD - ((tzOff || 5.5) / 24);
+
+    const localMidnightJD = baseJD - (resolvedTzOff / 24);
     const startTime = new Astronomy.AstroTime(localMidnightJD - 2451545.0);
-    const obs = new Astronomy.Observer(lat, lon, 0);
+    const obs = new Astronomy.Observer(vLat, vLon, 0);
     const rise = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, 1, startTime, 1);
     const set = Astronomy.SearchRiseSet(Astronomy.Body.Sun, obs, -1, startTime, 1);
     
-    const riseJD = rise ? (rise.ut + 2451545.0) : (baseJD + 6/24);
-    const setJD = set ? (set.ut + 2451545.0) : (baseJD + 18/24);
-    const _res = { rise: (riseJD - baseJD) * 24, set: (setJD - baseJD) * 24 };
+    const riseJD = rise ? (rise.ut + 2451545.0) : (localMidnightJD + 6/24);
+    const setJD = set ? (set.ut + 2451545.0) : (localMidnightJD + 18/24);
+    const _res = { rise: (riseJD - baseJD) * 24, set: (setJD - baseJD) * 24, riseJD, setJD };
     _sunriseCache.set(_srKey, _res);
     return _res;
 }
@@ -2275,6 +2305,9 @@ const VARJYAM_GHATIKAS = [
 ];
 
 function prevBoundary(jd, angleFn, unit) {
+    if (typeof findExactBoundaryJD === 'function') {
+        return findExactBoundaryJD(jd, angleFn, unit, -1, 26);
+    }
     const cur = angleFn(jd);
     const target = ((Math.floor(cur / unit) * unit) % 360 + 360) % 360;
     const maxSpan = 1.6;
@@ -2287,24 +2320,25 @@ function prevBoundary(jd, angleFn, unit) {
         hi = lo;
         lo = hi - step;
     }
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 26; i++) {
         const mid = (lo + hi) / 2;
         const diff = ((angleFn(mid) - target + 540) % 360) - 180;
         if (diff >= 0) hi = mid; else lo = mid;
     }
-    return hi;
+    return (lo + hi) / 2;
 }
 
 // ============================================================
-//  BOUNDARY FINDER — bisect to find next angle crossing
+//  BOUNDARY FINDER — Continuous binary search over Julian Day
 // ============================================================
 function nextBoundary(jd, angleFn, unit) {
+    if (typeof findExactBoundaryJD === 'function') {
+        return findExactBoundaryJD(jd, angleFn, unit, 1, 26);
+    }
     const cur = angleFn(jd);
     const target = (Math.floor(cur / unit) + 1) * unit % 360;
-    // FIXED: Step forward in small increments to bracket the FIRST crossing,
-    // then bisect. Prevents skipping multiple boundaries for small units (Karana=6°).
     const maxSpan = (unit <= 6) ? 0.8 : (unit <= 12 ? 1.4 : 1.6);
-    const step = 0.04; // ~58 minutes
+    const step = 0.04;
     let lo = jd, hi = jd + step;
     while (hi - jd < maxSpan) {
         const diffLo = ((angleFn(lo) - target + 540) % 360) - 180;
@@ -2313,13 +2347,12 @@ function nextBoundary(jd, angleFn, unit) {
         lo = hi;
         hi = lo + step;
     }
-    // Bisect within verified bracket (22 iterations → ~0.8ms precision)
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 26; i++) {
         const mid = (lo + hi) / 2;
         const diff = ((angleFn(mid) - target + 540) % 360) - 180;
         if (diff >= 0) hi = mid; else lo = mid;
     }
-    return hi;
+    return (lo + hi) / 2;
 }
 
 // ============================================================
@@ -2364,20 +2397,26 @@ function jdToLocalTimeStr24(jd, tzOffsetHours) {
 }
 
 const _tzOffsetCache = new Map();
-function getTzOffset(tzName, targetYear, targetMonth, targetDay) {
-    if (!tzName || tzName === 'Asia/Kolkata' || tzName === 'Asia/Calcutta') return 5.5;
-    const key = `${tzName}-${targetYear || 0}-${targetMonth || 0}`;
+function getTzOffset(tzName, targetYear, targetMonth, targetDay, lat, lon) {
+    if (typeof getDynamicTzOffsetHours === 'function') {
+        return getDynamicTzOffsetHours(tzName, targetYear, targetMonth, targetDay, lat, lon);
+    }
+    const resolvedTz = (typeof resolveTimezoneFromCoords === 'function')
+        ? resolveTimezoneFromCoords(lat, lon, tzName)
+        : (tzName || 'Asia/Kolkata');
+    const key = `${resolvedTz}-${targetYear || 0}-${targetMonth || 0}-${targetDay || 0}`;
     if (_tzOffsetCache.has(key)) return _tzOffsetCache.get(key);
-    // Get offset for a timezone at the TARGET date (handles DST)
     try {
-        const now = (targetYear && targetMonth && targetDay) ? new Date(targetYear, targetMonth - 1, targetDay, 12, 0, 0) : new Date();
+        const now = (targetYear && targetMonth && targetDay)
+            ? new Date(Date.UTC(targetYear, targetMonth - 1, targetDay, 12, 0, 0))
+            : new Date();
         const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
-        const localStr = now.toLocaleString('en-US', { timeZone: tzName });
+        const localStr = now.toLocaleString('en-US', { timeZone: resolvedTz });
         const off = (new Date(localStr) - new Date(utcStr)) / 3600000;
         _tzOffsetCache.set(key, off);
         return off;
     } catch (e) {
-        return 5.5; // default IST
+        return Number.isFinite(lon) ? Math.round((lon / 15.0) * 2) / 2 : 5.5;
     }
 }
 
@@ -2453,11 +2492,15 @@ function getAmantaMasaIdx(baseJD) {
 //  Finds the JD when Nija Chaitra Shukla Prathama begins.
 // ============================================================
 const _ugadiCache = {};
-function findUgadiJD(year) {
-    if (_ugadiCache[year]) return _ugadiCache[year];
-    // Ugadi falls on Chaitra Shukla Prathama of NIJA Chaitra (not Adhika Chaitra).
-    // In Amanta system, Chaitra begins after the NM when Sun is in Meena (rashi 11).
-    // If that month is Adhika Chaitra, Ugadi is celebrated on Nija Chaitra.
+function findUgadiJD(year, lat, lon, tzOff) {
+    const coords = (typeof validateCoordinates === 'function')
+        ? validateCoordinates(lat, lon)
+        : { lat: Number.isFinite(lat) ? lat : 12.9716, lon: Number.isFinite(lon) ? lon : 77.5946 };
+    const vLat = coords.lat, vLon = coords.lon;
+    const ayanId = (typeof getActiveAyanamsaId === 'function') ? getActiveAyanamsaId() : 'LAHIRI';
+    const uKey = `${year}-${vLat.toFixed(2)}-${vLon.toFixed(2)}-${ayanId}`;
+    if (_ugadiCache[uKey]) return _ugadiCache[uKey];
+
     const searchStartJD = julianDay(year, 2, 20, 12);
     const relSpd = 12.19;
     
@@ -2476,41 +2519,56 @@ function findUgadiJD(year) {
         const m = getAmantaMasaIdx(nmJD + 1);
         if (m.idx === 0 && !m.isAdhika) {
             const dt = jdToDate(nmJD);
-            const sr0 = computeSunrise(dt.year, dt.month, dt.day, 12.9716, 77.5946, 5.5);
+            const effTz = (typeof tzOff === 'number' && Number.isFinite(tzOff))
+                ? tzOff
+                : getTzOffset(tzOff, dt.year, dt.month, dt.day, vLat, vLon);
+            const sr0 = computeSunrise(dt.year, dt.month, dt.day, vLat, vLon, effTz);
             const rise0 = julianDay(dt.year, dt.month, dt.day, sr0.rise);
             const el0 = ((moonLongitude(rise0) - sunLongitude(rise0)) % 360 + 360) % 360;
             const t0 = Math.floor(el0 / 12) + 1;
             if (t0 === 1) {
-                _ugadiCache[year] = rise0;
+                _ugadiCache[uKey] = rise0;
                 return rise0;
             }
             const tEnd0 = nextBoundary(rise0, elongation, 12);
-            const sr1 = computeSunrise(dt.year, dt.month, dt.day + 1, 12.9716, 77.5946, 5.5);
+            const sr1 = computeSunrise(dt.year, dt.month, dt.day + 1, vLat, vLon, effTz);
             const rise1 = julianDay(dt.year, dt.month, dt.day + 1, sr1.rise);
             const nextTithiEnd = nextBoundary(tEnd0 + 0.005, elongation, 12);
             if (nextTithiEnd < rise1) {
-                _ugadiCache[year] = rise0;
+                _ugadiCache[uKey] = rise0;
                 return rise0;
             }
-            _ugadiCache[year] = rise1;
+            _ugadiCache[uKey] = rise1;
             return rise1;
         }
         daysToNM += 29.53;
     }
     const fallback = julianDay(year, 3, 22, 6);
-    _ugadiCache[year] = fallback;
+    _ugadiCache[uKey] = fallback;
     return fallback;
 }
 
 
 function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
     const isFast = !!(options && options.fast);
-    const tzOff = getTzOffset(tzName, year, month, day);
-    const sr = computeSunrise(year, month, day, lat, lon, tzOff);
+    const coords = (typeof validateCoordinates === 'function')
+        ? validateCoordinates(lat, lon)
+        : { lat: Number.isFinite(lat) ? lat : 12.9716, lon: Number.isFinite(lon) ? lon : 77.5946, valid: true };
+    const vLat = coords.lat;
+    const vLon = coords.lon;
+    const resolvedTz = (typeof resolveTimezoneFromCoords === 'function')
+        ? resolveTimezoneFromCoords(vLat, vLon, tzName)
+        : (tzName || 'Asia/Kolkata');
+    const tzOff = getTzOffset(resolvedTz, year, month, day, vLat, vLon);
+    const sr = computeSunrise(year, month, day, vLat, vLon, tzOff);
     if (!sr) return null;
 
     const riseJD = julianDay(year, month, day, sr.rise);
     const setJD = julianDay(year, month, day, sr.set);
+
+    const computeCore = () => {
+    const nextDaySr = computeSunrise(year, month, day + 1, vLat, vLon, tzOff);
+    const nextRiseJD = nextDaySr ? julianDay(year, month, day + 1, nextDaySr.rise) : (riseJD + 1.0);
 
     // Five limbs at sunrise
     const e = elongation(riseJD);
@@ -2518,7 +2576,7 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
     const s = siderealSun(riseJD);
     const ya = yogaAngle(riseJD);
 
-    // Tithi
+    // Tithi + Continuous Root-Finding + Kshaya / Adhika (Vriddhi) Detection
     const tithiNo = Math.floor(e / 12) + 1; // 1-30
     const paksha = tithiNo <= 15 ? "Shukla" : "Krishna";
     const pakshaKn = tithiNo <= 15 ? "ಶುಕ್ಲ ಪಕ್ಷ" : "ಕೃಷ್ಣ ಪಕ್ಷ";
@@ -2526,8 +2584,22 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
     if (tithiNo === 15) { tithiName = "Purnima"; tithiNameKn = "ಹುಣ್ಣಿಮೆ"; }
     else if (tithiNo === 30) { tithiName = "Amavasya"; tithiNameKn = "ಅಮಾವಾಸ್ಯೆ"; }
     else { const idx = (tithiNo - 1) % 15; tithiName = TITHI_EN[idx]; tithiNameKn = TITHI_KN[idx]; }
-    const tithiStart = isFast ? null : prevBoundary(riseJD, elongation, 12);
-    const tithiEnd = isFast ? null : nextBoundary(riseJD, elongation, 12);
+
+    let tithiStart = null, tithiEnd = null, isAdhikaTithi = false, isKshayaTithi = false, kshayaTithiObj = null;
+    if (!isFast) {
+        if (typeof detectKshayaAndAdhikaTithi === 'function') {
+            const ka = detectKshayaAndAdhikaTithi(riseJD, nextRiseJD, elongation, TITHI_EN, TITHI_KN);
+            tithiStart = ka.startJD;
+            tithiEnd = ka.endJD;
+            isAdhikaTithi = ka.isAdhika;
+            isKshayaTithi = ka.isKshaya;
+            kshayaTithiObj = ka.kshayaTithi;
+        } else {
+            tithiStart = prevBoundary(riseJD, elongation, 12);
+            tithiEnd = nextBoundary(riseJD, elongation, 12);
+            isAdhikaTithi = (tithiStart <= riseJD && tithiEnd >= nextRiseJD);
+        }
+    }
 
     // Nakshatra
     const nakIdx = Math.floor(m / (360 / 27));
@@ -2571,8 +2643,6 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
         // Amrit Kalam & Varjyam (Scaled to true Nakshatra duration in Ghatikas)
         const nakStart1 = prevBoundary(riseJD, siderealMoon, 360 / 27);
         const dur1 = nakEnd - nakStart1;
-        const nextDaySr = computeSunrise(year, month, day + 1, lat, lon, tzOff);
-        const nextRiseJD = nextDaySr ? julianDay(year, month, day + 1, nextDaySr.rise) : (riseJD + 1.0);
 
         // Window 1: Sunrise Nakshatra
         aStart1 = nakStart1 + (dur1 * (AMRITA_GHATIKAS[nakIdx] / 60));
@@ -2614,7 +2684,7 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
     const isAdhikaMasa = masaResult.isAdhika;
 
     // Samvatsara: compute actual Ugadi date for stable year determination
-    const ugadiJD = findUgadiJD(year);
+    const ugadiJD = findUgadiJD(year, vLat, vLon, tzOff);
     const currentJD = julianDay(year, month, day, 12);
     const isPastUgadi = currentJD >= ugadiJD;
     const shakaYear = isPastUgadi ? year - 78 : year - 79;
@@ -2642,8 +2712,14 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
     }
 
     return {
-        sunrise: riseJD, sunset: setJD, tzOff,
-        tithi: { no: tithiNo, name: tithiName, nameKn: tithiNameKn, paksha, pakshaKn, startJD: tithiStart, endJD: tithiEnd },
+        sunrise: riseJD, sunset: setJD, nextSunrise: nextRiseJD,
+        lat: vLat, lon: vLon, tzName: resolvedTz, tzOff, coordsValid: coords.valid,
+        tithi: {
+            no: tithiNo, name: tithiName, nameKn: tithiNameKn,
+            paksha, pakshaKn, startJD: tithiStart, endJD: tithiEnd,
+            isAdhika: isAdhikaTithi, isKshaya: isKshayaTithi, kshayaTithi: kshayaTithiObj
+        },
+        kshayaTithi: kshayaTithiObj,
         nakshatra: { idx: nakIdx, name: NAK_EN[nakIdx], nameKn: NAK_KN[nakIdx], pada, endJD: nakEnd },
         yoga: { idx: yogaIdx, name: YOGA_EN[yogaIdx], endJD: yogaEnd, inauspicious: INAUSPICIOUS_YOGAS.includes(yogaIdx) },
         karana: { name: karanaName(kNo), endJD: karanaEnd, isVishti: karanaName(kNo) === "Vishti" },
@@ -2661,11 +2737,17 @@ function computePanchanga(year, month, day, lat, lon, tzName, options = {}) {
         samvatsara: { name: samvatsaraName, idx: samvatsaraIdx, shaka: shakaYear },
         ayana: { en: ayana, kn: ayanaKn },
         ritu: rituName,
-        lagnas: isFast ? [] : computeDailyLagnas(riseJD, lat, lon),
+        lagnas: isFast ? [] : computeDailyLagnas(riseJD, vLat, vLon),
         shraddhaTithi: shraddha,
         elongation: elongation(riseJD),
         wd, year, month, day
     };
+    };
+
+    if (typeof EphemerisCache !== 'undefined') {
+        return EphemerisCache.getOrCompute('panchanga', riseJD, vLat, vLon, computeCore, isFast ? 'fast' : 'full');
+    }
+    return computeCore();
 }
 
 // ============================================================
@@ -2763,7 +2845,14 @@ function renderPanchanga(p) {
     const tithiEndStr = fmtWithDay(activeTithi.endJD);
     let udayaNoteHtml = '';
     if (isViewingToday && p.tithi.no !== activeTithi.no) {
-        udayaNoteHtml = `<div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px;opacity:0.85;">☀️ ${isKn ? 'ಉದಯ ತಿಥಿ (ಮುಕ್ತಾಯ)' : 'Sunrise Tithi (Completed)'}: ${isKn ? p.tithi.nameKn : p.tithi.name} (${fmtWithDay(p.tithi.endJD)})</div>`;
+        udayaNoteHtml += `<div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px;opacity:0.85;">☀️ ${isKn ? 'ಉದಯ ತಿಥಿ (ಮುಕ್ತಾಯ)' : 'Sunrise Tithi (Completed)'}: ${isKn ? p.tithi.nameKn : p.tithi.name} (${fmtWithDay(p.tithi.endJD)})</div>`;
+    }
+    if (p.tithi.isAdhika) {
+        udayaNoteHtml += `<div style="font-size:0.65rem;color:var(--gold-light);margin-top:2px;font-weight:600;">✨ ${isKn ? 'ವೃದ್ಧಿ / ಅಧಿಕ ತಿಥಿ (ಎರಡು ಸೂರ್ಯೋದಯ ವ್ಯಾಪ್ತಿ)' : 'Adhika / Vriddhi Tithi (Spans Two Consecutive Sunrises)'}</div>`;
+    }
+    if (p.kshayaTithi) {
+        const kt = p.kshayaTithi;
+        udayaNoteHtml += `<div style="font-size:0.65rem;color:var(--orange);margin-top:2px;font-weight:600;">⚡ ${isKn ? 'ಕ್ಷಯ ತಿಥಿ' : 'Kshaya Tithi'}: ${isKn ? kt.nameKn : kt.name} (${fmtWithDay(kt.startJD)} – ${fmtWithDay(kt.endJD)})</div>`;
     }
     document.getElementById('glTithi').innerHTML = `<div>${isKn ? activeTithi.pakshaKn + ' ' + activeTithi.nameKn : activeTithi.paksha + ' ' + activeTithi.name}</div><div style="font-size:0.7rem;color:var(--text-dim);font-weight:normal;margin-top:3px;line-height:1.4;">🟢 ${isKn ? 'ಪ್ರಾರಂಭ' : 'Start'}: <span style="color:var(--text);font-weight:500;">${tithiStartStr}</span><br>🔴 ${isKn ? 'ಅಂತ್ಯ' : 'End'}: <span style="color:var(--text);font-weight:500;">${tithiEndStr}</span>${udayaNoteHtml}</div>`;
     
@@ -2790,13 +2879,16 @@ function renderPanchanga(p) {
     document.getElementById('valSunrise').textContent = fmt(p.sunrise);
     document.getElementById('valSunset').textContent = fmt(p.sunset);
 
-    // --- Moonrise / Moonset ---
+    // --- Moonrise / Moonset & Dynamic Sun/Moon Rashi at evalJD ---
     const loc = getLocation();
-    const moonRS = computeMoonRiseSet(p.year, p.month, p.day, loc.lat, loc.lon);
+    const evalJD = isViewingToday ? nowJD : p.sunrise;
+    const activeSunRashiIdx = Math.floor(siderealSun(evalJD) / 30);
+    const activeMoonRashiIdx = Math.floor(siderealMoon(evalJD) / 30);
+    const moonRS = computeMoonRiseSet(p.year, p.month, p.day, loc.lat, loc.lon, p.tzOff);
     document.getElementById('valMoonrise').textContent = moonRS.riseJD ? fmt(moonRS.riseJD) : '—';
     document.getElementById('valMoonset').textContent = moonRS.setJD ? fmt(moonRS.setJD) : '—';
-    document.getElementById('valSunRashi').textContent = `${p.sunRashi.en} · ${p.sunRashi.kn}`;
-    document.getElementById('valMoonRashi').textContent = `${p.moonRashi.en} · ${p.moonRashi.kn}`;
+    document.getElementById('valSunRashi').textContent = `${RASHI_EN[activeSunRashiIdx]} · ${RASHI_KN[activeSunRashiIdx]}`;
+    document.getElementById('valMoonRashi').textContent = `${RASHI_EN[activeMoonRashiIdx]} · ${RASHI_KN[activeMoonRashiIdx]}`;
 
     // Five Limbs
     document.getElementById('valTithi').textContent = `${activeTithi.paksha} ${activeTithi.name}`;
@@ -3094,8 +3186,8 @@ function renderPanchanga(p) {
         `).join('');
     }, 0);
 
-    // --- GRAHA STHITI (Planetary Positions) ---
-    const grahas = getAllGrahaPositions(p.sunrise);
+    // --- GRAHA STHITI (Planetary Positions evaluated dynamically at evalJD) ---
+    const grahas = getAllGrahaPositions(evalJD);
     const grahaGrid = document.getElementById('grahaGrid');
     grahaGrid.innerHTML = grahas.map(g => {
         const badges = [];
@@ -3128,7 +3220,7 @@ function renderPanchanga(p) {
         warningNotes.push(`🪐 <span style="color:#f59e0b;">Vakri (Retrograde):</span> ${vakriPlanets.map(g => g.nameKn + ' (' + g.name + ')').join(', ')}.`);
     }
     if (typeof checkGandantaAndPushkar === 'function') {
-        const gp = checkGandantaAndPushkar(siderealMoon(p.sunrise), siderealSun(p.sunrise));
+        const gp = checkGandantaAndPushkar(siderealMoon(evalJD), siderealSun(evalJD));
         if (gp && gp.alerts && gp.alerts.length > 0) {
             gp.alerts.forEach(a => {
                 if (a.type === 'gandanta') {
@@ -3385,7 +3477,7 @@ function matchFestivals(p, pYesterday) {
     let tomorrowSunrise = p.sunrise + 1.0;
 
     {
-        const srTom = computeSunrise(p.year, p.month, p.day + 1, 12.9716, 77.5946, p.tzOff || 5.5);
+        const srTom = computeSunrise(p.year, p.month, p.day + 1, p.lat || 12.9716, p.lon || 77.5946, p.tzOff);
         if (srTom) tomorrowSunrise = julianDay(p.year, p.month, p.day + 1, srTom.rise);
         const tomElong = elongation(tomorrowSunrise);
         const tomTithiNum = Math.floor(tomElong / 12) + 1;
@@ -3602,10 +3694,16 @@ function getLocation() {
 }
 
 function setLocation(lat, lon, tz, name) {
-    currentLocation = { lat, lon, tz };
-    document.getElementById('latInput').value = lat.toFixed(4);
-    document.getElementById('lonInput').value = lon.toFixed(4);
-    document.getElementById('tzInput').value = tz;
+    const coords = (typeof validateCoordinates === 'function')
+        ? validateCoordinates(lat, lon)
+        : { lat: Number.isFinite(lat) ? lat : 12.9716, lon: Number.isFinite(lon) ? lon : 77.5946 };
+    const resolvedTz = (typeof resolveTimezoneFromCoords === 'function')
+        ? resolveTimezoneFromCoords(coords.lat, coords.lon, tz)
+        : (tz || 'Asia/Kolkata');
+    currentLocation = { lat: coords.lat, lon: coords.lon, tz: resolvedTz };
+    document.getElementById('latInput').value = coords.lat.toFixed(4);
+    document.getElementById('lonInput').value = coords.lon.toFixed(4);
+    document.getElementById('tzInput').value = resolvedTz;
     if (name) document.getElementById('locationName').textContent = name;
     recalculate();
 }
@@ -3645,11 +3743,19 @@ function detectLocation() {
 }
 
 function applyManualLocation() {
-    const lat = parseFloat(document.getElementById('latInput').value);
-    const lon = parseFloat(document.getElementById('lonInput').value);
-    const tz = document.getElementById('tzInput').value.trim() || 'Asia/Kolkata';
-    if (isNaN(lat) || isNaN(lon)) { alert('Enter valid latitude and longitude.'); return; }
-    setLocation(lat, lon, tz, `${lat.toFixed(4)}°, ${lon.toFixed(4)}°`);
+    const rawLat = parseFloat(document.getElementById('latInput').value);
+    const rawLon = parseFloat(document.getElementById('lonInput').value);
+    const rawTz = document.getElementById('tzInput').value.trim();
+    const coords = (typeof validateCoordinates === 'function')
+        ? validateCoordinates(rawLat, rawLon)
+        : { lat: rawLat, lon: rawLon, valid: (!isNaN(rawLat) && rawLat >= -90 && rawLat <= 90 && !isNaN(rawLon) && rawLon >= -180 && rawLon <= 180) };
+    if (!coords.valid) {
+        alert('Invalid coordinates (Latitude must be -90 to +90, Longitude -180 to +180). Falling back to Bengaluru (12.9716° N, 77.5946° E).');
+    }
+    const resolvedTz = (typeof resolveTimezoneFromCoords === 'function')
+        ? resolveTimezoneFromCoords(coords.lat, coords.lon, rawTz)
+        : (rawTz || 'Asia/Kolkata');
+    setLocation(coords.lat, coords.lon, resolvedTz, coords.valid ? `${coords.lat.toFixed(4)}°, ${coords.lon.toFixed(4)}°` : 'Bengaluru, Karnataka');
 }
 
 function recalculate() {
@@ -7516,6 +7622,8 @@ function onAyanamsaChange(sysId) {
         setActiveAyanamsaId(sysId);
     }
     // Clear ephemeris & calendar caches so new Ayanamsa takes effect everywhere
+    if (typeof EphemerisCache !== 'undefined') EphemerisCache.clear();
+    if (typeof _sunriseCache !== 'undefined') _sunriseCache.clear();
     if (typeof _nmMasaCache !== 'undefined') _nmMasaCache.clear();
     if (typeof _amantaMasaCache !== 'undefined') _amantaMasaCache.clear();
     if (typeof calMonthCache !== 'undefined') calMonthCache.clear();
