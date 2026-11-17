@@ -25,6 +25,7 @@ ENV/
 env.bak/
 venv.bak/
 dist.zip
+dist/
 node_modules/
 scratch/chrome_profile/
 .gradle/
@@ -36,4 +37,6 @@ android/local.properties
 ios/DerivedData/
 *.p12
 *.keystore
+keystore.properties
+android/keystore.properties
 

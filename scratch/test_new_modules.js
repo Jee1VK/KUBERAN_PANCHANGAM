@@ -412,7 +412,7 @@ assert(typeof sandbox.clearAllAppData === 'function', 'clearAllAppData function 
 const capConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'capacitor.config.json'), 'utf8'));
 assert.strictEqual(capConfig.appId, 'com.kuberansilks.panchangam', 'Capacitor appId matches com.kuberansilks.panchangam');
 assert.strictEqual(capConfig.appName, 'Kuberan Panchangam', 'Capacitor appName matches Kuberan Panchangam');
-assert.strictEqual(capConfig.webDir, 'docs', 'Capacitor webDir points to docs');
+assert.strictEqual(capConfig.webDir, 'dist', 'Capacitor webDir points to dist');
 
 // 7. Android Manifest Permissions Verification
 const androidManifest = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'src', 'main', 'AndroidManifest.xml'), 'utf8');
@@ -489,5 +489,24 @@ const pCall2 = sandbox.computePanchanga(2026, 11, 17, 12.9716, 77.5946, 'Asia/Ko
 const statsAfterHit = sandbox.EphemerisCache.getStats();
 assert(statsAfterHit.hits >= 1, 'Second computePanchanga call for same (JulianDay, Lat, Lon) hits memoization cache');
 assert.strictEqual(pCall1.tithi.no, pCall2.tithi.no, 'Cached Panchanga matches computed Panchanga');
+
+console.log('--- 7. Verifying Clean dist/ Build, Offline Fonts, Safe Storage, privacy.html & backButton ---');
+assert(!html.includes('fonts.googleapis.com'), 'Zero external Google Fonts CDN dependency for 100% offline execution');
+assert(typeof sandbox.safeStorageGet === 'function' && typeof sandbox.safeGetJathakaHistory === 'function', 'Safe try/catch localStorage wrappers exposed');
+assert(html.includes("addListener('backButton'"), 'Android hardware backButton listener registered');
+
+const privacyHtml = fs.readFileSync(path.join(__dirname, '..', 'docs', 'privacy.html'), 'utf8');
+assert(privacyHtml.includes('DPDP Act 2023') && privacyHtml.includes('purgeAllLocalData'), 'Standalone privacy.html includes DPDP Act 2023 and Clear History control');
+
+assert(fs.existsSync(path.join(__dirname, '..', 'dist', 'index.html')), 'dist/index.html built');
+assert(fs.existsSync(path.join(__dirname, '..', 'dist', 'privacy.html')), 'dist/privacy.html built');
+assert(fs.existsSync(path.join(__dirname, '..', 'dist', 'rules', 'festivals.json')), 'dist/rules/festivals.json built');
+assert(!fs.existsSync(path.join(__dirname, '..', 'dist', 'engine.py')), 'dist/ excludes engine.py');
+assert(!fs.existsSync(path.join(__dirname, '..', 'dist', 'KuberanPanchangam.spec')), 'dist/ excludes .spec');
+
+assert(fs.existsSync(path.join(__dirname, '..', 'store-assets', 'android', 'icon-512x512.png')), 'store-assets Android 512 icon exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store-assets', 'ios', 'icon-1024x1024.png')), 'store-assets iOS 1024 icon exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'store-assets', 'android', 'feature-graphic-1024x500.png')), 'store-assets feature graphic exists');
+assert(fs.existsSync(path.join(__dirname, '..', 'STORE_METADATA.md')), 'STORE_METADATA.md exists at root');
 
 console.log('🎉 ALL UNIT, INTEGRATION & STORE PUBLISHING TESTS PASSED!');

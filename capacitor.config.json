@@ -1,7 +1,7 @@
 {
   "appId": "com.kuberansilks.panchangam",
   "appName": "Kuberan Panchangam",
-  "webDir": "docs",
+  "webDir": "dist",
   "server": {
     "androidScheme": "https",
     "cleartext": false

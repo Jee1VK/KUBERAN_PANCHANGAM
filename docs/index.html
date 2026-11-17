@@ -9,8 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="assets/images/app_icon.jpg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Offline-first typography stack (zero blocking external font network calls) -->
     <script src="js/astronomy.js"></script>
     <script src="js/ashtakoota.js"></script>
     <script src="js/ayanamsa.js"></script>
@@ -35,8 +34,8 @@
             --orange: #f59e0b;
             --text: #e8e8f0;
             --text-dim: #9ca3af;
-            --font-kn: 'Noto Sans Kannada', sans-serif;
-            --font-en: 'Inter', 'Segoe UI', sans-serif;
+            --font-kn: 'Noto Sans Kannada', 'Nirmala UI', 'Tunga', 'Kedage', sans-serif;
+            --font-en: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
         html, body { overflow-x: hidden; max-width: 100vw; width: 100%; }
         body { font-family: var(--font-en); background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -772,9 +771,10 @@
             <p style="margin-top:10px;"><b>5. Traditional Purohit Consultation Notice:</b><br>
             The calculations provide traditional astronomical estimations. Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions.</p>
 
-            <p style="margin-top:10px;"><b>6. Official Public Privacy Policy:</b><br>
-            Read the complete Kuberan Silks Privacy Policy online at:<br>
-            <a href="https://kuberansilks.com/pages/panchangam-privacy" target="_blank" rel="noopener noreferrer" style="color:var(--gold-light); text-decoration:underline; word-break:break-all;">https://kuberansilks.com/pages/panchangam-privacy</a></p>
+            <p style="margin-top:10px;"><b>6. Official Privacy Policy &amp; Offline Notice:</b><br>
+            View standalone notice: <a href="privacy.html" style="color:var(--gold-light); text-decoration:underline;">Privacy &amp; Data Safety (Offline)</a><br>
+            Online HTTPS Policy: <a href="https://kuberansilks.com/pages/panchangam-privacy" target="_blank" rel="noopener noreferrer" style="color:var(--gold-light); text-decoration:underline; word-break:break-all;">https://kuberansilks.com/pages/panchangam-privacy</a><br>
+            Support Email: <a href="mailto:online@kuberansilks.in" style="color:var(--gold-light); text-decoration:underline;">online@kuberansilks.in</a></p>
         </div>
         <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
             <button onclick="clearAllAppData()" style="flex:1; background:rgba(239,68,68,0.15); border:1px solid var(--red); color:var(--red); padding:10px; border-radius:6px; font-weight:700; cursor:pointer; font-size:0.8rem;">🗑️ Clear All Stored Data</button>
@@ -1231,7 +1231,7 @@
         Computed values (Drik Ganita, Lahiri Ayanamsa) use high-precision modern Swiss Ephemeris & VSOP87 astronomical mechanics.<br>
         Traditional estimations: Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions.<br>
         Engine: Drik · Ayanamsa: <span id="activeAyanamsaLabel" style="color:var(--gold-light);cursor:pointer;text-decoration:underline;" onclick="openSettingsModal()">Lahiri (Chitrapaksha)</span> · Ephemeris: Swiss Ephemeris / VSOP87<br>
-        <span style="color:var(--gold);"><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:var(--gold);text-decoration:underline;">Privacy Policy (DPDP Act & GDPR)</a> &bull; <a href="https://kuberansilks.com/pages/panchangam-privacy" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">Online Policy</a></span><br><br>
+        <span style="color:var(--gold);"><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:var(--gold);text-decoration:underline;">Privacy &amp; Clear Data</a> &bull; <a href="privacy.html" style="color:var(--gold);text-decoration:underline;">Standalone Policy</a> &bull; <a href="https://kuberansilks.com/pages/panchangam-privacy" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">Online HTTPS Policy</a></span><br><br>
         <span style="color:var(--gold);">Kuberan Panchangam v2.0.0 (Google Play & Apple App Store Edition)</span>
     </div>
 </div>
@@ -2016,6 +2016,42 @@ const DASHA_YEARS = [7, 20, 6, 10, 7, 18, 16, 19, 17]; // 0-indexed: Sampat(1), 
 // For dates beyond ±500 years from present, Delta-T uncertainty grows to
 // ~minutes, which affects exact sunrise/sunset times but NOT Tithi/Nakshatra
 // determination (those depend on relative angular positions, not clock time).
+
+function safeStorageGet(key, fallback = null) {
+    try {
+        if (typeof localStorage === 'undefined') return fallback;
+        const val = localStorage.getItem(key);
+        return val !== null ? val : fallback;
+    } catch (e) {
+        return fallback;
+    }
+}
+
+function safeStorageSet(key, val) {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(key, String(val));
+        }
+    } catch (e) {}
+}
+
+function safeStorageRemove(key) {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem(key);
+        }
+    } catch (e) {}
+}
+
+function safeGetJathakaHistory() {
+    try {
+        const raw = safeStorageGet('kuberan_jathaka_history', '[]');
+        const parsed = JSON.parse(raw || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
+}
 
 function julianDay(y, m, d, h) {
     if (m <= 2) { y--; m += 12; }
@@ -3258,7 +3294,7 @@ function renderPanchanga(p) {
     // --- GOCHARA (Transit Analysis) ---
     // Check if user has generated a Jathaka or saved a Family Profile to get their birth Moon Rashi
     const gocharaCard = document.getElementById('gocharaCard');
-    const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    const history = safeGetJathakaHistory();
     const savedFamProfiles = (typeof getFamilyProfiles === 'function') ? getFamilyProfiles() : [];
     let gocharaPersonName = null;
     let birthMoonRashiIdx = null;
@@ -3380,7 +3416,7 @@ function renderPanchanga(p) {
 
     // --- DAILY RASHIFAL (Gochara Transit Analysis) ---
     cachedDailyGrahas = grahas;
-    const storedRashi = localStorage.getItem('kuberan_moon_rashi');
+    const storedRashi = safeStorageGet('kuberan_moon_rashi', null);
     const rashiToUse = (storedRashi !== null && !isNaN(parseInt(storedRashi, 10))) ? parseInt(storedRashi, 10) : 0;
     generateRashifal(rashiToUse, grahas, p);
 
@@ -3389,7 +3425,7 @@ function renderPanchanga(p) {
     updateLiveMuhurthaBanner();
 
     // --- RESTORE SAVED VIEW ---
-    const savedDailyView = localStorage.getItem('kuberan_daily_view') || 'quick';
+    const savedDailyView = safeStorageGet('kuberan_daily_view', 'quick') || 'quick';
     switchDailyView(savedDailyView);
 
     // --- START REAL-TIME COUNTDOWN TIMER ---
@@ -3797,7 +3833,7 @@ function toggleLang() {
     const isKn = document.body.dataset.lang === 'kn';
     document.body.dataset.lang = isKn ? 'en' : 'kn';
     document.getElementById('langToggle').textContent = isKn ? 'ಕನ್ನಡ' : 'English';
-    localStorage.setItem('kuberan_lang', document.body.dataset.lang);
+    safeStorageSet('kuberan_lang', document.body.dataset.lang);
     recalculate();
 }
 
@@ -4048,11 +4084,11 @@ function loadJathakaHistory() {
     const area = document.getElementById('jathakaHistoryArea');
     
     // Auto-delete records older than 48 hours
-    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    let history = safeGetJathakaHistory();
     const now = Date.now();
     const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
     history = history.filter(h => (now - h.timestamp) < FORTY_EIGHT_HOURS);
-    localStorage.setItem('kuberan_jathaka_history', JSON.stringify(history));
+    safeStorageSet('kuberan_jathaka_history', JSON.stringify(history));
 
     if (history.length === 0) {
         area.style.display = 'none';
@@ -4080,15 +4116,15 @@ function loadJathakaHistory() {
 }
 
 function deleteJathaka(idx) {
-    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    let history = safeGetJathakaHistory();
     history.splice(idx, 1);
-    localStorage.setItem('kuberan_jathaka_history', JSON.stringify(history));
+    safeStorageSet('kuberan_jathaka_history', JSON.stringify(history));
     loadJathakaHistory();
 }
 
 function clearJathakaHistory() {
     if(confirm("Delete all Jathaka history?")) {
-        localStorage.removeItem('kuberan_jathaka_history');
+        safeStorageRemove('kuberan_jathaka_history');
         loadJathakaHistory();
     }
 }
@@ -4096,7 +4132,7 @@ function clearJathakaHistory() {
 function clearAllAppData() {
     if (confirm("Delete all locally stored profiles, family members, Jathaka history, and preferences from this device? This action is irreversible.")) {
         try {
-            localStorage.removeItem('kuberan_jathaka_history');
+            safeStorageRemove('kuberan_jathaka_history');
             localStorage.removeItem('kuberan_panchangam_family_profiles_v1');
             localStorage.removeItem('kuberan_moon_rashi');
             localStorage.removeItem('kuberan_ayanamsa_id');
@@ -4110,7 +4146,7 @@ function clearAllAppData() {
 }
 
 function loadJathakaFromHistory(idx) {
-    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    let history = safeGetJathakaHistory();
     if(history[idx]) {
         document.getElementById('jName').value = history[idx].name;
         document.getElementById('jDob').value = history[idx].dobStrRaw;
@@ -4926,7 +4962,7 @@ function generateJathaka() {
             };
 
             // Save to history
-            let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+            let history = safeGetJathakaHistory();
             // Remove exact duplicate if re-generating
             history = history.filter(h => !(h.name === name && h.dobStrRaw === dobStrRaw));
             const cityName = document.getElementById('jCityName')?.textContent || 'Bengaluru, India';
@@ -4936,7 +4972,7 @@ function generateJathaka() {
             });
             // Keep max 20
             if(history.length > 20) history.pop();
-            localStorage.setItem('kuberan_jathaka_history', JSON.stringify(history));
+            safeStorageSet('kuberan_jathaka_history', JSON.stringify(history));
             loadJathakaHistory();
 
             // Show results
@@ -5387,7 +5423,7 @@ function switchDailyView(mode) {
     // Toggle all detailed-only elements
     document.querySelectorAll('.detailed-only').forEach(el => {
         if (el.id === 'gocharaCard') {
-            const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+            const history = safeGetJathakaHistory();
             const fam = (typeof getFamilyProfiles === 'function') ? getFamilyProfiles() : [];
             el.style.display = (isDetailed && (history.length > 0 || fam.length > 0)) ? 'block' : 'none';
         } else {
@@ -5802,7 +5838,7 @@ const RASHI_ASTRO_PROPS = [
 
 function generateRashifal(moonRashiIdx, dayGrahas, p) {
     if (moonRashiIdx === undefined || moonRashiIdx === null || isNaN(moonRashiIdx)) {
-        const storedRashi = typeof localStorage !== 'undefined' ? localStorage.getItem('kuberan_moon_rashi') : null;
+        const storedRashi = safeStorageGet('kuberan_moon_rashi', null);
         moonRashiIdx = (storedRashi !== null && !isNaN(parseInt(storedRashi, 10))) ? parseInt(storedRashi, 10) : 0;
     }
     moonRashiIdx = ((parseInt(moonRashiIdx, 10) % 12) + 12) % 12;
@@ -6241,7 +6277,7 @@ function onSelectRashifal(rashiIdx) {
     }
     const idx = parseInt(rashiIdx, 10);
     const validIdx = (!isNaN(idx) && idx >= 0 && idx < 12) ? idx : 0;
-    if (typeof localStorage !== 'undefined') localStorage.setItem('kuberan_moon_rashi', validIdx);
+    safeStorageSet('kuberan_moon_rashi', validIdx);
     generateRashifal(validIdx, cachedDailyGrahas, lastPanchanga);
 }
 
@@ -6435,7 +6471,7 @@ function scanDates() {
 //  TARABALAM & CHANDRABALAM
 // ============================================================
 function updateMuhurthaPersonalized() {
-    const history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    const history = safeGetJathakaHistory();
     const savedFam = (typeof getFamilyProfiles === 'function') ? getFamilyProfiles() : [];
     if (history.length === 0 && savedFam.length === 0) return;
     if (history.length === 0 && savedFam.length > 0) {
@@ -7857,7 +7893,7 @@ function generateAndSaveFamilyJathaka() {
 }
 
 function saveHistoryItemToFamily(idx) {
-    let history = JSON.parse(localStorage.getItem('kuberan_jathaka_history') || '[]');
+    let history = safeGetJathakaHistory();
     const h = history[idx];
     if (!h || typeof saveFamilyProfile !== 'function') return;
     const d = new Date(h.dobStrRaw);
@@ -8095,7 +8131,7 @@ function renderSavedFamilyProfiles() {
 (function init() {
     renderSavedFamilyProfiles();
     // Restore language preference
-    const savedLang = localStorage.getItem('kuberan_lang') || 'en';
+    const savedLang = safeStorageGet('kuberan_lang', 'en') || 'en';
     document.body.dataset.lang = savedLang;
     if (savedLang === 'kn') document.getElementById('langToggle').textContent = 'English';
 
@@ -8144,6 +8180,48 @@ function renderSavedFamilyProfiles() {
     }
     // Also render immediately with defaults (GPS callback will re-render if it succeeds)
     recalculate();
+
+    // Register Android hardware Back button handler for Capacitor WebView
+    try {
+        const capApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+        if (capApp && typeof capApp.addListener === 'function') {
+            capApp.addListener('backButton', function() {
+                const privModal = document.getElementById('privacyModal');
+                const setModal = document.getElementById('settingsModal');
+                const discModal = document.getElementById('disclaimerModal');
+                const dailyRes = document.getElementById('dailyCityResults');
+                const jRes = document.getElementById('jCityResults');
+
+                if (dailyRes && dailyRes.style.display === 'block') {
+                    dailyRes.style.display = 'none';
+                    return;
+                }
+                if (jRes && jRes.style.display === 'block') {
+                    jRes.style.display = 'none';
+                    return;
+                }
+                if (privModal && privModal.style.display === 'flex') {
+                    closePrivacyModal();
+                    return;
+                }
+                if (setModal && setModal.style.display === 'flex') {
+                    closeSettingsModal();
+                    return;
+                }
+                if (discModal && discModal.style.display === 'flex') {
+                    return; // Keep consent modal active until user chooses
+                }
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab && activeTab.id !== 'tab-daily') {
+                    switchTab('daily');
+                    return;
+                }
+                if (typeof capApp.exitApp === 'function') {
+                    capApp.exitApp();
+                }
+            });
+        }
+    } catch (e) {}
 })();
 </script>
 </body>
