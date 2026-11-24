@@ -19,9 +19,19 @@ const EXCLUDED_EXTS = new Set(['.py', '.pyc', '.spec', '.zip', '.md']);
 const EXCLUDED_FILE_REGEX = /^(test_.*|pytest.*|requirements\.txt|ota-manifest\.json)$/i;
 const EXCLUDED_DIRS = new Set(['superpowers']);
 
+const TEXT_EXTS = new Set(['.html', '.js', '.css', '.json', '.svg', '.txt', '.xml', '.webmanifest']);
+
+function readNormalizedBytes(filePath) {
+    const raw = fs.readFileSync(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+    if (!TEXT_EXTS.has(ext)) return raw;
+    // Normalize CRLF -> LF so SHA-256 matches GitHub Pages (Git LF blobs) identically on Windows & Linux
+    return Buffer.from(raw.toString('utf8').replace(/\r\n/g, '\n'), 'utf8');
+}
+
 function sha256File(filePath) {
     const hash = crypto.createHash('sha256');
-    hash.update(fs.readFileSync(filePath));
+    hash.update(readNormalizedBytes(filePath));
     return hash.digest('hex');
 }
 
@@ -52,9 +62,10 @@ function collectDocsFiles(baseDir, currentDir, outMap) {
         } else if (entry.isFile() && shouldCopyFile(entry.name)) {
             if (entry.name === 'robots.txt' || entry.name === 'sitemap.xml') continue;
             const rel = path.relative(baseDir, fullPath).split(path.sep).join('/');
+            const normBuf = readNormalizedBytes(fullPath);
             outMap[rel] = {
-                sha256: sha256File(fullPath),
-                size: fs.statSync(fullPath).size
+                sha256: crypto.createHash('sha256').update(normBuf).digest('hex'),
+                size: normBuf.length
             };
         }
     }
@@ -102,9 +113,10 @@ function copyDirFiltered(srcDir, destDir, stats) {
             if (EXCLUDED_DIRS.has(entry.name.toLowerCase())) continue;
             copyDirFiltered(srcPath, destPath, stats);
         } else if (entry.isFile() && shouldCopyFile(entry.name)) {
-            fs.copyFileSync(srcPath, destPath);
+            const normBuf = readNormalizedBytes(srcPath);
+            fs.writeFileSync(destPath, normBuf);
             stats.files++;
-            stats.bytes += fs.statSync(destPath).size;
+            stats.bytes += normBuf.length;
         }
     }
 }
