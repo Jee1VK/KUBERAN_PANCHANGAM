@@ -3479,7 +3479,7 @@ const FESTIVAL_RULES = [
     {"id":"hanuman_jayanti","name":{"en":"Hanuman Jayanti","kn":"ಹನುಮಾನ್ ಜಯಂತಿ"},"masa":"Margashira","paksha":"Shukla","tithi":13,"shopping_peak":false},
     {"id":"ugadi","name":{"en":"Ugadi","kn":"ಯುಗಾದಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":1,"shopping_peak":true},
     {"id":"rama_navami","name":{"en":"Rama Navami","kn":"ರಾಮ ನವಮಿ"},"masa":"Chaitra","paksha":"Shukla","tithi":9,"shopping_peak":false},
-    {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"ಅಕ್ಷಯ ತೃತೀಯ"},"masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
+    {"id":"akshaya_tritiya","name":{"en":"Akshaya Tritiya","kn":"ಅಕ್ಷಯ ತೃತೀಯ"},"kaala":"madhyahna","masa":"Vaishakha","paksha":"Shukla","tithi":3,"shopping_peak":true},
     {"id":"guru_purnima","name":{"en":"Guru Purnima","kn":"ಗುರು ಪೂರ್ಣಿಮೆ"},"masa":"Ashadha","paksha":"Shukla","tithi":15,"shopping_peak":false},
     {"id":"nagara_panchami","name":{"en":"Nagara Panchami","kn":"ನಾಗರ ಪಂಚಮಿ"},"masa":"Shravana","paksha":"Shukla","tithi":5,"shopping_peak":false},
     {"id":"krishna_janmashtami","name":{"en":"Krishna Janmashtami","kn":"ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ"},"kaala":"midnight","masa":"Shravana","paksha":"Krishna","tithi":23,"shopping_peak":false},
@@ -3511,11 +3511,11 @@ const FESTIVAL_RULES = [
 // Recurring vratas (checked every paksha)
 const VRATA_RULES = [
     {"id":"ekadashi","name":{"en":"Ekadashi Vrata","kn":"ಏಕಾದಶಿ ವ್ರತ"},"tithi":11,"shopping_peak":false},
-    {"id":"pradosha","name":{"en":"Pradosha Vrata","kn":"ಪ್ರದೋಷ ವ್ರತ"},"tithi":13,"shopping_peak":false},
+    {"id":"pradosha","name":{"en":"Pradosha Vrata","kn":"ಪ್ರದೋಷ ವ್ರತ"},"kaala":"pradosha","tithi":13,"shopping_peak":false},
     {"id":"sankashti","name":{"en":"Sankashti Chaturthi","kn":"ಸಂಕಷ್ಟ ಚತುರ್ಥಿ"},"tithi":4,"paksha":"Krishna","shopping_peak":false},
     {"id":"amavasya","name":{"en":"Amavasya","kn":"ಅಮಾವಾಸ್ಯೆ"},"tithi":30,"shopping_peak":false},
     {"id":"purnima","name":{"en":"Purnima","kn":"ಹುಣ್ಣಿಮೆ"},"tithi":15,"shopping_peak":false},
-    {"id":"shivaratri","name":{"en":"Masa Shivaratri","kn":"ಮಾಸ ಶಿವರಾತ್ರಿ"},"tithi":14,"paksha":"Krishna","shopping_peak":false}
+    {"id":"shivaratri","name":{"en":"Masa Shivaratri","kn":"ಮಾಸ ಶಿವರಾತ್ರಿ"},"kaala":"midnight","tithi":14,"paksha":"Krishna","shopping_peak":false}
 ];
 
 // Solar Ingress Solver for Makara Sankranti
@@ -3648,11 +3648,32 @@ function matchFestivals(p, pYesterday) {
         if (matched) results.push(f);
     }
 
-    // Match recurring vratas (with Vriddhi Day-2 suppression)
+    // Match recurring vratas (with Kaala Vyapti for Pradosha/Masa Shivaratri & Vriddhi Day-2 suppression)
     const tithiInPaksha = tithiNum <= 15 ? tithiNum : tithiNum - 15; // 1-15 within each paksha
     const yTithiInPaksha = yTithiNum <= 15 ? yTithiNum : yTithiNum - 15;
+    const hasMahaShivaratri = results.some(r => r.id === 'maha_shivaratri');
     for (const v of VRATA_RULES) {
-        if (v.tithi < 15) {
+        if (v.id === 'shivaratri' && hasMahaShivaratri) continue; // Maha Shivaratri supersedes Masa Shivaratri
+        if (v.kaala) {
+            const offsetHours = v.kaala === 'midnight' ? 18 : 12; // Nishita (midnight) or Pradosha (sunset)
+            const jdToday = v.kaala === 'pradosha' ? p.sunset : (p.sunrise + offsetHours / 24);
+            const elToday = ((moonLongitude(jdToday) - sunLongitude(jdToday)) % 360 + 360) % 360;
+            const tNoToday = Math.floor(elToday / 12) + 1;
+            const tInPksToday = tNoToday <= 15 ? tNoToday : tNoToday - 15;
+            const pksToday = tNoToday <= 15 ? 'Shukla' : 'Krishna';
+
+            const jdYest = v.kaala === 'pradosha' ? (validYest ? pYesterday.sunset : p.sunset - 1.0) : ((validYest ? pYesterday.sunrise : p.sunrise - 1.0) + offsetHours / 24);
+            const elYest = ((moonLongitude(jdYest) - sunLongitude(jdYest)) % 360 + 360) % 360;
+            const tNoYest = Math.floor(elYest / 12) + 1;
+            const tInPksYest = tNoYest <= 15 ? tNoYest : tNoYest - 15;
+            const pksYest = tNoYest <= 15 ? 'Shukla' : 'Krishna';
+
+            const hitToday = (tInPksToday === v.tithi && (!v.paksha || v.paksha === pksToday));
+            const hitYest = (tInPksYest === v.tithi && (!v.paksha || v.paksha === pksYest));
+            if (hitToday && !hitYest && !results.find(r => r.id === v.id)) {
+                results.push(v);
+            }
+        } else if (v.tithi < 15) {
             if (tithiInPaksha === v.tithi) {
                 if (!v.paksha || v.paksha === pakshaStr) {
                     const hitYest = (yTithiInPaksha === v.tithi && (!v.paksha || v.paksha === yPaksha));
@@ -3700,15 +3721,14 @@ function matchFestivals(p, pYesterday) {
         });
     }
 
-    // Check Solar & Lunar Eclipses on this day
-    if (tithiNum === 15 || tithiNum === 30) {
-        const obs = new Astronomy.Observer(p.lat || 12.9716, p.lon || 77.5946, 920);
+    // Check Solar & Lunar Eclipses on this day (including when Purnima/Amavasya begins after sunrise)
+    if (tithiNum === 14 || tithiNum === 15 || tithiNum === 29 || tithiNum === 30) {
         const searchTime = new Astronomy.AstroTime(p.sunrise - 2451545.0);
-        if (tithiNum === 15) {
+        if (tithiNum === 14 || tithiNum === 15) {
             const le = Astronomy.SearchLunarEclipse(searchTime.AddDays(-0.5));
             if (le) {
                 const pkJD = le.peak.ut + 2451545.0;
-                if (pkJD >= p.sunrise - 0.5 && pkJD < p.sunrise + 1.0) {
+                if (pkJD >= p.sunrise && pkJD < p.sunrise + 1.0) {
                     results.push({
                         id: "chandra_grahanam",
                         name: { en: `Chandra Grahanam (${le.kind})`, kn: `ಚಂದ್ರ ಗ್ರಹಣ (${le.kind === 'total' ? 'ಖಗ್ರಾಸ' : (le.kind === 'partial' ? 'ಖಂಡಗ್ರಾಸ' : 'ಛಾಯಾ')})` },
@@ -3717,11 +3737,12 @@ function matchFestivals(p, pYesterday) {
                     });
                 }
             }
-        } else if (tithiNum === 30) {
+        }
+        if (tithiNum === 29 || tithiNum === 30) {
             const se = Astronomy.SearchGlobalSolarEclipse(searchTime.AddDays(-0.5));
             if (se) {
                 const pkJD = se.peak.ut + 2451545.0;
-                if (pkJD >= p.sunrise - 0.5 && pkJD < p.sunrise + 1.0) {
+                if (pkJD >= p.sunrise && pkJD < p.sunrise + 1.0) {
                     results.push({
                         id: "surya_grahanam",
                         name: { en: `Surya Grahanam (${se.kind})`, kn: `ಸೂರ್ಯ ಗ್ರಹಣ (${se.kind === 'total' ? 'ಖಗ್ರಾಸ' : (se.kind === 'annular' ? 'ಕಂಕಣ' : 'ಖಂಡಗ್ರಾಸ')})` },
@@ -4577,9 +4598,18 @@ function findYearEclipses(year, lat = 12.9716, lon = 77.5946, tzOff = 5.5) {
             const mokshaDate = new Date(peakDate.getTime() + sdMin * 60000);
             const sutakaDate = new Date(sparshaDate.getTime() - 9 * 3600000); // 3 praharas (9 hrs) before
 
-            const moonEquator = Astronomy.Equator(Astronomy.Body.Moon, le.peak, obs, true, true);
-            const moonHor = Astronomy.Horizon(le.peak, obs, moonEquator.ra, moonEquator.dec, 'normal');
-            const isVisible = moonHor.altitude > 0;
+            // Check Moon horizon visibility across the ENTIRE umbral span [sparshaDate .. mokshaDate]
+            // to accurately detect Grasodaya (eclipsed moonrise, e.g. Mar 3 2026 in India) & Grastasta!
+            const sampleFracs = [0, 0.25, 0.5, 0.75, 1.0];
+            let maxAlt = -90;
+            for (const frac of sampleFracs) {
+                const sampleMs = sparshaDate.getTime() + (mokshaDate.getTime() - sparshaDate.getTime()) * frac;
+                const sampleTime = new Astronomy.AstroTime(new Date(sampleMs));
+                const moonEq = Astronomy.Equator(Astronomy.Body.Moon, sampleTime, obs, true, true);
+                const moonHor = Astronomy.Horizon(sampleTime, obs, moonEq.ra, moonEq.dec, 'normal');
+                if (moonHor.altitude > maxAlt) maxAlt = moonHor.altitude;
+            }
+            const isVisible = maxAlt > 0;
 
             const kindKnMap = { 'total': 'ಖಗ್ರಾಸ (Total)', 'partial': 'ಖಂಡಗ್ರಾಸ (Partial)', 'penumbral': 'ಛಾಯಾ (Penumbral)' };
             eclipses.push({
@@ -4609,7 +4639,12 @@ function findYearEclipses(year, lat = 12.9716, lon = 77.5946, tzOff = 5.5) {
             const peakDate = se.peak.date;
             const localSearchTime = se.peak.AddDays(-1);
             const lse = Astronomy.SearchLocalSolarEclipse(localSearchTime, obs);
-            const isLocal = lse && Math.abs(lse.peak.time.date.getTime() - peakDate.getTime()) < 24 * 3600000 && lse.peak.altitude > 0;
+            const lseMaxAlt = lse ? Math.max(
+                lse.partial_begin ? lse.partial_begin.altitude : -90,
+                lse.peak ? lse.peak.altitude : -90,
+                lse.partial_end ? lse.partial_end.altitude : -90
+            ) : -90;
+            const isLocal = Boolean(lse && Math.abs(lse.peak.time.date.getTime() - peakDate.getTime()) < 24 * 3600000 && lseMaxAlt > 0);
 
             let sparshaDate, mokshaDate;
             if (isLocal && lse.partial_begin && lse.partial_end) {
