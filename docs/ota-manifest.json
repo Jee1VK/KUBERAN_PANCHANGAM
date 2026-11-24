@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "appId": "com.kuberansilks.panchangam",
+  "version": "2.0.0-v68",
+  "bundleHash": "0ac407553d6005f5be4c99180e888e9e0e8d6606d59204560045d704ab823c60",
+  "minNativeVersionCode": 1,
+  "baseUrl": "https://jee1vk.github.io/KUBERAN_PANCHANGAM/",
+  "builtAt": "2026-11-24T14:02:21.363Z",
+  "files": {
+    "404.html": {
+      "sha256": "6c5ffebc51a1a4cf7e6884a9cf3aca8d122d591cad2907bc4e12a95beea10b2e",
+      "size": 2237
+    },
+    "assets/css/style.css": {
+      "sha256": "308ddabd4e7b494e5f7980b8e3e5769b651ce705f734eef574c1e28b1eaf720c",
+      "size": 10385
+    },
+    "assets/images/app_icon.jpg": {
+      "sha256": "f1578b7563f52e93c03e1e01dd61fdc6148a4eb70e8d894879f288fea972593e",
+      "size": 584545
+    },
+    "assets/images/kuberan_logo_white_bg.png": {
+      "sha256": "b7af068b5ca770c030727f2491777eb725b73012975f21f95ab6f026dc9dd50d",
+      "size": 169333
+    },
+    "index.html": {
+      "sha256": "d1048f850329ac8e487cb0da9c1affe58f5c9530cba859f684a96e48a7cd1096",
+      "size": 508532
+    },
+    "js/app.js": {
+      "sha256": "87f3fd9c544e7a4bbc322f1c3bab5315a81c757fbef0fa15bc91d2e5c78e9806",
+      "size": 1098
+    },
+    "js/ashtakoota.js": {
+      "sha256": "5a30cb9f1722f320fd4871265105a21b9099d3f601f1b878fb06769db1bb341e",
+      "size": 8359
+    },
+    "js/astronomy.js": {
+      "sha256": "f41139a87941ea017ab902b954c9389fa27ea72083d7fab4971756d7769d14e6",
+      "size": 116424
+    },
+    "js/ayanamsa.js": {
+      "sha256": "32780bd4417762950325e4ff1f77e4efe9ca4110c3e72950d5952de6820cf8f9",
+      "size": 7465
+    },
+    "js/cities.js": {
+      "sha256": "403fa1d6b0ad213caa791802b6a0cff68f3e208564f91aec84a911e56f7d94f5",
+      "size": 7826
+    },
+    "js/ephemeris.js": {
+      "sha256": "b66ca32cc0cc95df65ad4d6917d39f8584e60df108d04dbad6d7c66c596b19cd",
+      "size": 19625
+    },
+    "js/exportUtils.js": {
+      "sha256": "88a2e8f4e7a91b876aeaaf23f4b3eaba85b870c2fafc0d8850700ffe5537c6e3",
+      "size": 2753
+    },
+    "js/familyStore.js": {
+      "sha256": "3692529a50480cc4c1d2886e0d762c76db9945f123ab8c7f465ac999ed7f9c9d",
+      "size": 3069
+    },
+    "js/muhurthaEngine.js": {
+      "sha256": "62ca369e61b72946eb007e79a0f7b91a8e6ece4e419b3bdb66adfb38a747b107",
+      "size": 9137
+    },
+    "js/otaClient.js": {
+      "sha256": "1cff0daa1babf11548e7e0599ba37773fd444014a45ed93b2144c0866a3ba4f8",
+      "size": 12452
+    },
+    "manifest.json": {
+      "sha256": "75b203caf1619d57b6c040713b4a8866de327214495b39dc9a37ab3e4f978d6a",
+      "size": 784
+    },
+    "privacy.html": {
+      "sha256": "8601d5eb2dd74a2f58d2093e722c1e77d025098b8085c2b1705e623b42fbec65",
+      "size": 12524
+    },
+    "sw.js": {
+      "sha256": "9e2933bb2af10968a2bf63be1d4737881d7b93bf270bddaa43c0f18441ece62b",
+      "size": 2198
+    }
+  }
+}

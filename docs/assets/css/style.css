@@ -1,33 +1,398 @@
 /* ============================================================
- * Kuberan Panchangam — Royal Silk & Vedic Gold ThemeVariables & Utilities
+ * Kuberan Panchangam — Master Design Engineering & Craft Layer
+ * Aligned with Google Stitch DESIGN.md + emil-design-eng + taste-frontend + ui-ux-pro-max
  * ============================================================ */
 :root {
-    --kuberan-maroon: #7b1e2d;
-    --kuberan-maroon-dark: #4a0e17;
-    --kuberan-gold: #d4a017;
-    --kuberan-gold-light: #f5c842;
+    --kuberan-maroon: #6B1D2F;
+    --kuberan-maroon-dark: #3D0E18;
+    --kuberan-gold: #C5A059;
+    --kuberan-gold-light: #F5D47A;
+    --kuberan-green: #1B4D3E;
+    --kuberan-ivory: #FAFAF7;
     --kuberan-bg: #0c0f1a;
-    --kuberan-card: #161b2e;
-    --kuberan-border: #232a42;
+    --kuberan-card: #151a2c;
+    --kuberan-border: rgba(197, 160, 89, 0.22);
+    --ease-out-expo: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out-morph: cubic-bezier(0.77, 0, 0.175, 1);
+    /* Override dim secondary text to pass WCAG AA 4.5:1 on dark surfaces */
+    --text-dim: #b4bccb;
+    --maroon: #6B1D2F;
+    --gold: #C5A059;
+    --gold-light: #F5D47A;
 }
 
-/* Smooth transitions for interactive badges and family chips */
+/* Crisp typography & editorial balance */
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, .samvatsara, .date-en {
+    text-wrap: balance;
+}
+
+.header-band .samvatsara,
+.jathaka-header h2 {
+    font-family: "Cormorant Garamond", "Cinzel", Georgia, "Times New Roman", serif;
+    letter-spacing: 0.02em;
+}
+
+/* Tabular numerals for ALL timers, dates, countdowns, scores, and planetary degrees */
+.window-time,
+.limb-item .time,
+.sm-item .val,
+.timeline-labels,
+.date-picker-input,
+#liveMuhurthaBanner,
+#jDashaTimeline,
+#latInput,
+#lonInput,
+.si-cell,
+[id*="Time"],
+[id*="Score"],
+[id*="Guna"] {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Layered hairline shadows & concentric radii (12px outer -> 8px inner -> 6px control) */
+.card,
+.header-band,
+.jathaka-report {
+    box-shadow:
+        0 0 0 1px rgba(197, 160, 89, 0.12),
+        0 4px 12px rgba(0, 0, 0, 0.26),
+        0 12px 28px -8px rgba(0, 0, 0, 0.42);
+    border-radius: 12px;
+}
+
+.header-band {
+    background: linear-gradient(135deg, #6B1D2F 0%, #3A0D18 100%) !important;
+    border: 1px solid rgba(197, 160, 89, 0.35) !important;
+}
+
+.limb-item,
+.sm-item,
+.j-box,
+.person-entry {
+    border-radius: 8px;
+}
+
+/* Top Bar Optical Alignment & 44x44px Touch Targets */
+.top-bar {
+    gap: 10px;
+    background: rgba(15, 19, 34, 0.96) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(197, 160, 89, 0.22) !important;
+}
+
+.top-bar .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    flex: 1;
+}
+
+.top-bar .brand-lockup a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 13px;
+    overflow: hidden;
+    border: 1.5px solid rgba(197, 160, 89, 0.72);
+    box-shadow: 0 2px 10px rgba(197, 160, 89, 0.22), 0 2px 6px rgba(0, 0, 0, 0.45);
+    background: #FFFFFF;
+}
+
+.top-bar .brand-lockup a img {
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+    display: block;
+    border-radius: 11px;
+}
+
+.top-bar h1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.1;
+    margin: 0;
+    font-family: "Cormorant Garamond", "Cinzel", "Playfair Display", Georgia, "Palatino Linotype", "Book Antiqua", serif !important;
+    color: var(--kuberan-gold-light) !important;
+}
+
+.top-bar h1 .brand-main {
+    font-size: 1.12rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #F6DC8C;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.top-bar h1 .brand-sub {
+    font-family: var(--font-en);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    color: #D5BA7A;
+    margin-top: 2px;
+    text-transform: uppercase;
+}
+
+@media (max-width: 650px) {
+    .top-bar {
+        padding-left: max(12px, env(safe-area-inset-left)) !important;
+        padding-right: max(12px, env(safe-area-inset-right)) !important;
+    }
+    .top-bar .brand-lockup {
+        gap: 9px;
+    }
+    .top-bar .brand-lockup a {
+        border-radius: 12px;
+    }
+    .top-bar .brand-lockup a img {
+        height: 38px;
+        width: 38px;
+        border-radius: 10px;
+    }
+    .top-bar h1 .brand-main {
+        font-size: 0.96rem;
+        letter-spacing: 0.12em;
+    }
+    .top-bar h1 .brand-sub {
+        font-size: 0.58rem;
+        letter-spacing: 0.18em;
+    }
+}
+
+.top-bar .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.top-bar button {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px !important;
+    transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out, transform 100ms ease-out;
+}
+
+.top-bar #langToggle {
+    padding: 0 12px !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap;
+}
+
+/* Enforce WCAG 2.2 AA 44x44px minimum touch targets across interactive controls */
+.btn-stepper,
+.date-picker-input,
+.day-chip-btn,
+.vedic-action-btn,
+.seg-btn,
+.btn-today,
+.btn-calc,
+.btn-print,
+.btn-add,
+.tab-btn,
+.install-banner button,
+#disclaimerModal button,
+#privacyModal button,
+#settingsModal button,
+#btnUseMyLocation,
+#btnApplyManualLoc,
+#dailyCitySearch {
+    min-height: 44px !important;
+}
+
+.btn-stepper {
+    min-width: 44px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.seg-btn {
+    padding: 0 14px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 22px !important;
+    font-size: 0.8rem !important;
+    transition: background-color 180ms var(--ease-out-expo), color 180ms var(--ease-out-expo), transform 100ms ease-out;
+}
+
+/* Tactile button press feedback (Emil Kowalski standard) */
+button,
+.bottom-nav button,
+.tab-btn,
+.day-chip-btn,
+.vedic-action-btn,
+.seg-btn {
+    transition: transform 100ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out, opacity 150ms ease-out;
+}
+
+button:active:not(:disabled),
+.bottom-nav button:active,
+.day-chip-btn:active,
+.vedic-action-btn:active,
+.seg-btn:active {
+    transform: scale(0.97);
+}
+
+/* Keyboard focus rings (WCAG 2.2 AA) */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+    outline: 2px solid var(--kuberan-gold) !important;
+    outline-offset: 2px !important;
+}
+
+/* Minimum readable typography floor (eliminates <11px micro-text) */
+.limb-item .label,
+.sm-item .lbl,
+.controls label,
+.person-form label,
+.person-entry label,
+.timeline-labels,
+.disclaimer,
+.bottom-nav button span {
+    font-size: max(0.72rem, 11.5px) !important;
+}
+
+.si-cell-title {
+    font-size: 0.68rem !important;
+}
+
+/* Install Banner — sleek compact single-row strip, dismissible, never shown in standalone/native */
+.install-banner {
+    position: relative;
+    padding: 8px 46px 8px 14px !important;
+}
+
+.install-banner p {
+    font-size: 0.82rem !important;
+    margin-bottom: 6px !important;
+}
+
+.install-banner #installBtn {
+    padding: 0 20px !important;
+    font-size: 0.86rem !important;
+}
+
+.install-banner .install-dismiss-btn {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 !important;
+    background: transparent !important;
+    color: var(--kuberan-ivory) !important;
+    border: none !important;
+    font-size: 1.35rem !important;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.install-banner .install-dismiss-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Smooth Modal Entrance (Composite-only: transform + opacity) */
+@keyframes kuberanModalEnter {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+#disclaimerModal .modal-content,
+#privacyModal .modal-content,
+#settingsModal > div {
+    animation: kuberanModalEnter 220ms var(--ease-out-expo) both;
+    border: 1.5px solid rgba(197, 160, 89, 0.55) !important;
+    box-shadow:
+        0 0 0 1px rgba(197, 160, 89, 0.18),
+        0 18px 48px rgba(0, 0, 0, 0.72) !important;
+}
+
+/* Non-blocking Kuberan Toast Notification (replaces blocking native alert()) */
+#kuberanToast {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+    max-width: 460px;
+    margin: 0 auto;
+    z-index: 100000;
+    background: linear-gradient(135deg, #24121b 0%, #151a2c 100%);
+    color: var(--kuberan-ivory);
+    border: 1.5px solid var(--kuberan-gold);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    box-shadow:
+        0 0 0 1px rgba(197, 160, 89, 0.2),
+        0 12px 32px rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(14px);
+    transition: opacity 200ms var(--ease-out-expo), transform 220ms var(--ease-out-expo);
+}
+
+#kuberanToast.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+#kuberanToast.toast-error {
+    border-color: #ef4444;
+}
+
+#kuberanToast.toast-success {
+    border-color: #22c55e;
+}
+
+/* Smooth hover lift for interactive badges & chips */
 #rashifalFamilyChips button:hover,
 #familyProfilesList button:hover,
 #festivalList button:hover {
-    filter: brightness(1.12);
+    filter: brightness(1.1);
     transform: translateY(-1px);
 }
 
 /* Moon Phase Celestial Aura & Smooth Animation in Today at a Glance */
 @keyframes moonAuraPulse {
     0%, 100% {
-        filter: drop-shadow(0 0 6px rgba(245, 200, 66, 0.35));
+        filter: drop-shadow(0 0 6px rgba(245, 200, 66, 0.32));
         transform: scale(1);
     }
     50% {
-        filter: drop-shadow(0 0 11px rgba(245, 200, 66, 0.65));
-        transform: scale(1.035);
+        filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.58));
+        transform: scale(1.03);
     }
 }
 
@@ -37,9 +402,19 @@
 }
 
 #glanceMoonPhase:hover {
-    background: rgba(212, 160, 23, 0.12);
+    background: rgba(197, 160, 89, 0.12);
 }
 
 #glanceMoonPhase:active .moon-phase-svg {
     transform: scale(0.95);
+}
+
+/* Respect OS Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

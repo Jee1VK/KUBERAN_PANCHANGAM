@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kuberan-panchangam-v65';
+const CACHE_NAME = 'kuberan-panchangam-v68';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const ASSETS_TO_CACHE = [
   './js/familyStore.js',
   './js/muhurthaEngine.js',
   './js/exportUtils.js',
+  './js/otaClient.js',
   './js/app.js'
 ];
 
@@ -39,6 +40,9 @@ self.addEventListener('activate', (event) => {
 // - Serve cached content immediately, then update cache in background
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
+  // On Capacitor native WebViewLocalServer (https://localhost), all files are already served locally
+  // from APK assets or the active OTA bundle directory—never shadow them with stale SW CacheStorage.
+  if (self.location.hostname === 'localhost' || event.request.url.includes('ota-manifest.json')) return;
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {

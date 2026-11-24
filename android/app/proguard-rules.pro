@@ -16,6 +16,10 @@
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable
 
+# Keep Kuberan native Capacitor plugins & @PluginMethod annotations intact under R8 minification
+-keep class com.kuberansilks.panchangam.OtaUpdaterPlugin { *; }
+-keepattributes *Annotation*
+
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile

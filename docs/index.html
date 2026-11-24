@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="js/ephemeris.js"></script>
     <script src="js/exportUtils.js"></script>
+    <script src="js/otaClient.js"></script>
     <script src="js/app.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -783,16 +784,19 @@
     </div>
 </div>
 
-<!-- DISCLAIMER MODAL -->
-<div id="disclaimerModal">
-    <div class="modal-content">
-        <h2 style="color:var(--gold); margin-bottom:15px; font-size:1.4rem;">⚠️ Important Notice</h2>
-        <p style="font-size:0.95rem; line-height:1.6; margin-bottom:20px; color:var(--text);">
+<!-- DISCLAIMER MODAL (shown only on first launch or via explicit openDisclaimerModal) -->
+<div id="disclaimerModal" style="display:none;">
+    <div class="modal-content" style="max-width:420px; border-radius:12px;">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:10px;background:rgba(197,160,89,0.14);border:1px solid rgba(197,160,89,0.45);margin-bottom:12px;color:var(--gold-light);" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        </div>
+        <h2 style="color:var(--gold-light); margin-bottom:12px; font-size:1.3rem;">Traditional Consultation Notice</h2>
+        <p style="font-size:0.92rem; line-height:1.6; margin-bottom:20px; color:var(--text);">
             The calculations provide traditional astronomical estimations. Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions.
         </p>
         <div style="display:flex; gap:10px;">
-            <button onclick="acceptDisclaimer()" style="flex:1; background:var(--green); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; cursor:pointer;">Accept</button>
-            <button onclick="declineDisclaimer()" style="flex:1; background:var(--red); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; cursor:pointer;">Decline</button>
+            <button type="button" onclick="acceptDisclaimer()" style="flex:1.4; min-height:44px; background:var(--gold); color:#1C1917; border:none; padding:12px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.9rem;">Accept &amp; Continue</button>
+            <button type="button" onclick="declineDisclaimer()" style="flex:0.8; min-height:44px; background:rgba(239,68,68,0.12); color:#fca5a5; border:1px solid rgba(239,68,68,0.45); padding:12px 14px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.88rem;">Decline</button>
         </div>
     </div>
 </div>
@@ -808,13 +812,28 @@
         <div style="background:rgba(212,160,23,0.08); border:1px solid rgba(212,160,23,0.3); border-radius:10px; padding:12px; margin-bottom:14px;">
             <label style="font-size:0.78rem; font-weight:700; color:var(--gold-light); display:block; margin-bottom:6px;">🧭 Ayanamsa Calculation System (ಅಯನಾಂಶ ಪದ್ಧತಿ)</label>
             <select id="ayanamsaSelect" onchange="onAyanamsaChange(this.value)" style="width:100%; padding:9px 10px; background:var(--bg); border:1px solid var(--gold); color:var(--text); border-radius:8px; font-size:0.86rem; font-weight:600;">
-                <option value="LAHIRI">Lahiri / Chitrapaksha (Drik Ganita Standard)</option>
+                <option value="LAHIRI">Lahiri / Chitrapaksha (Drik Standard)</option>
                 <option value="KP">KP Newcomb (Krishnamurti Paddhati)</option>
                 <option value="RAMAN">B.V. Raman Ayanamsa</option>
                 <option value="PUSHYA">Pushya Paksha Ayanamsa</option>
             </select>
             <div id="ayanamsaLiveVal" style="font-size:0.75rem; color:var(--text-dim); margin-top:6px;">
                 Active Offset: <strong style="color:var(--gold-light);">~24.21° (Lahiri Chitrapaksha)</strong>
+            </div>
+        </div>
+
+        <div style="background:rgba(107,29,47,0.22); border:1px solid rgba(197,160,89,0.45); border-radius:10px; padding:12px; margin-bottom:14px;">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--gold-light); margin-bottom:4px;">🔄 PWA-Style Live OTA Updates</div>
+            <div style="font-size:0.74rem; color:var(--text-dim); margin-bottom:8px;">
+                Active Bundle: <strong id="otaActiveBundleLabel" style="color:var(--text);">Checking...</strong>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <button type="button" id="btnOtaCheck" onclick="window.KuberanOTA && window.KuberanOTA.checkNow(false)" style="min-height:44px; padding:0 14px; background:var(--maroon); border:1px solid var(--gold); color:var(--gold-light); border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;">Check for Live Updates</button>
+                <button type="button" id="btnOtaApplyStaged" onclick="window.KuberanOTA && window.KuberanOTA.applyNow()" style="display:none; min-height:44px; padding:0 14px; background:var(--gold); border:none; color:#000; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer;">Apply Update</button>
+                <button type="button" id="btnOtaRollback" onclick="window.KuberanOTA && window.KuberanOTA.rollback()" style="display:none; min-height:44px; padding:0 12px; background:rgba(239,68,68,0.14); border:1px solid var(--red); color:var(--red); border-radius:8px; font-weight:700; font-size:0.76rem; cursor:pointer;">Reset to Built-in</button>
+            </div>
+            <div id="otaStatusFeedback" style="font-size:0.73rem; color:var(--text-dim); margin-top:6px;">
+                Updates download silently over HTTPS with SHA-256 verification and automatic crash rollback.
             </div>
         </div>
 
@@ -844,19 +863,25 @@
 
 <!-- TOP NAV -->
 <div class="top-bar">
-    <a href="https://kuberansilks.com/" target="_blank" rel="noopener noreferrer">
-        <img src="assets/images/kuberan_logo_white_bg.png" alt="Kuberan Silks">
-    </a>
-    <h1>KUBERAN PANCHANGAM</h1>
+    <div class="brand-lockup">
+        <a href="https://kuberansilks.com/" target="_blank" rel="noopener noreferrer" aria-label="Visit Kuberan Silks website">
+            <img src="assets/images/kuberan_logo_white_bg.png" alt="Kuberan Silks">
+        </a>
+        <h1><span class="brand-main">KUBERAN</span> <span class="brand-sub">PANCHANGAM</span></h1>
+    </div>
     <div class="nav-right">
-        <button class="tab-nav desktop-tab active" data-tab="daily">Daily</button>
-        <button class="tab-nav desktop-tab" data-tab="muhurtha">Muhurtha</button>
-        <button class="tab-nav desktop-tab" data-tab="jathaka">Jathaka</button>
-        <button class="tab-nav desktop-tab" data-tab="matching">Match</button>
-        <button class="tab-nav desktop-tab" data-tab="calendar">Calendar</button>
-        <button id="btnOpenPrivacy" onclick="openPrivacyModal()" title="Privacy & DPDP Act Data Safety" style="background:rgba(212,160,23,0.12);border-color:var(--gold);color:var(--gold);font-weight:700;font-size:0.8rem;padding:6px 10px;">🔒</button>
-        <button id="btnOpenSettings" onclick="openSettingsModal()" title="Ayanamsa Settings & Vedic Guide" style="background:rgba(212,160,23,0.12);border-color:var(--gold);color:var(--gold);font-weight:700;font-size:0.8rem;padding:6px 10px;">⚙️</button>
-        <button id="langToggle" onclick="toggleLang()" style="background:var(--maroon);border-color:var(--gold);color:var(--gold);font-weight:600;font-size:0.75rem;">ಕನ್ನಡ</button>
+        <button type="button" class="tab-nav desktop-tab active" data-tab="daily">Daily</button>
+        <button type="button" class="tab-nav desktop-tab" data-tab="muhurtha">Muhurtha</button>
+        <button type="button" class="tab-nav desktop-tab" data-tab="jathaka">Jathaka</button>
+        <button type="button" class="tab-nav desktop-tab" data-tab="matching">Match</button>
+        <button type="button" class="tab-nav desktop-tab" data-tab="calendar">Calendar</button>
+        <button type="button" id="btnOpenPrivacy" onclick="openPrivacyModal()" title="Privacy &amp; DPDP Act Data Safety" aria-label="Privacy and Data Safety" style="background:rgba(197,160,89,0.12);border-color:var(--gold);color:var(--gold-light);padding:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><rect x="9" y="11" width="6" height="5" rx="1"></rect><path d="M10 11V9a2 2 0 1 1 4 0v2"></path></svg>
+        </button>
+        <button type="button" id="btnOpenSettings" onclick="openSettingsModal()" title="Ayanamsa Settings &amp; Vedic Guide" aria-label="Settings and Vedic Guide" style="background:rgba(197,160,89,0.12);border-color:var(--gold);color:var(--gold-light);padding:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <button type="button" id="langToggle" onclick="toggleLang()" aria-label="Toggle Kannada or English language" style="background:var(--maroon);border-color:var(--gold);color:var(--gold-light);font-weight:700;">ಕನ್ನಡ</button>
     </div>
 </div>
 
@@ -869,10 +894,11 @@
     <button class="tab-nav" data-tab="calendar"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><span>Calendar</span></button>
 </nav>
 
-<!-- INSTALL BANNER -->
+<!-- INSTALL BANNER (web browser only, dismissible) -->
 <div class="install-banner" id="installBanner">
-    <p>📲 Install <b>Kuberan Panchangam</b> on your device for offline use!</p>
-    <button id="installBtn">Install App</button>
+    <button type="button" class="install-dismiss-btn" onclick="dismissInstallBanner()" aria-label="Dismiss install banner">&times;</button>
+    <p>Install <b>Kuberan Panchangam</b> on your home screen for offline use.</p>
+    <button type="button" id="installBtn">Install App</button>
 </div>
 
 <!-- DAILY TAB -->
@@ -928,34 +954,37 @@
     </div>
 
     <!-- LOCATION CONTROLS -->
-    <div class="card" style="padding:12px 16px; margin-bottom:14px;">
+    <div class="card" style="padding:12px 14px; margin-bottom:14px;">
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <button onclick="detectLocation()" style="background:var(--gold);color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;white-space:nowrap;">📍 Use My Location</button>
-            <div id="locationLabel" style="font-size:0.9rem; flex:1; min-width:120px;">
+            <button type="button" id="btnUseMyLocation" onclick="detectLocation()" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#1C1917;border:none;padding:0 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.84rem;white-space:nowrap;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Use My Location
+            </button>
+            <div id="locationLabel" style="font-size:0.88rem; flex:1; min-width:120px;">
                 <span style="color:var(--text-dim);">Location:</span> <strong id="locationName">Bengaluru, India</strong>
             </div>
         </div>
         <div style="position:relative; margin-top:8px;">
-            <input type="text" id="dailyCitySearch" oninput="onDailyCitySearchInput(this.value)" onfocus="onDailyCitySearchInput(this.value)" placeholder="🔍 Quick switch city (e.g. Mysuru, Udupi, Hubballi, Sringeri, London)..." autocomplete="off" style="width:100%; background:var(--bg); border:1px solid var(--card-border); color:var(--text); padding:7px 10px; border-radius:6px; font-size:0.82rem;">
+            <input type="text" id="dailyCitySearch" oninput="onDailyCitySearchInput(this.value)" onfocus="onDailyCitySearchInput(this.value)" placeholder="Switch city (Mysuru, Udupi, Hubballi...)" aria-label="Search and switch city" autocomplete="off" style="width:100%; background:var(--bg); border:1px solid var(--card-border); color:var(--text); padding:0 12px; border-radius:8px; font-size:0.86rem;">
             <div id="dailyCityResults" style="display:none; position:absolute; top:100%; left:0; right:0; z-index:60; background:var(--card); border:1px solid var(--gold); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,0.6);"></div>
         </div>
-        <details style="margin-top:10px;">
-            <summary style="cursor:pointer; font-size:0.8rem; color:var(--gold);">Or enter location manually ▾</summary>
+        <details style="margin-top:8px;">
+            <summary style="cursor:pointer; font-size:0.8rem; color:var(--gold-light); padding:4px 0;">Or enter coordinates manually ▾</summary>
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:8px;">
                 <div>
-                    <label style="font-size:0.7rem;color:var(--text-dim);">Latitude</label>
-                    <input type="number" step="any" id="latInput" value="12.9716" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:6px 8px;border-radius:6px;width:100%;font-size:0.85rem;">
+                    <label style="color:var(--text-dim);">Latitude</label>
+                    <input type="number" step="any" id="latInput" value="12.9716" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
                 </div>
                 <div>
-                    <label style="font-size:0.7rem;color:var(--text-dim);">Longitude</label>
-                    <input type="number" step="any" id="lonInput" value="77.5946" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:6px 8px;border-radius:6px;width:100%;font-size:0.85rem;">
+                    <label style="color:var(--text-dim);">Longitude</label>
+                    <input type="number" step="any" id="lonInput" value="77.5946" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
                 </div>
                 <div>
-                    <label style="font-size:0.7rem;color:var(--text-dim);">Timezone</label>
-                    <input type="text" id="tzInput" value="Asia/Kolkata" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:6px 8px;border-radius:6px;width:100%;font-size:0.85rem;">
+                    <label style="color:var(--text-dim);">Timezone</label>
+                    <input type="text" id="tzInput" value="Asia/Kolkata" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
                 </div>
             </div>
-            <button onclick="applyManualLocation()" style="background:var(--gold);color:#000;border:none;padding:6px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.8rem;margin-top:8px;">Apply</button>
+            <button type="button" id="btnApplyManualLoc" onclick="applyManualLocation()" style="background:var(--gold);color:#1C1917;border:none;padding:0 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.84rem;margin-top:8px;">Apply Coordinates</button>
         </details>
     </div>
 
@@ -1267,7 +1296,7 @@
                 </select>
             </div>
             <div>
-                <label style="font-size:0.7rem;color:var(--text-dim);">Filter by Nakshatra (ನಕ್ಷತ್ರ ಆಧಾರಿತ ಶೋಧನೆ)</label>
+                <label style="color:var(--text-dim); display:block; margin-bottom:4px;">Nakshatra Filter (ನಕ್ಷತ್ರ)</label>
                 <select id="scanNakshatra" style="background:var(--card);border:1px solid var(--card-border);color:var(--text);padding:8px;border-radius:6px;width:100%;font-size:0.85rem;">
                     <option value="all">✨ Any / All Nakshatras (ಎಲ್ಲಾ)</option>
                     <option value="auspicious_only">🌟 Shubha Nakshatras Only (ಶುಭ ಮಾತ್ರ)</option>
@@ -1819,7 +1848,7 @@
             </div>
         </div>
         
-        <button onclick="doMarriageMatch()" style="background:linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);color:#0c0f1a;border:none;height:42px;padding:0 16px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;font-size:0.86rem;box-shadow:0 2px 10px rgba(212,160,23,0.3);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;">Calculate Compatibility · ಹೊಂದಾಣಿಕೆ ಪರಿಶೀಲಿಸಿ</button>
+        <button type="button" onclick="doMarriageMatch()" style="background:linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);color:#1C1917;border:none;min-height:48px;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;font-size:0.86rem;line-height:1.3;box-shadow:0 2px 10px rgba(197,160,89,0.3);display:flex;align-items:center;justify-content:center;text-align:center;flex-wrap:wrap;gap:4px;">Calculate Compatibility · ಹೊಂದಾಣಿಕೆ ಪರಿಶೀಲಿಸಿ</button>
     </div>
     
     <div class="card" id="matchResultArea" style="display:none;">
@@ -1870,7 +1899,7 @@
             </div>
         </div>
         <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <input type="text" id="calYearSearchInput" oninput="searchYearFestivals(this.value)" placeholder="Search any festival in the year (e.g. Ugadi, Deepavali, Ekadashi, Sankranti)..." style="flex:1; padding:9px 12px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:8px; font-size:0.85rem;">
+            <input type="text" id="calYearSearchInput" oninput="searchYearFestivals(this.value)" placeholder="Search festival (Ugadi, Deepavali...)" aria-label="Search festivals in selected year" style="flex:1; min-height:44px; padding:0 12px; background:var(--bg); border:1px solid var(--card-border); color:var(--text); border-radius:8px; font-size:0.85rem;">
             <button type="button" onclick="clearYearFestivalSearch()" style="background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text-dim); padding:8px 12px; border-radius:8px; cursor:pointer; font-size:0.8rem;">Clear</button>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
@@ -3786,7 +3815,7 @@ function applyManualLocation() {
         ? validateCoordinates(rawLat, rawLon)
         : { lat: rawLat, lon: rawLon, valid: (!isNaN(rawLat) && rawLat >= -90 && rawLat <= 90 && !isNaN(rawLon) && rawLon >= -180 && rawLon <= 180) };
     if (!coords.valid) {
-        alert('Invalid coordinates (Latitude must be -90 to +90, Longitude -180 to +180). Falling back to Bengaluru (12.9716° N, 77.5946° E).');
+        showKuberanToast('Invalid coordinates (Latitude must be -90 to +90, Longitude -180 to +180). Falling back to Bengaluru (12.9716° N, 77.5946° E).');
     }
     const resolvedTz = (typeof resolveTimezoneFromCoords === 'function')
         ? resolveTimezoneFromCoords(coords.lat, coords.lon, rawTz)
@@ -3802,6 +3831,33 @@ function recalculate() {
     const p = computePanchanga(y, m, d, loc.lat, loc.lon, loc.tz);
     lastPanchanga = p;
     renderPanchanga(p);
+}
+
+// NON-BLOCKING KUBERAN TOAST NOTIFICATION (Replaces blocking browser showKuberanToast())
+let _kuberanToastTimer = null;
+function showKuberanToast(message, type) {
+    try {
+        if (typeof document === 'undefined' || !document.body) return;
+        let el = document.getElementById('kuberanToast');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'kuberanToast';
+            el.setAttribute('role', 'status');
+            el.setAttribute('aria-live', 'polite');
+            document.body.appendChild(el);
+        }
+        el.className = '';
+        if (type === 'error') el.classList.add('toast-error');
+        else if (type === 'success') el.classList.add('toast-success');
+        const cleanMsg = String(message || '').replace(/^[\u2705\u26A0\uFE0F\uD83D\uDC64\s]+/, '').trim();
+        el.innerHTML = '<span>' + cleanMsg.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>' +
+            '<button type="button" aria-label="Dismiss notification" style="min-width:36px;min-height:36px;background:none;border:none;color:var(--gold-light);font-size:1.1rem;cursor:pointer;flex-shrink:0;">&times;</button>';
+        const closeBtn = el.querySelector('button');
+        if (closeBtn) closeBtn.onclick = () => el.classList.remove('visible');
+        requestAnimationFrame(() => el.classList.add('visible'));
+        clearTimeout(_kuberanToastTimer);
+        _kuberanToastTimer = setTimeout(() => el.classList.remove('visible'), 4200);
+    } catch (_) {}
 }
 
 // DISCLAIMER LOGIC
@@ -3820,7 +3876,9 @@ function openDisclaimerModal() {
 }
 
 function acceptDisclaimer() {
-    document.getElementById('disclaimerModal').style.display = 'none';
+    safeStorageSet('kuberan_disclaimer_accepted', '1');
+    const m = document.getElementById('disclaimerModal');
+    if (m) m.style.display = 'none';
 }
 function declineDisclaimer() {
     document.body.innerHTML = '<div style="display:flex;height:100vh;align-items:center;justify-content:center;background:var(--bg);color:var(--red);text-align:center;padding:20px;"><h2>You must accept the terms to use this application. Please restart the app.</h2></div>';
@@ -3941,7 +3999,7 @@ function removePerson(btn) {
     if (!entry) return;
     const container = document.getElementById('peopleContainer');
     if (container.querySelectorAll('.person-entry').length <= 1) {
-        alert('At least one person is required.');
+        showKuberanToast('At least one person is required.');
         return;
     }
     entry.remove();
@@ -3963,7 +4021,7 @@ function updatePersonRemoveButtons() {
 function addPerson() {
     const container = document.getElementById('peopleContainer');
     const entries = container.querySelectorAll('.person-entry');
-    if (entries.length >= 10) { alert('Maximum 10 people.'); return; }
+    if (entries.length >= 10) { showKuberanToast('Maximum 10 people.'); return; }
     personCount++;
     const div = document.createElement('div');
     div.className = 'person-entry';
@@ -3975,7 +4033,7 @@ function addPerson() {
 function calcCompat() {
     const loc = getLocation();
     const targetStr = document.getElementById('targetDate').value;
-    if (!targetStr) { alert('Pick a target date.'); return; }
+    if (!targetStr) { showKuberanToast('Pick a target date.'); return; }
     const [ty, tm, td] = targetStr.split('-').map(Number);
     const targetP = computePanchanga(ty, tm, td, loc.lat, loc.lon, loc.tz);
     if (!targetP) return;
@@ -4038,7 +4096,7 @@ function calcCompat() {
     });
 
     if (results.length === 0) {
-        alert('Enter at least one person with valid birth details (DOB or Nakshatra).');
+        showKuberanToast('Enter at least one person with valid birth details (DOB or Nakshatra).');
         return;
     }
 
@@ -4140,7 +4198,7 @@ function clearAllAppData() {
         } catch (e) {
             console.error(e);
         }
-        alert("All local data has been purged.");
+        showKuberanToast("All local data has been purged.");
         window.location.reload();
     }
 }
@@ -4173,7 +4231,7 @@ function shareJathaka() {
     } else {
         // Fallback to clipboard
         navigator.clipboard.writeText(text).then(() => {
-            alert("Jathaka details copied to clipboard!");
+            showKuberanToast("Jathaka details copied to clipboard!");
         });
     }
 }
@@ -4635,7 +4693,7 @@ function generateJathaka() {
     const tz = document.getElementById('jTz').value;
 
     if (!dobStrRaw || isNaN(lat) || isNaN(lon)) {
-        alert("Please enter Name, Date & Time of Birth, Latitude, and Longitude.");
+        showKuberanToast("Please enter Name, Date & Time of Birth, Latitude, and Longitude.");
         return;
     }
 
@@ -4983,7 +5041,7 @@ function generateJathaka() {
             document.getElementById('btnShareJathaka').style.display = 'block';
 
         } catch (e) {
-            alert("Error computing Jathaka. Check inputs.");
+            showKuberanToast("Error computing Jathaka. Check inputs.");
             console.error(e);
         } finally {
             document.getElementById('btnGenJathaka').style.display = 'block';
@@ -5588,7 +5646,7 @@ function shareTodayPanchanga() {
     } else {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Panchanga copied to clipboard! Opening WhatsApp to share...');
+                showKuberanToast('✅ Panchanga copied to clipboard! Opening WhatsApp to share...');
                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
             }).catch(() => {
                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
@@ -6356,9 +6414,9 @@ function scanDates() {
     const toStr = document.getElementById('scanTo').value;
     const purpose = document.getElementById('scanPurpose').value;
     const nakFilter = document.getElementById('scanNakshatra') ? document.getElementById('scanNakshatra').value : 'all';
-    if (!fromStr || !toStr) { alert("Please select From and To dates."); return; }
+    if (!fromStr || !toStr) { showKuberanToast("Please select From and To dates."); return; }
     const from = new Date(fromStr), to = new Date(toStr);
-    if (to - from > 365 * 86400000) { alert("Max scan range is 365 days."); return; }
+    if (to - from > 365 * 86400000) { showKuberanToast("Max scan range is 365 days."); return; }
     document.getElementById('scanLoading').style.display = 'block';
     document.getElementById('scanResults').innerHTML = '';
     // Chunked async scan: 7 days per animation frame to keep UI responsive
@@ -6655,7 +6713,7 @@ function exportMonthICS() {
         });
     }
 
-    if (events.length === 0) { alert('No festivals this month to export.'); return; }
+    if (events.length === 0) { showKuberanToast('No festivals this month to export.'); return; }
 
     const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//KuberanPanchangam//EN\nCALSCALE:GREGORIAN\n${events.join('\n')}\nEND:VCALENDAR`;
 
@@ -6669,37 +6727,64 @@ function exportMonthICS() {
 }
 
 // ============================================================
-//  PWA INSTALL PROMPT
+//  PWA INSTALL PROMPT (Web browser only, never in native APK / standalone)
 // ============================================================
 let deferredPrompt = null;
+function dismissInstallBanner() {
+    safeStorageSet('kuberan_install_dismissed', '1');
+    const b = document.getElementById('installBanner');
+    if (b) b.style.display = 'none';
+}
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
+    const isNative = Boolean(window.Capacitor && (window.Capacitor.isNativePlatform ? window.Capacitor.isNativePlatform() : window.Capacitor.Plugins));
+    const isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    if (isNative || isStandalone || safeStorageGet('kuberan_install_dismissed') === '1') return;
     deferredPrompt = e;
-    document.getElementById('installBanner').style.display = 'block';
+    const b = document.getElementById('installBanner');
+    if (b) b.style.display = 'block';
 });
-document.getElementById('installBtn').addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    document.getElementById('installBanner').style.display = 'none';
-});
+const _installBtn = document.getElementById('installBtn');
+if (_installBtn) {
+    _installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        const b = document.getElementById('installBanner');
+        if (b) b.style.display = 'none';
+    });
+}
 
-// Register service worker
+// Register service worker on Web PWA; inside Native Capacitor APK, let WebViewLocalServer & OtaUpdater serve files directly
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
+        const hasNativeOta = Boolean(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.OtaUpdater);
+        if (hasNativeOta) {
+            try {
+                if (navigator.serviceWorker.getRegistrations) {
+                    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(() => {});
+                }
+                if (window.caches && window.caches.keys) {
+                    window.caches.keys().then(keys => keys.forEach(k => window.caches.delete(k))).catch(() => {});
+                }
+            } catch (_) {}
+            return;
+        }
         navigator.serviceWorker.register('sw.js')
             .then(reg => console.log('SW registered', reg))
             .catch(err => console.error('SW failed', err));
-            
+
         // Automatically reload the page when a new Service Worker takes over
         let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) {
-                refreshing = true;
-                window.location.reload();
-            }
-        });
+        if (typeof navigator.serviceWorker.addEventListener === 'function') {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+        }
     });
 }
 
@@ -7165,7 +7250,7 @@ function autoCalcMatchFromDob(who) {
 
 function doMarriageMatch() {
     if (typeof calculateAshtakoota === 'undefined') {
-        alert("Ashtakoota engine is loading. Please try again in a moment.");
+        showKuberanToast("Ashtakoota engine is loading. Please try again in a moment.");
         return;
     }
 
@@ -7633,6 +7718,9 @@ function openSettingsModal() {
     const curId = (typeof getActiveAyanamsaId === 'function') ? getActiveAyanamsaId() : 'LAHIRI';
     if (sel) sel.value = curId;
     updateAyanamsaLiveLabel(curId);
+    if (window.KuberanOTA && typeof window.KuberanOTA.refreshStatusUI === 'function') {
+        window.KuberanOTA.refreshStatusUI();
+    }
     m.style.display = 'flex';
 }
 
@@ -7735,7 +7823,7 @@ function saveNewFamilyMemberFromForm() {
     const rashi = parseInt(document.getElementById('famRashiSelect')?.value || '0', 10);
     const nakshatra = parseInt(document.getElementById('famNakSelect')?.value || '1', 10);
     if (!name) {
-        alert('Please enter the family member name.');
+        showKuberanToast('Please enter the family member name.');
         return;
     }
     saveFamilyProfile({ name, relation, birthDate: '', birthTime: '', rashi, nakshatra });
@@ -7795,7 +7883,7 @@ function saveNewFamilyMemberFromJathakaForm() {
     const placeName = parts[3] || 'Bengaluru, Karnataka';
 
     if (!name) {
-        alert('Please enter the family member name.');
+        showKuberanToast('Please enter the family member name.');
         return;
     }
     if (dobRaw) autoFillFamilyRashiNakFromDob('j');
@@ -7848,14 +7936,14 @@ function saveCurrentJathakaToFamily() {
         placeName
     });
     renderSavedFamilyProfiles();
-    alert(`✅ Saved ${d.name} to Family Profiles! Available in Jathaka, Muhurtha & Daily Rashifal.`);
+    showKuberanToast(`✅ Saved ${d.name} to Family Profiles! Available in Jathaka, Muhurtha & Daily Rashifal.`);
 }
 
 function generateAndSaveFamilyJathaka() {
     const name = (document.getElementById('jName')?.value || '').trim();
     const dobStrRaw = document.getElementById('jDob')?.value || '';
     if (!name || !dobStrRaw) {
-        alert('Please enter Full Name and Date & Time of Birth first.');
+        showKuberanToast('Please enter Full Name and Date & Time of Birth first.');
         return;
     }
     const relation = document.getElementById('jRelation')?.value || 'Family Member';
@@ -7923,7 +8011,7 @@ function saveHistoryItemToFamily(idx) {
         tz: h.tz || 'Asia/Kolkata'
     });
     renderSavedFamilyProfiles();
-    alert(`✅ Saved ${h.name} to Family Profiles!`);
+    showKuberanToast(`✅ Saved ${h.name} to Family Profiles!`);
 }
 
 function loadFamilyProfileIntoJathaka(profileId) {
@@ -7953,7 +8041,7 @@ function loadFamilyProfileIntoJathaka(profileId) {
         generateJathaka();
     } else if (dobEl) {
         dobEl.focus();
-        alert(`👤 Loaded ${prof.name} (${RASHI_EN[prof.rashi || 0]} · ${NAK_EN[(prof.nakshatra || 1) - 1]}). Please enter their Birth Date & Time below and click "Generate & Save to Family" to view their full Kundali.`);
+        showKuberanToast(`👤 Loaded ${prof.name} (${RASHI_EN[prof.rashi || 0]} · ${NAK_EN[(prof.nakshatra || 1) - 1]}). Please enter their Birth Date & Time below and click "Generate & Save to Family" to view their full Kundali.`);
     }
 }
 
@@ -8129,6 +8217,15 @@ function renderSavedFamilyProfiles() {
 //  INIT — Try GPS first, fall back to defaults
 // ============================================================
 (function init() {
+    // Show one-time Purohit consultation notice only on first launch
+    try {
+        const discAccepted = safeStorageGet('kuberan_disclaimer_accepted');
+        const discModal = document.getElementById('disclaimerModal');
+        if (discModal) {
+            discModal.style.display = (discAccepted === '1' || discAccepted === 'true') ? 'none' : 'flex';
+        }
+    } catch (_) {}
+
     renderSavedFamilyProfiles();
     // Restore language preference
     const savedLang = safeStorageGet('kuberan_lang', 'en') || 'en';
@@ -8220,6 +8317,13 @@ function renderSavedFamilyProfiles() {
                     capApp.exitApp();
                 }
             });
+        }
+    } catch (e) {}
+
+    // Initialize PWA-style native Over-The-Air (OTA) live update engine & confirm healthy boot
+    try {
+        if (window.KuberanOTA && typeof window.KuberanOTA.init === 'function') {
+            window.KuberanOTA.init();
         }
     } catch (e) {}
 })();

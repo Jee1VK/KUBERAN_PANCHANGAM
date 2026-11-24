@@ -254,9 +254,13 @@
             }
         }
 
-        // Android hardware backButton support in Capacitor
+        // Android hardware backButton support & OTA watchdog confirmation in Capacitor
         (function setupBackButton() {
             try {
+                var ota = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.OtaUpdater;
+                if (ota && typeof ota.notifyAppReady === 'function') {
+                    ota.notifyAppReady();
+                }
                 var capApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
                 if (capApp && typeof capApp.addListener === 'function') {
                     capApp.addListener('backButton', function() {
