@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "appId": "com.kuberansilks.panchangam",
-  "version": "2.0.0-v70",
-  "bundleHash": "58b104567a556dcb054778a7e2de2b90d7246f6aed7ebbccd61b15a97e724c28",
+  "version": "2.0.0-v71",
+  "bundleHash": "d3c77d6c68853bc95bc3cd3c23abcf426ad1df33e5a1d25d7b287581b6d5e7e5",
   "minNativeVersionCode": 1,
   "baseUrl": "https://jee1vk.github.io/KUBERAN_PANCHANGAM/",
-  "builtAt": "2026-11-24T15:47:25.959Z",
+  "builtAt": "2026-11-25T06:16:57.965Z",
   "files": {
     "404.html": {
       "sha256": "6c5ffebc51a1a4cf7e6884a9cf3aca8d122d591cad2907bc4e12a95beea10b2e",
@@ -24,8 +24,8 @@
       "size": 169333
     },
     "index.html": {
-      "sha256": "f209133baf645e8e3524fa0ebaef98f4b3ed212004df98d34e3a5282737c5f79",
-      "size": 503929
+      "sha256": "a61750f1ebe0946afc191f2698181773e525c0d37b9081b1663beb39da647d95",
+      "size": 506725
     },
     "js/app.js": {
       "sha256": "4c07b43056a0aa2bc91d4f6afaaf41e32b6f58af629fbe99842320e7fc65523d",
@@ -76,7 +76,7 @@
       "size": 12250
     },
     "sw.js": {
-      "sha256": "05cea88a344cf6c333a5ab59c6f609e30f280b4362846add7ded1912b989d59e",
+      "sha256": "cf4959b0bab470a3e186e5fe5776ecb522fd8d6247a929ef163dd039daf406b8",
       "size": 2140
     }
   }
