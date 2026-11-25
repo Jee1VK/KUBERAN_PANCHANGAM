@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "appId": "com.kuberansilks.panchangam",
-  "version": "2.0.0-v73",
-  "bundleHash": "44d34d4cc2494f6002da6fc6d5d45b732e70809e85c66647e88ee57acdd493ea",
+  "version": "2.0.0-v74",
+  "bundleHash": "9ba492f4a8d37a13e2d253d2d69c2ddd7dad6c84c17dfba1baf855c3fb531b21",
   "minNativeVersionCode": 1,
   "baseUrl": "https://jee1vk.github.io/KUBERAN_PANCHANGAM/",
-  "builtAt": "2026-11-25T06:57:43.630Z",
+  "builtAt": "2026-11-25T07:27:00.870Z",
   "files": {
     "404.html": {
       "sha256": "6c5ffebc51a1a4cf7e6884a9cf3aca8d122d591cad2907bc4e12a95beea10b2e",
@@ -24,48 +24,48 @@
       "size": 169333
     },
     "index.html": {
-      "sha256": "f5a3a45112b21528ef92c4270ac789d5cce2d501a649eb272c04a154c31d04be",
-      "size": 852469
+      "sha256": "0da50563506ff2a6747c9ab3db27bc0def8f60f7c102f7553898a9d3a8584bb8",
+      "size": 851772
     },
     "js/app.js": {
-      "sha256": "c4a5cfdf550c05f399c5b431cc760358319ebcc2eedb9806e8b25e28ef6bed87",
-      "size": 6289
+      "sha256": "6af967453fd416f4d7e157adada6abe40652f3f30a028a262f92aec5e32cfe11",
+      "size": 6425
     },
     "js/ashtakoota.js": {
-      "sha256": "adf4511233bd565d8a2d810e3e6458e0a4de00e115a038812c501a35e7d2b25a",
-      "size": 23349
+      "sha256": "9e74ac9eef6d164eec4bf6cbbd608fb232085a9705efdc553f69a8e0c27687a8",
+      "size": 23186
     },
     "js/astronomy.js": {
       "sha256": "f41139a87941ea017ab902b954c9389fa27ea72083d7fab4971756d7769d14e6",
       "size": 116424
     },
     "js/ayanamsa.js": {
-      "sha256": "d54724a18780319854694041023a9064607afce207b0d62f026cc41fefbd1e9a",
-      "size": 14066
+      "sha256": "3493fc180e48b9fa298eecaaac40c5eb711314da779ca6c2d16cab27c1c0783a",
+      "size": 14452
     },
     "js/cities.js": {
-      "sha256": "e21a4165592616753348990be9179b049817b3972609ed74921151f69089f8f3",
-      "size": 17318
+      "sha256": "a9cf39ac388486729a6b7ebc0a4d1819a22068c22598b1da025574faf72ce012",
+      "size": 17328
     },
     "js/ephemeris.js": {
-      "sha256": "a86541d58695a95c2513778cb17396bc19e3765f44ffb0d242cb1e05d9ae5c5e",
-      "size": 27756
+      "sha256": "c5086aa517f4d57e36deeb08aed9a55869dc46e0b589d10cd2afefdcf740a615",
+      "size": 28174
     },
     "js/exportUtils.js": {
-      "sha256": "3a51dfcc36a228657a883d7994de60158230aea0e3b00dcfa9ed309b2205565a",
-      "size": 10094
+      "sha256": "f0fb0485d6adbba277f05e8ab501887deaee808b491460bff02b371dd775fb49",
+      "size": 10395
     },
     "js/familyStore.js": {
-      "sha256": "555592f6a8ade28a1eebc82ae13ca99defa027dc5ea1387ad74184463307f567",
-      "size": 9947
+      "sha256": "865faebaa717795ad31d431c7f6bfabdf54e602f7ef4ab9aac9bba68ec6ff066",
+      "size": 9831
     },
     "js/muhurthaEngine.js": {
-      "sha256": "6a51c7c4b10582b97d63391c16f09d7d767a9b6f9db38775f17584e180e96b2e",
-      "size": 19716
+      "sha256": "20c270fb1fed342923401dba662e15a18b2b058b2b520b458fed2d4c13284e4f",
+      "size": 20075
     },
     "js/otaClient.js": {
-      "sha256": "7fb774b81337ee99918ab5c8b6bca3a5a30da14a376060ad22f472364d0e3325",
-      "size": 25974
+      "sha256": "5efb90597deb1206ce029cf390d6d0d1ea716ab37c19b5592beab9c3f389d398",
+      "size": 25933
     },
     "manifest.json": {
       "sha256": "4c962fdf6cf4bbb34b92de02cf759d2beddea7031b01b9320a386c8aecc0f122",
@@ -76,7 +76,7 @@
       "size": 12250
     },
     "sw.js": {
-      "sha256": "b7a1e51eaeafe33318057040253fae52a14cc53ec9be0464b8ac2d20bdd620a9",
+      "sha256": "c4838cafb291a2a4fe9b72065c12478665382b1919461e2f33d81819e98172db",
       "size": 2140
     }
   }
