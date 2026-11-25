@@ -40,4 +40,7 @@ ios/DerivedData/
 *.keystore
 keystore.properties
 android/keystore.properties
+# Keep unobfuscated readable source private on NAS; only obfuscated docs/ is published
+src/
+
 
