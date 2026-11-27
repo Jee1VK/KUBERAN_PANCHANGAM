@@ -117,7 +117,7 @@ function compileSrcToDocs() {
                 const obf = JavaScriptObfuscator.obfuscate(code, modCfg).getObfuscatedCode();
                 fs.writeFileSync(destPath, obf.replace(/\r\n/g, '\n') + '\n', 'utf8');
                 obfuscatedJs++;
-            } else if (rel === 'index.html') {
+            } else if (ext === '.html') {
                 const html = readNormalizedBytes(srcPath).toString('utf8');
                 const compiledHtml = html.replace(
                     /(<script(?![^>]*\bsrc=)(?![^>]*\btype\s*=\s*["']application\/ld\+json["'])[^>]*>)([\s\S]*?)(<\/script>)/gi,

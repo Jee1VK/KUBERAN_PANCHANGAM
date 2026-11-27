@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Privacy Policy & Data Safety — Kuberan Panchangam</title>
-    <meta name="theme-color" content="#7b1e2d">
+    <meta name="referrer" content="no-referrer">
+    <title>Privacy Policy &amp; Data Safety — Kuberan Panchangam</title>
+    <meta name="theme-color" content="#6B1D2F">
+    <script src="js/familyStore.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --bg: #0c0f1a;
             --card: #161b2e;
             --card-border: #232a42;
-            --gold: #d4a017;
+            --gold: #C5A059;
             --gold-light: #f5c842;
             --maroon: #6B1D2F;
             --green: #22c55e;
@@ -48,7 +50,8 @@
         }
         .top-bar img {
             height: 44px;
-            border-radius: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--gold);
         }
         .top-bar h1 {
             font-size: 1.05rem;
@@ -65,14 +68,14 @@
             background: var(--maroon);
             color: #fff;
             border: 1px solid var(--gold);
-            border-radius: 6px;
+            border-radius: 8px;
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
         }
         .container {
-            max-width: 760px;
+            max-width: 780px;
             margin: 0 auto;
             padding: 18px 16px;
         }
@@ -119,6 +122,26 @@
         .card li {
             margin-bottom: 6px;
         }
+        .endpoint-table-wrap {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        table.endpoint-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+        }
+        table.endpoint-table th, table.endpoint-table td {
+            border: 1px solid var(--card-border);
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        table.endpoint-table th {
+            background: rgba(197, 160, 89, 0.14);
+            color: var(--gold-light);
+            font-weight: 700;
+        }
         .badge {
             display: inline-block;
             padding: 3px 10px;
@@ -137,6 +160,26 @@
             padding: 14px;
             margin-top: 12px;
         }
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 10px 18px;
+            background: var(--maroon);
+            color: #fff;
+            border: 1px solid var(--gold);
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+        }
         .btn-purge {
             display: inline-flex;
             align-items: center;
@@ -148,11 +191,10 @@
             border: none;
             border-radius: 6px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             cursor: pointer;
-            margin-top: 10px;
         }
-        .btn-purge:focus-visible, .btn-back:focus-visible, a:focus-visible {
+        .btn-export:focus-visible, .btn-purge:focus-visible, .btn-back:focus-visible, a:focus-visible {
             outline: 2px solid var(--gold);
             outline-offset: 2px;
         }
@@ -180,47 +222,83 @@
 
     <main class="container">
         <section class="hero">
-            <span class="badge">DPDP Act 2023 &amp; GDPR Compliant &bull; Zero Data Collection</span>
+            <span class="badge">DPDP Act 2023 &amp; DPDP Rules 2025 &bull; GDPR Compliant &bull; AES-256-GCM Encrypted Vault</span>
             <h2>Kuberan Panchangam — Privacy Policy</h2>
-            <p>Application ID: <code>com.kuberansilks.panchangam</code> &bull; Category: Lifestyle / Books &amp; Reference / Astrology</p>
+            <p>Application ID: <code>com.kuberansilks.panchangam</code> &bull; Category: Lifestyle / Books &amp; Reference / Astrology &bull; <a href="terms.html">Terms of Service</a></p>
         </section>
 
         <section class="card">
-            <h3>1. 100% On-Device Computation (Zero Server Transmission)</h3>
+            <h3>1. 100% On-Device Computation &amp; AES-256-GCM Encryption at Rest</h3>
             <p>Kuberan Panchangam performs all Vedic astronomical calculations—including Daily Panchangam (Tithi, Nakshatra, Yoga, Karana, Rahu Kala), Janma Jathaka / Kundli, D9 Navamsha, Vimshottari Dasha, and Ashtakoota Marriage Matching—strictly inside your device memory using offline VSOP87 / Swiss Ephemeris analytical mechanics.</p>
             <ul>
-                <li><strong>Jathaka &amp; Kundli Inputs:</strong> Personal details you enter (<strong>Name, Date of Birth, Time of Birth, Place Coordinates</strong>) remain exclusively on your device. They are <strong>never uploaded, transmitted, logged, or shared</strong> with Kuberan Silks servers or any third party.</li>
+                <li><strong>Encrypted Local Vault:</strong> Personal birth details saved in Family Profiles (<strong>Name, Date of Birth, Time of Birth, Place Coordinates</strong>) are encrypted at rest on your device using Web Crypto <strong><code>AES-256-GCM</code></strong> with a device-local 256-bit random key. They are <strong>never uploaded, transmitted, logged, or shared</strong> with Kuberan Silks servers or any third party.</li>
+                <li><strong>OS Keyboard &amp; Backup Hardening:</strong> Sensitive birth inputs disable OS predictive keyboard learning (<code>autocomplete="off"</code>, <code>autocorrect="off"</code>, <code>spellcheck="false"</code>), and Android cloud auto-backup is disabled (<code>allowBackup="false"</code>) so local WebView storage is never silently copied to cloud drives.</li>
                 <li><strong>No Accounts, No Ads, No Tracking:</strong> The app requires no sign-up or login and contains zero advertising SDKs, zero third-party analytics, and zero behavioral tracking cookies.</li>
             </ul>
         </section>
 
         <section class="card">
-            <h3>2. Location Permission &amp; Optional Network Requests</h3>
-            <ul>
-                <li><strong>GPS Location (Optional):</strong> When you tap auto-detect location, your coordinates are used ephemerally on-device to calculate exact local Sunrise, Sunset, Tithi end-times, and Lagna for your city. You may decline GPS permission and use the built-in <strong>100% offline city database</strong> at any time.</li>
-                <li><strong>Reverse Geocoding (Optional):</strong> Only if you explicitly trigger GPS detection or online city search while connected, a latitude/longitude or search query is sent to OpenStreetMap Nominatim to resolve a city name. Astrological calculations work 100% offline.</li>
-            </ul>
+            <h3>2. Infrastructure &amp; Optional Network Endpoints</h3>
+            <p>Core Panchangam and Kundli calculations operate <strong>100% offline</strong>. In accordance with the <strong>Digital Personal Data Protection (DPDP) Act, 2023 &amp; DPDP Rules, 2025</strong> (Sections 5 &amp; 11) and <strong>GDPR</strong> (Articles 13 &amp; 28), every external HTTPS endpoint the app may contact is itemized below:</p>
+            <div class="endpoint-table-wrap">
+                <table class="endpoint-table" aria-label="Infrastructure and Optional Network Endpoints">
+                    <thead>
+                        <tr>
+                            <th>Endpoint / Host</th>
+                            <th>Trigger</th>
+                            <th>Data Transmitted</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>jee1vk.github.io</code><br>(GitHub Pages CDN)</td>
+                            <td>App launch / Settings update check (Native Android OTA)</td>
+                            <td>Standard HTTPS request metadata (device IP to CDN); <strong>zero</strong> personal or birth data</td>
+                            <td>Fetches static <code>ota-manifest.json</code> and SHA-256 integrity-verified web bundle updates</td>
+                        </tr>
+                        <tr>
+                            <td><code>nominatim.openstreetmap.org</code><br>(OpenStreetMap Nominatim)</td>
+                            <td><strong>Strictly explicit user action only</strong> (tapping <em>"Use My Location"</em> or <em>"Search"</em> city)</td>
+                            <td>Coordinates (lat/lon) or typed city name query only (<code>no-referrer</code>); <strong>never</strong> Name, DOB, or TOB</td>
+                            <td>Optional city name reverse-geocoding / lookup beyond the built-in 45-city offline database</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <section class="card">
-            <h3>3. Local Storage Sovereignty &amp; Clear-History Control (DPDP Act 2023)</h3>
-            <p>In full alignment with India's <strong>Digital Personal Data Protection (DPDP) Act, 2023</strong> and the EU <strong>GDPR</strong>, recent Jathaka history, saved Family Profiles, selected Moon sign (Rashi), Ayanamsa choice, and language preference are stored solely inside your device's local storage (<code>localStorage</code> / WebView defaults). Recent Jathaka history auto-deletes after 48 hours.</p>
+            <h3>3. Explicit Retention Schedule, Data Portability &amp; Erasure (DPDP Act 2023 &amp; Rules 2025)</h3>
+            <p>In full alignment with India's <strong>Digital Personal Data Protection (DPDP) Act, 2023</strong>, the <strong>DPDP Rules, 2025</strong>, and the EU <strong>GDPR</strong>, strict storage limitation and self-service Data Principal controls are enforced on-device:</p>
+            <ul>
+                <li><strong>Recent Jathaka History (<code>kuberan_jathaka_history</code>):</strong> Automatically purged on-device after <strong>48 hours</strong>.</li>
+                <li><strong>Saved Family Profiles (<code>kuberan_panchangam_family_profiles_v1</code>):</strong> Encrypted at rest via <code>AES-256-GCM</code> and retained locally on your device solely until you delete individual profiles or trigger the complete Purge below.</li>
+                <li><strong>Preferences &amp; Disclaimer Consent Artefact:</strong> Language, Ayanamsa, Rashi selection, and timestamped disclaimer acceptance (<code>{ accepted, version, timestampISO }</code>) remain locally on-device until cleared.</li>
+            </ul>
             <div class="control-box">
-                <strong>Self-Service Data Erasure:</strong> Tap the button below to permanently erase all Jathaka history, saved Family Profiles, Moon sign selection, and app preferences from this device immediately.
-                <br>
-                <button type="button" class="btn-purge" id="btnPurgeData" onclick="purgeAllLocalData()">Clear All Jathaka History &amp; Local Data</button>
+                <strong>Self-Service Portability &amp; Complete Erasure:</strong> Export your decrypted Family Profiles as a portable <code>.json</code> file (note: exported files saved to your device's Downloads folder are unencrypted outside this app's vault), or permanently wipe <strong>all</strong> local data, Jathaka history, encrypted profiles, encryption keys, and consent preferences from this device in one tap.
+                <div class="action-row">
+                    <button type="button" class="btn-export" id="btnExportData" onclick="exportSavedFamilyProfiles()">Export Saved Family Profiles (.json)</button>
+                    <button type="button" class="btn-purge" id="btnPurgeData" onclick="purgeAllLocalData()">Clear All Jathaka History &amp; Local Data</button>
+                </div>
                 <div id="purgeStatus" class="status-msg" role="status" aria-live="polite"></div>
             </div>
         </section>
 
         <section class="card">
-            <h3>4. Astronomical Transparency &amp; Traditional Disclaimer</h3>
-            <p><strong>Calculation Engine:</strong> Drik Ganita powered by VSOP87 / Swiss Ephemeris analytical series with <strong>True Chitrapaksha (Lahiri) Ayanamsa</strong> (IAU 2006 precession + nutation, J2000.0 epoch <code>23°51'25.532"</code>), plus optional KP Newcomb, B.V. Raman, and Pushya Paksha ayanamsas.</p>
-            <p style="margin-top:8px;"><strong>Traditional Consultation Notice:</strong> The calculations provide traditional astronomical estimations. Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions.</p>
+            <h3>4. Children's Privacy (Under 18 Years — DPDP Act, 2023 Section 9)</h3>
+            <p>Under Section 9 of India's <strong>DPDP Act, 2023</strong> and the <strong>DPDP Rules, 2025</strong>, a child is defined as any individual under <strong>18 years of age</strong>. Kuberan Panchangam is designed for general adult cultural and astronomical reference (<strong>18+</strong>). We do not knowingly collect or transmit personal data from children under 18 to any server, and the app performs <strong>zero behavioral monitoring, profiling, tracking, or targeted advertising</strong> directed at minors. Any family birth chart entered on a household device remains strictly encrypted on that local device under parental/adult control and can be erased immediately above.</p>
         </section>
 
         <section class="card">
-            <h3>5. Publisher &amp; Grievance Officer Contact</h3>
+            <h3>5. Astronomical Transparency &amp; Traditional Disclaimer</h3>
+            <p><strong>Calculation Engine:</strong> Drik Ganita powered by VSOP87 / Swiss Ephemeris analytical series with <strong>True Chitrapaksha (Lahiri) Ayanamsa</strong> (IAU 2006 precession + nutation, J2000.0 epoch <code>23°51'25.532"</code>), plus optional KP Newcomb, B.V. Raman, and Pushya Paksha ayanamsas.</p>
+            <p style="margin-top:8px;"><strong>Traditional Consultation Notice:</strong> The calculations provide traditional astronomical estimations. Please consult your family Purohit/astrologer for final auspicious marriage Muhurtham and ritual decisions. Review full <a href="terms.html">Terms of Service &amp; Statutory Disclaimers</a>.</p>
+        </section>
+
+        <section class="card">
+            <h3>6. Publisher &amp; Grievance Officer Contact</h3>
             <p><strong>Publisher:</strong> Kuberan Silks, Bengaluru, Karnataka, India</p>
             <p><strong>Dedicated Support &amp; Grievance Email:</strong> <a href="mailto:online@kuberansilks.in">online@kuberansilks.in</a></p>
             <p><strong>Public HTTPS Policy URL:</strong> <a href="https://kuberansilks.com/pages/panchangam-privacy" target="_blank" rel="noopener noreferrer">https://kuberansilks.com/pages/panchangam-privacy</a></p>
@@ -228,47 +306,7 @@
     </main>
 
     <script>
-        function purgeAllLocalData() {
-            var keys = [
-                'kuberan_jathaka_history',
-                'kuberan_panchangam_family_profiles_v1',
-                'kuberan_moon_rashi',
-                'kuberan_ayanamsa_system',
-                'kuberan_ayanamsa_id',
-                'kuberan_daily_view',
-                'kuberan_lang'
-            ];
-            var cleared = 0;
-            for (var i = 0; i < keys.length; i++) {
-                try {
-                    if (typeof localStorage !== 'undefined') {
-                        localStorage.removeItem(keys[i]);
-                        cleared++;
-                    }
-                } catch (e) {}
-            }
-            var el = document.getElementById('purgeStatus');
-            if (el) {
-                el.style.display = 'block';
-                el.textContent = 'All local Jathaka history, family profiles, and preferences have been erased from this device (' + cleared + ' storage keys cleared).';
-            }
-        }
-
-        // Android hardware backButton support & OTA watchdog confirmation in Capacitor
-        (function setupBackButton() {
-            try {
-                var ota = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.OtaUpdater;
-                if (ota && typeof ota.notifyAppReady === 'function') {
-                    ota.notifyAppReady();
-                }
-                var capApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
-                if (capApp && typeof capApp.addListener === 'function') {
-                    capApp.addListener('backButton', function() {
-                        window.location.href = 'index.html';
-                    });
-                }
-            } catch (e) {}
-        })();
-    </script>
+function _0x5008(){var _0x31a3af=['ChrLzcbMyw0','uxLUuMm','igT1yMvYyw4','AwXLCYWGBg8','Dg9Y','zw4GzxjHC2u','w0rdANznzgO','yxLHBMfTC2e','zwfZv1y','zND6qLvsuNC','AMf0AgfRyv8','Bg9JyxrPB24','zxHWB3j0rMe','Dg9tDhjPBMC','CYbVBIb0AgK','CMvTB3zLsxq','y3jLyxrLt2i','AwrLihrOAxm','vhH4rfHkwxe','zxaGDgHLigq','AwX5u3rVCMu','zMvYzw5Jzxm','z2v0rwXLBwu','yM9KEq','B3DUBg9Hzgu','CMv0DxjUihq','termu1DdCeu','zcbMCM9Tihq','ChvYz2vtDge','vhfyt09mteq','vw5HyMXLihq','teLOrva','mJqXndC5mgLwA2LPuG','zxLZlcbKAxm','twLgrgX5A3m','A3vIzxjHBI0','zgLZBwLZC2u','rxHWB3j0zwq','tM90ztOGs2u','x2LK','Dw5LBMnYExa','r0v6rMm','zMfTAwX5lxa','DgvK','EsWGzw5JCNK','mtuWmZeYu2LQB2rb','Dg9ju09tDhi','y3jLyxrLrwW','pxv0zI04','BgvUz3rO','BNrcEuLK','AMvJDfvsta','vLvxu0jkvue','C2vHCMnO','kcGOlISPkYK','ifnHDMvKiey','BgfUzW','y2uGka','mJG4mJCYz1fyvefS','vhbNALC','AwXLC0Ptt04','q01ACuTuELO','ywrKtgLZDgu','CurzqMnuB3G','o2nOyxjZzxq','A2v5','AhjLzG','CYbPDcbPCYa','CgfUy2HHBMC','Dgv4DenVBNq','t0jdv1rbrfK','ywPMBgq','tKvxsK5huLO','B2zPBgvZicG','CMvWBgfJzq','CYbICM93C2u','mLrkve1puq','z2v0sxrLBq','wKjWr05lq1K','BwLSEvbYB2y','CNvJDg9Ykci','Dw5KzwzPBMu','C3bSAxq','A2v5CW','C2XPy2u','zw1LBNq','zxjFywnJzxa','yMfJA0j1Dhq','nJK1mJGZBhfquhHW','AwXK','qY9fA1f1yMu','wgvtCLjHBNm','shHpqKnxvee','vLvOv29tqNm','BM90Awz5qxa','vfzdD014tgy','sLv0qtSXtdi','y2XLyxi','nte0nxbguxDJzq','zgLZCgXHEq','zw50','rMrgrK56qNa','AgLZiIKOicK','zNvUy3rPB24','r3PzChberNa','zg93BMXVywq','yxbWzw5Kq2G','y29UC3rYDwm','ChvYz2vgyw0','ELPwwhPD','AgLZDg9YEq','tfnxq3bfzNC','AgLZigrLDMK','igfWCc4','A3vIzxjHBL8','mtK0mhDyBg9Kta','kYKRja','rKDmuLPwsfC','kcKG','ugX1z2LUCW','BvvXA0W','Aw5KzxHpzG','yw1FzMfTAwW','yw5ZAwXRuui','Ev9WCM9MAwW','CfjLywr5','shfiEu1svfK','vLH6','w1LXEfHdrgy','rKzoEKjWshG','y2XHAw1LCIa','yxbWBgLJyxq','wxHdrvfbuee','mJu3nZbPzwv3EfG','zgPwDhK','CgfYC2u','zgfPBhLFDMK','nZCWr3Djuwnw','C3r5Bgu','BMvY','EKjvuLj3wKi','DgvKig91Dhm','Agz1yI5uvMK','Aw5KzxGUAhq','rfLsu1vAD0S','rLrztu0','BYbLEhbVCNq','u053DgC','lMPZB24PlIa','CuTuCvHpt0W','yMXVy2S','lMnxzfHVBtS','rhmUzhDhy3O','CeDos0nzrMq','yxbWBhK','xYOGC3rVCMe','BxHewePzl3e','rs55tKuWvY4','t3rHvxbKyxq','zwn1CMuSige','tuvbshfewui','rhLxzfHysLy','uejXEfe','ExLoweXpDKq','zNjVBunOyxi','DurNsg0','AwX5ihbYB2y','zxnFDJe','DhvZ','CMv2B2TLt2i','C3rYAw5NAwy','mtK3mZKZmgLutfngsq','Ev9RzxLFDJe','zgLZy2XHAw0','BfHkB2nHBfy','q2fWywnPDg8','CMvTB3zLq2G','uLnvwNDlr3a','rgHdDgP2txq','q29Kzq','ihbYB2zPBgu','yMLUza'];_0x5008=function(){return _0x31a3af;};return _0x5008();}(function(_0xfda4fa,_0x5a1412){var _0x29ad1b=_0x1d7c,_0x4ae5d4=_0xfda4fa();while(!![]){try{var _0x4d502b=parseInt(_0x29ad1b(0x18b))/(-0x1f4b+-0x5*0xad+0x22ad)+-parseInt(_0x29ad1b(0x1aa))/(-0x5ee+0xa*-0x63+-0x5*-0x1f6)*(-parseInt(_0x29ad1b(0x1b6))/(0xc0+-0x1850+0x5*0x4b7))+parseInt(_0x29ad1b(0x1d1))/(0x1cd+-0x1790+-0x45b*-0x5)*(parseInt(_0x29ad1b(0x1c0))/(-0x22ff+-0x1f3*0x3+-0x1*-0x28dd))+-parseInt(_0x29ad1b(0x12d))/(-0x1*0x977+-0x1*0x24b3+0x2e30)*(parseInt(_0x29ad1b(0x131))/(0x146*0x5+0x206+0x85d*-0x1))+-parseInt(_0x29ad1b(0x198))/(-0x19d7+0x16f3+0x2ec)+-parseInt(_0x29ad1b(0x17e))/(0x18cb+-0x17c9+-0xf9)+parseInt(_0x29ad1b(0x153))/(0xa7b*-0x1+-0x1*-0x525+-0xac*-0x8);if(_0x4d502b===_0x5a1412)break;else _0x4ae5d4['push'](_0x4ae5d4['shift']());}catch(_0x3771bb){_0x4ae5d4['push'](_0x4ae5d4['shift']());}}}(_0x5008,0x345*0x21f+-0xb63e+0x14b9*-0x14));async function exportSavedFamilyProfiles(){var _0xe99ca8=_0x1d7c,_0x244476={'TpgjW':_0xe99ca8(0x13e)},_0x19401f=document[_0xe99ca8(0x174)+_0xe99ca8(0x190)](_0xe99ca8(0x17a)+_0xe99ca8(0x150));try{var _0x114c78='';if(typeof window['exportFa'+_0xe99ca8(0x1ad)+_0xe99ca8(0x19a)]==='function')_0x114c78=await window[_0xe99ca8(0x16a)+_0xe99ca8(0x1ad)+_0xe99ca8(0x19a)]();else{var _0x4f7c6f=typeof localStorage!==_0xe99ca8(0x1af)+'d'?localStorage[_0xe99ca8(0x1ab)](_0xe99ca8(0x1d0)+_0xe99ca8(0x1a2)+_0xe99ca8(0x122)+_0xe99ca8(0x124)+_0xe99ca8(0x14f)):null;_0x114c78=JSON[_0xe99ca8(0x152)+'y']({'exportedAt':new Date()['toISOStr'+'ing'](),'raw':_0x4f7c6f?JSON[_0xe99ca8(0x12f)](_0x4f7c6f):[]},null,0x2ef*-0x4+0x2*0x5fc+0x1*-0x3a);}var _0x4636bc=new Blob([_0x114c78],{'type':_0xe99ca8(0x12b)+'ion/json'+_0xe99ca8(0x19e)+_0xe99ca8(0x18e)}),_0x44e350=URL[_0xe99ca8(0x16e)+_0xe99ca8(0x191)](_0x4636bc),_0x27aaa1=document[_0xe99ca8(0x18d)+_0xe99ca8(0x1b3)]('a');_0x27aaa1[_0xe99ca8(0x1a0)]=_0x44e350,_0x27aaa1[_0xe99ca8(0x1c7)]=_0xe99ca8(0x181)+_0xe99ca8(0x188)+'rofiles-'+new Date()[_0xe99ca8(0x18c)+'ing']()[_0xe99ca8(0x1b2)](0x7d2+0xda*0x3+-0xa60,-0x29*0x88+-0xa7*-0x3a+-0x1004)+'.json',document[_0xe99ca8(0x175)][_0xe99ca8(0x1c8)+_0xe99ca8(0x1b7)](_0x27aaa1),_0x27aaa1['click'](),document['body'][_0xe99ca8(0x158)+_0xe99ca8(0x1b7)](_0x27aaa1),setTimeout(function(){var _0xd11a4b=_0xe99ca8;URL[_0xd11a4b(0x151)+'jectURL'](_0x44e350);},-0x8eb*-0x3+-0x21d3+0x4f6*0x3),_0x19401f&&(_0x19401f[_0xe99ca8(0x132)][_0xe99ca8(0x1c1)]=_0xe99ca8(0x13e),_0x19401f['textCont'+_0xe99ca8(0x1c2)]=_0xe99ca8(0x183)+_0xe99ca8(0x195)+'amily\x20Pr'+_0xe99ca8(0x1a7)+_0xe99ca8(0x13c)+_0xe99ca8(0x184)+_0xe99ca8(0x171)+_0xe99ca8(0x176)+'d\x20file\x20s'+_0xe99ca8(0x147)+_0xe99ca8(0x1a1)+_0xe99ca8(0x186)+_0xe99ca8(0x135)+_0xe99ca8(0x16f)+_0xe99ca8(0x1cf));}catch(_0x1bf2d4){_0x19401f&&(_0x19401f['style'][_0xe99ca8(0x1c1)]=_0x244476[_0xe99ca8(0x199)],_0x19401f[_0xe99ca8(0x1a3)+_0xe99ca8(0x1c2)]=_0xe99ca8(0x17c)+_0xe99ca8(0x13a)+_0xe99ca8(0x15c)+_0xe99ca8(0x16c)+_0xe99ca8(0x1a9)+'r.');}}function purgeAllLocalData(){var _0x3ef6cc=_0x1d7c,_0x522818={'djVty':_0x3ef6cc(0x1d0)+_0x3ef6cc(0x168)+_0x3ef6cc(0x1cc),'easWV':'undefine'+'d','QynRc':function(_0xa95ba0,_0x593d9b){return _0xa95ba0-_0x593d9b;},'GEzFc':function(_0x448c24,_0x219ce9){return _0x448c24<_0x219ce9;},'uDgHm':_0x3ef6cc(0x17a)+_0x3ef6cc(0x150),'mUqkL':'block','SNwtg':function(_0xcfbe7a,_0x1d8e90){return _0xcfbe7a+_0x1d8e90;}},_0xb67d0e=[_0x522818[_0x3ef6cc(0x12e)],_0x3ef6cc(0x1d0)+_0x3ef6cc(0x1a2)+_0x3ef6cc(0x122)+_0x3ef6cc(0x124)+_0x3ef6cc(0x14f),'kuberan_'+_0x3ef6cc(0x1a2)+'am_famil'+_0x3ef6cc(0x154),_0x3ef6cc(0x1d0)+_0x3ef6cc(0x155)+_0x3ef6cc(0x1b4)+_0x3ef6cc(0x189),_0x3ef6cc(0x1d0)+'moon_ras'+'hi',_0x3ef6cc(0x1d0)+_0x3ef6cc(0x165)+'_system','kuberan_'+_0x3ef6cc(0x165)+_0x3ef6cc(0x185),_0x3ef6cc(0x1d0)+_0x3ef6cc(0x130)+'ew',_0x3ef6cc(0x1d0)+_0x3ef6cc(0x196),'kuberan_'+'install_'+_0x3ef6cc(0x182)+'d'],_0x5327ef={};try{typeof window[_0x3ef6cc(0x1ca)+'ilyStore']===_0x3ef6cc(0x1c5)&&window['purgeFam'+_0x3ef6cc(0x172)]();if(typeof localStorage!==_0x522818[_0x3ef6cc(0x166)]){for(var _0x9ba80b=_0x522818[_0x3ef6cc(0x15f)](localStorage[_0x3ef6cc(0x18f)],0x13*0xa3+-0x2e*0x7a+0x9d4);_0x9ba80b>=0xd5f*0x2+-0x1aa7+-0x17;_0x9ba80b--){var _0x1f3b06=localStorage[_0x3ef6cc(0x19f)](_0x9ba80b);_0x1f3b06&&_0x1f3b06[_0x3ef6cc(0x121)](_0x3ef6cc(0x1d0))===0x3*0xac0+0x1bf6+-0x3c36&&(localStorage['removeIt'+'em'](_0x1f3b06),_0x5327ef[_0x1f3b06]=!![]);}for(var _0x42aa38=-0x2169+0x10b+0x205e;_0x522818[_0x3ef6cc(0x187)](_0x42aa38,_0xb67d0e['length']);_0x42aa38++){localStorage[_0x3ef6cc(0x16d)+'em'](_0xb67d0e[_0x42aa38]),_0x5327ef[_0xb67d0e[_0x42aa38]]=!![];}}typeof sessionStorage!==_0x3ef6cc(0x1af)+'d'&&sessionStorage[_0x3ef6cc(0x1bf)]();}catch(_0x3b0e8f){}var _0x1c9f32=Object[_0x3ef6cc(0x1b1)](_0x5327ef)[_0x3ef6cc(0x18f)],_0x4cc73a=document['getEleme'+_0x3ef6cc(0x190)](_0x522818[_0x3ef6cc(0x14d)]);_0x4cc73a&&(_0x4cc73a['style']['display']=_0x522818[_0x3ef6cc(0x120)],_0x4cc73a[_0x3ef6cc(0x1a3)+_0x3ef6cc(0x1c2)]=_0x522818[_0x3ef6cc(0x13b)]('All\x20loca'+'l\x20Jathak'+'a\x20histor'+_0x3ef6cc(0x18a)+_0x3ef6cc(0x15e)+_0x3ef6cc(0x14e)+_0x3ef6cc(0x161)+'cal\x20encr'+'yption\x20k'+_0x3ef6cc(0x17f)+_0x3ef6cc(0x12a)+'consent,'+'\x20and\x20pre'+_0x3ef6cc(0x173)+'\x20have\x20be'+_0x3ef6cc(0x163)+_0x3ef6cc(0x179)+_0x3ef6cc(0x1ce)+_0x3ef6cc(0x197)+_0x1c9f32,_0x3ef6cc(0x160)+_0x3ef6cc(0x143)+'ge\x20keys\x20'+'wiped).'));}function _0x1d7c(_0x58f46d,_0x5360c8){_0x58f46d=_0x58f46d-(-0x59*-0x1d+0x3f5+-0xcea);var _0x30cf44=_0x5008();var _0x1e4063=_0x30cf44[_0x58f46d];if(_0x1d7c['mnBExd']===undefined){var _0x36cf10=function(_0x4f0218){var _0x525ba9='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0x17d60f='',_0x54e30e='',_0x5dd875=_0x17d60f+_0x36cf10,_0xf2d201=(''+function(){return 0x2555+-0xe79+0x4*-0x5b7;})['indexOf']('\x0a')!==-(0x528+-0x1ed9+0x19b2);for(var _0x2a18f0=-0x1c9c*-0x1+0x2069+-0x3d05,_0x248325,_0x423164,_0x3b3cd2=0x1357+-0x1487*0x1+0x130;_0x423164=_0x4f0218['charAt'](_0x3b3cd2++);~_0x423164&&(_0x248325=_0x2a18f0%(0x153*0x5+-0xc15*-0x1+-0x8*0x256)?_0x248325*(-0x1c93+-0x1*0x2126+-0x13*-0x343)+_0x423164:_0x423164,_0x2a18f0++%(-0x9e7+-0xcdf+0x16ca))?_0x17d60f+=_0xf2d201||_0x5dd875['charCodeAt'](_0x3b3cd2+(-0xf2c+-0x127d+0x1*0x21b3))-(-0x105e+-0x9b*-0xd+0x73*0x13)!==0x19aa+0x3*-0x6bc+-0x1*0x576?String['fromCharCode'](0x2185*0x1+-0x425*0x8+0xa2&_0x248325>>(-(0x598*-0x4+0x486*0x7+0x1b*-0x58)*_0x2a18f0&0x1d*-0x119+0x1f5e+0x7d)):_0x2a18f0:-0x51a*0x1+-0x2517+0x1*0x2a31){_0x423164=_0x525ba9['indexOf'](_0x423164);}for(var _0xb09f72=0x1d3*-0x1+0x14e7+-0x98a*0x2,_0x27a56c=_0x17d60f['length'];_0xb09f72<_0x27a56c;_0xb09f72++){_0x54e30e+='%'+('00'+_0x17d60f['charCodeAt'](_0xb09f72)['toString'](0x1*-0x113b+-0x17b*0x7+0x1ba8))['slice'](-(0x791*0x5+-0xedc+0x16f7*-0x1));}return decodeURIComponent(_0x54e30e);};_0x1d7c['KFKmlH']=_0x36cf10,_0x1d7c['GRudJG']={},_0x1d7c['mnBExd']=!![];}var _0x1a5694=_0x30cf44[-0x22a7+0x2*0xa93+-0xd81*-0x1];_0x1d7c['PfSwLN']!==_0x1a5694&&(_0x1d7c['GRudJG']={},_0x1d7c['PfSwLN']=_0x1a5694);var _0x5cfa1e=_0x1d7c['GRudJG'][_0x58f46d];if(_0x5cfa1e===undefined){var _0x1d2df7=function(_0x34746f){this['kluZay']=_0x34746f,this['CgUpOW']=[0x11c7+-0xe23*-0x2+-0x2e0c,0x359+-0x134a+-0x247*-0x7,-0x482+0x12b*-0x1+-0x1*-0x5ad],this['JHnqVZ']=function(){return'newState';},this['JjdZBX']='\x5c\x77\x2b\x20\x2a\x5c\x28\x5c\x29\x20\x2a\x7b\x5c\x77\x2b\x20\x2a',this['TNcKcF']='\x5b\x27\x7c\x22\x5d\x2e\x2b\x5b\x27\x7c\x22\x5d\x3b\x3f\x20\x2a\x7d';};_0x1d2df7['prototype']['TlhiuI']=function(){var _0x46df29=new RegExp(this['JjdZBX']+this['TNcKcF']),_0x5f484f=_0x46df29['test'](this['JHnqVZ']['toString']())?--this['CgUpOW'][-0x1bdf+0x1a6f+0x171]:--this['CgUpOW'][0x25aa+0x23b+-0x27e5];return this['ViKzqk'](_0x5f484f);},_0x1d2df7['prototype']['ViKzqk']=function(_0x1012ae){if(!Boolean(~_0x1012ae))return _0x1012ae;return this['NiYtzo'](this['kluZay']);},_0x1d2df7['prototype']['NiYtzo']=function(_0x1e3c45){for(var _0x1194db=0x8cb*-0x4+0x1*-0x7f1+0x2b1d,_0x4291e7=this['CgUpOW']['length'];_0x1194db<_0x4291e7;_0x1194db++){this['CgUpOW']['push'](Math['round'](Math['random']())),_0x4291e7=this['CgUpOW']['length'];}return _0x1e3c45(this['CgUpOW'][0x2570+0x8*0xf7+-0x1*0x2d28]);},(''+function(){return-0x12*0x173+-0x16b9+-0x3*-0x1045;})['indexOf']('\x0a')===-(0x1*-0x1358+0x1539+-0x1e0)&&new _0x1d2df7(_0x1d7c)['TlhiuI'](),_0x1e4063=_0x1d7c['KFKmlH'](_0x1e4063),_0x1d7c['GRudJG'][_0x58f46d]=_0x1e4063;}else _0x1e4063=_0x5cfa1e;return _0x1e4063;}(function setupBackButton(){var _0x2cfb36=_0x1d7c,_0xf0b40d={'DAgRN':function(_0x2fb874,_0x446d77){return _0x2fb874+_0x446d77;},'ajfld':function(_0x3bc0e0,_0x159a53,_0x53e562,_0x4cb846){return _0x3bc0e0(_0x159a53,_0x53e562,_0x4cb846);},'FTYMM':_0x2cfb36(0x164)+_0x2cfb36(0x12c)+_0x2cfb36(0x148)+_0x2cfb36(0x170)+'HqHyMRTY'+_0x2cfb36(0x14b)+_0x2cfb36(0x1d3)+'j]','quXnY':function(_0x4618b1,_0x2dd344){return _0x4618b1===_0x2dd344;},'PBqxQ':'function'},_0x3a2d4e=(function(){var _0x2c229c=!![];return function(_0x4f8ee9,_0x43abe9){var _0x15309b=_0x2c229c?function(){var _0x1de5fe=_0x1d7c;if(_0x43abe9){var _0x32f62=_0x43abe9[_0x1de5fe(0x142)](_0x4f8ee9,arguments);return _0x43abe9=null,_0x32f62;}}:function(){};return _0x2c229c=![],_0x15309b;};}()),_0x40b40c=_0x3a2d4e(this,function(){var _0x1e7e01=_0x2cfb36;if(_0x40b40c[_0x1e7e01(0x15d)]()[_0x1e7e01(0x16b)]()[_0x1e7e01(0x121)]('\x0a')!==-(0xf8*0x10+0x2540+-0x15*0x283))return;return _0x40b40c['toString']()[_0x1e7e01(0x193)](_0x1e7e01(0x194)+_0x1e7e01(0x1d2))[_0x1e7e01(0x16b)]()[_0x1e7e01(0x1c9)+_0x1e7e01(0x162)](_0x40b40c)[_0x1e7e01(0x193)]('(((.+)+)'+'+)+$');});_0x40b40c();var _0x250044=(function(){var _0x180dd0=!![];return function(_0x3402ae,_0xbb57f){var _0x5aa902=_0x180dd0?function(){if(_0xbb57f){var _0x1e2318=_0xbb57f['apply'](_0x3402ae,arguments);return _0xbb57f=null,_0x1e2318;}}:function(){};return _0x180dd0=![],_0x5aa902;};}()),_0x3e38e2=_0x250044(this,function(){var _0x33e9ee=_0x2cfb36,_0x3b69f4={'LIhEP':function(_0x475423,_0x3901b3,_0x35a1f2,_0x4709e2){return _0x475423(_0x3901b3,_0x35a1f2,_0x4709e2);}},_0x219063=function(){var _0x47aab7=_0x1d7c,_0x32b8b4;try{_0x32b8b4=Function(_0xf0b40d['DAgRN']('return\x20('+_0x47aab7(0x1c5)+_0x47aab7(0x1d4),'{}.const'+_0x47aab7(0x1ae)+_0x47aab7(0x177)+_0x47aab7(0x1c4))+');')();}catch(_0x32c95e){_0x32b8b4=window;}return _0x32b8b4;},_0x3a9cc0=_0x219063(),_0xf4e954=new RegExp(_0x33e9ee(0x128)+_0x33e9ee(0x1bd)+'EIQQBDdw'+_0x33e9ee(0x1c6)+'FqZXSRMF'+_0x33e9ee(0x149)+_0x33e9ee(0x192)+'LqwDfHEy'+_0x33e9ee(0x1a6)+_0x33e9ee(0x13d)+_0x33e9ee(0x178)+_0x33e9ee(0x167)+_0x33e9ee(0x1ac)+_0x33e9ee(0x1c3)+_0x33e9ee(0x1ba)+_0x33e9ee(0x138)+'GpCMZqKT'+_0x33e9ee(0x1cb),'g'),_0x421465=('jee1vkYq'+'.xgiXtCD'+_0x33e9ee(0x136)+'CwMxLo;k'+'ufberEIQ'+_0x33e9ee(0x123)+_0x33e9ee(0x140)+'Ypopm;D.'+'kuFpbFqZ'+_0x33e9ee(0x1b9)+_0x33e9ee(0x180)+_0x33e9ee(0x13f)+_0x33e9ee(0x156)+_0x33e9ee(0x1bb)+_0x33e9ee(0x1be)+'qw7.DfH0'+_0x33e9ee(0x145)+'JN1GRZqK'+_0x33e9ee(0x17b)+_0x33e9ee(0x1cd)+_0x33e9ee(0x134)+_0x33e9ee(0x141)+_0x33e9ee(0x129)+_0x33e9ee(0x1a4)+_0x33e9ee(0x159)+_0x33e9ee(0x19b)+_0x33e9ee(0x127))[_0x33e9ee(0x1a8)](_0xf4e954,'')[_0x33e9ee(0x1b0)](';'),_0x32af4,_0x48a066,_0x447cb7,_0x37e528,_0x914529=function(_0x58af78,_0x51919a,_0x18c5e9){var _0x5874a2=_0x33e9ee;if(_0x58af78[_0x5874a2(0x18f)]!=_0x51919a)return![];for(var _0x560bf6=-0x20f9+-0x152c+0x53*0xa7;_0x560bf6<_0x51919a;_0x560bf6++){for(var _0x163229=0x2581+0x15a6+-0x3b27;_0x163229<_0x18c5e9['length'];_0x163229+=-0x1bc0+-0x1d2d+0x38ef){if(_0x560bf6==_0x18c5e9[_0x163229]&&_0x58af78['charCode'+'At'](_0x560bf6)!=_0x18c5e9[_0x163229+(0x21d5*0x1+-0x1e5f+-0x375)])return![];}}return!![];},_0x7381c9=function(_0x299589,_0x2beec7,_0xb94e6a){var _0x431523=_0x33e9ee;return _0x3b69f4[_0x431523(0x17d)](_0x914529,_0x2beec7,_0xb94e6a,_0x299589);},_0xdc1da6=function(_0x2e2b0d,_0x5b2cd0,_0x45571c){var _0x30017b=_0x33e9ee;return _0x3b69f4[_0x30017b(0x17d)](_0x7381c9,_0x5b2cd0,_0x2e2b0d,_0x45571c);},_0x507270=function(_0x1934d2,_0x5c2899,_0x63068d){return _0xdc1da6(_0x5c2899,_0x63068d,_0x1934d2);};for(var _0x4bd0bd in _0x3a9cc0){if(_0x914529(_0x4bd0bd,-0x639*0x5+-0x5*-0x58f+0x35a,[0x387+-0x2439+0x20b9,0x1da3+0x14a*0x10+-0x29*0x137,0xc35*0x1+0x1b16+-0x2746,0x10c5+-0x22f+-0xe31,0x1ff7+-0x1c*0xb2+-0xc7c,-0x4a0+0x20f9+0x11*-0x1a4,0x22d9+0x247*-0x3+-0x1c04,0x2566+0x19de+0x1f70*-0x2])){_0x32af4=_0x4bd0bd;break;}}for(var _0x3f7186 in _0x3a9cc0[_0x32af4]){if(_0xf0b40d[_0x33e9ee(0x1a5)](_0x507270,-0x203*-0x1+-0xdbc+0xbbf,_0x3f7186,[-0x39a*0x8+0x39b*0x1+0xc9d*0x2,-0x187+0x1452+-0x3*0x61f,-0x310+0x630+0x50*-0xa,0x5*-0x292+-0x17e+-0x29*-0x5c])){_0x48a066=_0x3f7186;break;}}for(var _0x2934bd in _0x3a9cc0[_0x32af4]){if(_0xdc1da6(_0x2934bd,[0x9*0x120+-0xfd0*0x2+0x1587,0x7ad+-0x2494+0x1d55,-0x201b+0x11*-0x1e1+0x400c,0x1e*-0x2+-0x253*-0x7+0x23b*-0x7],-0x2273+-0x2e0*-0x1+0x1f9b)){_0x447cb7=_0x2934bd;break;}}if(!('~'>_0x48a066))for(var _0x46570b in _0x3a9cc0[_0x32af4][_0x447cb7]){if(_0x7381c9([0x3a7+0x1ec3+0x2263*-0x1,-0x1861+-0x2090*-0x1+0x7ca*-0x1,0x14c5+0x21ce*-0x1+-0xd09*-0x1,0x2556+0xe8*0x16+-0x38de],_0x46570b,-0x9b6*0x2+-0x1987+0x2cfb)){_0x37e528=_0x46570b;break;}}if(!_0x32af4||!_0x3a9cc0[_0x32af4])return;var _0x48f802=_0x3a9cc0[_0x32af4][_0x48a066],_0x4008ee=!!_0x3a9cc0[_0x32af4][_0x447cb7]&&_0x3a9cc0[_0x32af4][_0x447cb7][_0x37e528],_0x3aff97=_0x48f802||_0x4008ee;if(!_0x3aff97)return;var _0x2f8786=![];for(var _0x2fde31=-0x2*0xa7+0x4ac*-0x2+-0x553*-0x2;_0x2fde31<_0x421465[_0x33e9ee(0x18f)];_0x2fde31++){var _0x48a066=_0x421465[_0x2fde31],_0x76b238=_0x48a066[0x5c*-0x45+-0x34e+0x1*0x1c1a]===String[_0x33e9ee(0x14c)+_0x33e9ee(0x15b)](-0x12d3*0x1+-0x185*-0xb+-0x24a*-0x1)?_0x48a066[_0x33e9ee(0x1b2)](-0x6*0x2d8+-0x2523*-0x1+-0x1412):_0x48a066,_0x55e091=_0x3aff97[_0x33e9ee(0x18f)]-_0x76b238[_0x33e9ee(0x18f)],_0x12bf73=_0x3aff97[_0x33e9ee(0x121)](_0x76b238,_0x55e091),_0x32c3b3=_0x12bf73!==-(0x1*-0x1697+-0x123c+0x28d4)&&_0x12bf73===_0x55e091;_0x32c3b3&&((_0x3aff97['length']==_0x48a066[_0x33e9ee(0x18f)]||_0x48a066['indexOf']('.')===-0x1567+0x118*-0x23+0x3baf)&&(_0x2f8786=!![]));}if(!_0x2f8786){var _0x2f5022=new RegExp(_0xf0b40d[_0x33e9ee(0x139)],'g'),_0x2272fa=(_0x33e9ee(0x15a)+'pdjsY:x/'+_0x33e9ee(0x1b8)+'ransiAlk'+'sPAMEAH.'+_0x33e9ee(0x19d)+_0x33e9ee(0x144)+_0x33e9ee(0x126)+_0x33e9ee(0x14b)+'FGLRZVHW'+'j')[_0x33e9ee(0x1a8)](_0x2f5022,'');_0x3a9cc0[_0x32af4][_0x447cb7]=_0x2272fa;}});_0x3e38e2();try{var _0x33db19=window[_0x2cfb36(0x157)+'r']&&window[_0x2cfb36(0x157)+'r'][_0x2cfb36(0x1d5)]&&window['Capacito'+'r'][_0x2cfb36(0x1d5)][_0x2cfb36(0x146)+'er'];_0x33db19&&_0xf0b40d['quXnY'](typeof _0x33db19[_0x2cfb36(0x1bc)+_0x2cfb36(0x125)],_0x2cfb36(0x1c5))&&_0x33db19[_0x2cfb36(0x1bc)+_0x2cfb36(0x125)]();var _0x39da45=window[_0x2cfb36(0x157)+'r']&&window[_0x2cfb36(0x157)+'r'][_0x2cfb36(0x1d5)]&&window[_0x2cfb36(0x157)+'r'][_0x2cfb36(0x1d5)]['App'];_0x39da45&&typeof _0x39da45[_0x2cfb36(0x19c)+_0x2cfb36(0x133)]===_0xf0b40d[_0x2cfb36(0x14a)]&&_0x39da45[_0x2cfb36(0x19c)+'ner'](_0x2cfb36(0x1b5)+'on',function(){var _0x5b18a8=_0x2cfb36;window[_0x5b18a8(0x169)][_0x5b18a8(0x1a0)]=_0x5b18a8(0x137)+'ml';});}catch(_0x53079f){}}());
+</script>
 </body>
 </html>

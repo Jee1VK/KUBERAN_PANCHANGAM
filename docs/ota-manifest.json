@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "appId": "com.kuberansilks.panchangam",
-  "version": "2.0.0-v74",
-  "bundleHash": "9ba492f4a8d37a13e2d253d2d69c2ddd7dad6c84c17dfba1baf855c3fb531b21",
+  "version": "2.0.0-v75",
+  "bundleHash": "d150f625c42355399439a14ba751c62969c05983e7d2e000f4d7d384196afd09",
   "minNativeVersionCode": 1,
   "baseUrl": "https://jee1vk.github.io/KUBERAN_PANCHANGAM/",
-  "builtAt": "2026-11-25T07:27:00.870Z",
+  "builtAt": "2026-11-27T08:29:08.971Z",
   "files": {
     "404.html": {
-      "sha256": "6c5ffebc51a1a4cf7e6884a9cf3aca8d122d591cad2907bc4e12a95beea10b2e",
-      "size": 2237
+      "sha256": "f8be15092d62d990282a14ba5847fb5bb7d2f0c77a737e6986a8e2e5af770067",
+      "size": 2286
     },
     "assets/css/style.css": {
       "sha256": "308ddabd4e7b494e5f7980b8e3e5769b651ce705f734eef574c1e28b1eaf720c",
@@ -24,60 +24,64 @@
       "size": 169333
     },
     "index.html": {
-      "sha256": "0da50563506ff2a6747c9ab3db27bc0def8f60f7c102f7553898a9d3a8584bb8",
-      "size": 851772
+      "sha256": "ae81232b760b000f92ab7ff26ab0e4a71b4e999b8cbf93d5d1abb408624aa19a",
+      "size": 852071
     },
     "js/app.js": {
-      "sha256": "6af967453fd416f4d7e157adada6abe40652f3f30a028a262f92aec5e32cfe11",
-      "size": 6425
+      "sha256": "8d7c9ae78e380c46bf7c99718c759166d3a7bc50ca3c2c7b05b4606a9c508cee",
+      "size": 6283
     },
     "js/ashtakoota.js": {
-      "sha256": "9e74ac9eef6d164eec4bf6cbbd608fb232085a9705efdc553f69a8e0c27687a8",
-      "size": 23186
+      "sha256": "852d4b392b4bb714160e74641e4d376f17b51c26a5a80ca05abbc25c7c6e5981",
+      "size": 23880
     },
     "js/astronomy.js": {
       "sha256": "f41139a87941ea017ab902b954c9389fa27ea72083d7fab4971756d7769d14e6",
       "size": 116424
     },
     "js/ayanamsa.js": {
-      "sha256": "3493fc180e48b9fa298eecaaac40c5eb711314da779ca6c2d16cab27c1c0783a",
-      "size": 14452
+      "sha256": "af0066810a95bc153dcdd8faf657bf045b1267dce576613cb5ad19946a63c1d9",
+      "size": 13701
     },
     "js/cities.js": {
-      "sha256": "a9cf39ac388486729a6b7ebc0a4d1819a22068c22598b1da025574faf72ce012",
-      "size": 17328
+      "sha256": "c6236ec6fdd421f212b7de8f996c2ea8227c4eab50ed1a39266fbe727fc41175",
+      "size": 17192
     },
     "js/ephemeris.js": {
-      "sha256": "c5086aa517f4d57e36deeb08aed9a55869dc46e0b589d10cd2afefdcf740a615",
-      "size": 28174
+      "sha256": "2365e342b1a01380feb05adab12879915897302600b1d8f56c29df22a7887237",
+      "size": 27001
     },
     "js/exportUtils.js": {
-      "sha256": "f0fb0485d6adbba277f05e8ab501887deaee808b491460bff02b371dd775fb49",
-      "size": 10395
+      "sha256": "715bb7c9cadfac4b8c354138446dfb5bcb7bf23c9e7bb9a23ec1716feb8cd5c2",
+      "size": 10174
     },
     "js/familyStore.js": {
-      "sha256": "865faebaa717795ad31d431c7f6bfabdf54e602f7ef4ab9aac9bba68ec6ff066",
-      "size": 9831
+      "sha256": "aa35de6d70b84c28fa8b849f4df8aee7d0669a4305f9e9efc2aef20b08e927cd",
+      "size": 22489
     },
     "js/muhurthaEngine.js": {
-      "sha256": "20c270fb1fed342923401dba662e15a18b2b058b2b520b458fed2d4c13284e4f",
-      "size": 20075
+      "sha256": "125928c4424c502b5075230d687e0ca6f3ebf61dd712830e0f3b79eecbf13226",
+      "size": 19491
     },
     "js/otaClient.js": {
-      "sha256": "5efb90597deb1206ce029cf390d6d0d1ea716ab37c19b5592beab9c3f389d398",
-      "size": 25933
+      "sha256": "c04911b35e081c9d2a7140f68737446a2c49ca4d4083531d70d2d11fa1d2faa0",
+      "size": 26175
     },
     "manifest.json": {
       "sha256": "4c962fdf6cf4bbb34b92de02cf759d2beddea7031b01b9320a386c8aecc0f122",
       "size": 757
     },
     "privacy.html": {
-      "sha256": "b75e47fcd5704acd2151e64326bc187845e16fed19bc733da11b602db5a5ea38",
-      "size": 12250
+      "sha256": "e81ab5be456510c07cd53e0f513912a30e187e0c264a61290b5daf45452d152c",
+      "size": 33128
     },
     "sw.js": {
-      "sha256": "c4838cafb291a2a4fe9b72065c12478665382b1919461e2f33d81819e98172db",
-      "size": 2140
+      "sha256": "c98481b6a88367780dca86c034460add26731994155d28e1c6677191598c6e15",
+      "size": 2158
+    },
+    "terms.html": {
+      "sha256": "7dfb1af4acb3f30f3bc57bf689091dc068c837b42668e3ff501f58f4fb3e9df7",
+      "size": 20964
     }
   }
 }
